@@ -7,7 +7,7 @@ import { mkdir, writeFile } from "fs/promises";
 import { join, dirname } from "path";
 
 // Output directory relative to the api package
-const OUTPUT_DIR = join(dirname(import.meta.dir), "output");
+const OUTPUT_DIR = process.env.OUTPUT_DIR || join(dirname(import.meta.dir), "output");
 
 /**
  * Generates a unique filename based on timestamp and optional source
