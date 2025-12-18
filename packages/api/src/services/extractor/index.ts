@@ -1,8 +1,3 @@
-/**
- * Content Extractor Service
- * Uses OpenAI to extract key information from text and format as Markdown
- */
-
 import OpenAI from "openai";
 
 let openaiClient: OpenAI | null = null;
@@ -11,32 +6,24 @@ function getOpenAIClient(): OpenAI {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY environment variable is not set");
   }
+
   if (!openaiClient) {
     openaiClient = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
   }
+
   return openaiClient;
 }
 
-const SYSTEM_PROMPT = `You are an expert content analyst. Your task is to extract the most important information from the provided content and present it in a clear, well-structured Markdown format.
+const SYSTEM_PROMPT = `Your task is to extract the most important information from the provided content and present it in a clear, well-structured Markdown format.
 
 Guidelines:
-- Identify the main topic and key points
-- Extract important facts, data, and insights
-- Organize information hierarchically with headers
-- Use bullet points for lists of related items
-- Include any notable quotes or statistics
-- Preserve important names, dates, and numbers
-- Remove redundant or irrelevant information
-- Keep the summary comprehensive but concise
+- The task is to keep the content at the original level of detail. There should be no changes to the content, because your main job is to present it in a Markdown format. If the content is already in Markdown format, you should return it as is. Content can be present as a form of html, text xml, etc. It may also include other information that is not relevant to the main content, you should ignore it
+- Don't make the markdown format more complex than it already is in provided content.
+- You may add your own comments or explanations to the content, if you see that the content is related to some image or other media and it won't be clear what it is without your explanation.
 
-Output format:
-- Start with a brief summary (1-2 sentences)
-- Use ## for main sections
-- Use ### for subsections if needed
-- Use bullet points and numbered lists appropriately
-- Bold **important terms** and *italicize* emphasis where appropriate`;
+The content is present below:`;
 
 /**
  * Extracts key information from text content using OpenAI
@@ -44,27 +31,15 @@ Output format:
 export async function extractContent(content: string): Promise<string> {
   const openai = getOpenAIClient();
 
-  // Truncate content if too long (GPT-4 has ~128k token limit, but we'll be conservative)
-  const maxLength = 100000;
-  const truncatedContent = content.length > maxLength ? content.slice(0, maxLength) + "\n\n[Content truncated...]" : content;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: SYSTEM_PROMPT,
-      },
-      {
-        role: "user",
-        content: `Please extract and summarize the key information from the following content:\n\n${truncatedContent}`,
-      },
-    ],
+  const completion = await openai.completions.create({
+    model: "gpt-oss-120b",
+    prompt: SYSTEM_PROMPT + "\n\n" + content,
     temperature: 0.3,
     max_tokens: 4096,
+    stream: false,
   });
 
-  const result = completion.choices[0]?.message?.content;
+  const result = completion.choices[0].text;
 
   if (!result) {
     throw new Error("Failed to get response from OpenAI");
@@ -72,4 +47,3 @@ export async function extractContent(content: string): Promise<string> {
 
   return result;
 }
-
