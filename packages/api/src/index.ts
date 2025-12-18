@@ -66,54 +66,6 @@ const app = new Elysia()
       },
     }
   )
-  .post(
-    "/process/text",
-    async ({ body, set }) => {
-      try {
-        console.log(`📄 Processing text input: ${body.content.length} characters`);
-
-        // Extract key information using LLM
-        console.log("🤖 Sending to OpenAI for extraction...");
-        const markdown = await extractContent(body.content);
-        console.log(`✅ Received ${markdown.length} characters from OpenAI`);
-
-        // Save to file
-        const { filename, savedAt } = await saveMarkdown(markdown);
-        console.log(`💾 Saved to: ${filename}`);
-
-        return {
-          success: true,
-          markdown,
-          filename,
-          savedAt,
-        };
-      } catch (error) {
-        console.error("❌ Extraction error:", error);
-        set.status = 500;
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : "Unknown error occurred",
-        };
-      }
-    },
-    {
-      body: t.Object({
-        content: t.String({ minLength: 1 }),
-      }),
-      response: {
-        200: t.Object({
-          success: t.Literal(true),
-          markdown: t.String(),
-          filename: t.String(),
-          savedAt: t.String(),
-        }),
-        500: t.Object({
-          success: t.Literal(false),
-          error: t.String(),
-        }),
-      },
-    }
-  )
   .listen(process.env.PORT || 8080);
 
 console.log(`🦊 Content Extractor API running at ${app.server?.hostname}:${app.server?.port}`);
