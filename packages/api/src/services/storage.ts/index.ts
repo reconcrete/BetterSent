@@ -37,7 +37,8 @@ export async function saveEpub(
 ): Promise<{ filename: string; path: string; savedAt: string }> {
   const { path } = await saveMarkdown(content, source);
   await $`pandoc ${path} -o ${path.replace(".md", ".epub")} --to epub3`;
-  
+  await $`rm ${path}`;
+
   return {
     filename: path.replace(".md", ".epub"),
     path: path.replace(".md", ".epub"),
