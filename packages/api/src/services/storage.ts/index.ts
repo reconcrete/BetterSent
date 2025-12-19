@@ -5,6 +5,7 @@
 
 import { mkdir, writeFile } from "fs/promises";
 import { join, dirname } from "path";
+import { $ } from "bun";
 
 // Output directory relative to the api package
 const OUTPUT_DIR = process.env.OUTPUT_DIR || join(dirname(import.meta.dir), "output");
@@ -30,6 +31,20 @@ async function ensureOutputDir(): Promise<void> {
   await mkdir(OUTPUT_DIR, { recursive: true });
 }
 
+export async function saveEpub(
+  content: string,
+  source?: string
+): Promise<{ filename: string; path: string; savedAt: string }> {
+  const { path } = await saveMarkdown(content, source);
+  await $`pandoc ${path} -o ${path.replace(".md", ".epub")} --to epub3`;
+  
+  return {
+    filename: path.replace(".md", ".epub"),
+    path: path.replace(".md", ".epub"),
+    savedAt: new Date().toISOString(),
+  };
+}
+
 /**
  * Saves markdown content to a file
  * Returns the filename and full path
@@ -46,8 +61,9 @@ export async function saveMarkdown(
 
   // Add metadata header to the markdown
   const header = `---
-source: ${source || "text input"}
-extracted: ${savedAt}
+title: "My Document Title"
+author: "Author Name"
+language: "en-US"
 ---
 
 `;
@@ -67,4 +83,3 @@ extracted: ${savedAt}
 export function getOutputDir(): string {
   return OUTPUT_DIR;
 }
-
