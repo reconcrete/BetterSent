@@ -32,27 +32,39 @@ export function ContentExtractor() {
       let response: any;
 
       if (type === "url") {
-        const response = await api.extract.url.post({
+        response = await api.extract.url.post({
           url: content.trim(),
         });
       } else {
-        const response = await api.extract.text.post({
+        response = await api.extract.text.post({
           textContent: content.trim(),
         });
       }
 
-      if (response.data) {
-        const data = response.data as ProcessResponse | ErrorResponse;
-        if (data.success === true) {
-          // Ensure savedAt is a string (Eden might deserialize it as Date)
-          const result: ProcessResponse = {
-            ...data,
-            savedAt: typeof data.savedAt === "string" ? data.savedAt : new Date(data.savedAt).toISOString(),
-          };
-          setResult(result);
+      if (response.success === true && response.data) {
+        const data = response.data;
+        // Ensure savedAt is a string (Eden might deserialize it as Date)
+        let savedAt: string;
+        if (typeof data.savedAt === "string") {
+          savedAt = data.savedAt;
+        } else if (data.savedAt instanceof Date) {
+          savedAt = data.savedAt.toISOString();
+        } else if (data.savedAt) {
+          const date = new Date(data.savedAt);
+          savedAt = isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
         } else {
-          setError(data.error);
+          savedAt = new Date().toISOString();
         }
+
+        const result: ProcessResponse = {
+          success: true,
+          markdown: data.markdown,
+          filename: data.filename,
+          savedAt,
+        };
+        setResult(result);
+      } else if (response.success === false) {
+        setError(response.error || "An error occurred");
       } else if (response.error) {
         // Handle Eden Treaty error structure
         const errorObj = response.error;
