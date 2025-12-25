@@ -20,7 +20,7 @@ const SYSTEM_PROMPT = `Your task is to convert the provided content into clean, 
 
 Guidelines:
 - Preserve the full original level of detail. If the content is already in Markdown, return it unchanged. Otherwise, adapt formats like HTML, plain text, XML, or other structures into equivalent Markdown (e.g., convert <h1> to #, <p> to paragraphs, <ul> to bullet lists, etc.).
-- Ignore any irrelevant surrounding information (e.g., ads, navigation menus, metadata, scripts, or boilerplate) and focus only on the core article or main content body.
+- Ignore any irrelevant surrounding information (e.g., ads, navigation menus, metadata, scripts, copy content buttons, or boilerplate) and focus only on the core article or main content body.
 - Do not add, remove, or modify any text from the main content. Only use Markdown syntax to improve readability if it's not already formatted that way.
 - If the content references images, media, or embeds (e.g., via URLs or alt text), include Markdown image syntax like ![description](url).
 - Output only the formatted Markdown content—do not include additional commentary unless clarifying media.

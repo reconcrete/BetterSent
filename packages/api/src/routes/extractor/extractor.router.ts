@@ -1,10 +1,12 @@
 import Elysia from "elysia";
+import { logger } from "@bogeychan/elysia-logger";
 
 import { extractTextInputSchema, extractUrlInputSchema, extractOutputSchema } from "./extractor.schema";
 
 import { extractText, extractUrl } from "./extractor.service";
 
 export const extractorRouter = new Elysia({ prefix: "/extract" })
+  .use(logger())
   .post(
     "/text",
     async ({ body, set }) => {
