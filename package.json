@@ -1,5 +1,8 @@
 {
-  "name": "wrap",
+  "name": "kindle-wrap",
   "private": true,
-  "workspaces": ["packages/*"]
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "bun run --filter @kindle-wrap/* dev"
+  }
 }
