@@ -15,6 +15,9 @@ const reactScan: () => PluginOption = () => ({
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), reactScan()],
+  server: {
+    allowedHosts: [process.env.HOST ?? "localhost"],
+  },
   resolve: {
     alias: {
       "~/backend": path.resolve(__dirname, "../backend/src"),
