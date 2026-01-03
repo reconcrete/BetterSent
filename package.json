@@ -3,6 +3,8 @@
   "private": true,
   "workspaces": ["packages/*"],
   "scripts": {
-    "dev": "bun run --filter @kindle-wrap/* dev"
+    "dev": "bun run --filter @kindle-wrap/* dev",
+    "install": "bun install --filter @kindle-wrap/*",
+    "clean": "rm -rf node_modules ./packages/*/node_modules"
   }
 }
