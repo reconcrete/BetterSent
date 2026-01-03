@@ -1,6 +1,9 @@
 import { defineConfig, type PluginOption } from "vite";
+
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+
 import path from "node:path";
 
 const reactScan: () => PluginOption = () => ({
@@ -14,7 +17,7 @@ const reactScan: () => PluginOption = () => ({
 });
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), reactScan()],
+  plugins: [tanstackRouter(), react(), tailwindcss(), reactScan()],
   server: {
     allowedHosts: [process.env.HOST ?? "localhost"],
   },
