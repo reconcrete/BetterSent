@@ -25,14 +25,14 @@
 
     "baseUrl": ".",
     "paths": {
-      "~/backend/*": ["../backend/src/*"],
+      "~/api/*": ["../api/src/*"],
 
       "~/app/*": ["./src/app/*"],
       "~/pages/*": ["./src/pages/*"],
       "~/widgets/*": ["./src/widgets/*"],
       "~/features/*": ["./src/features/*"],
       "~/entities/*": ["./src/entities/*"],
-      "~/shared/*": ["./src/shared/*"]
+      "~/shared/*": ["./src/shared/*"],
     }
   },
   "include": ["src"]

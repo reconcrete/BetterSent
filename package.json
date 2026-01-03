@@ -1,9 +1,17 @@
 {
   "name": "kindle-wrap",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "catalog": {
+      "elysia": "1.4.20"
+    }
+  },
   "scripts": {
     "dev": "bun run --filter @kindle-wrap/* dev",
+    "reinstall": "bun run clean && bun run install",
     "install": "bun install --filter @kindle-wrap/*",
     "clean": "rm -rf node_modules ./packages/*/node_modules"
   }

@@ -8,7 +8,7 @@
   "dependencies": {
     "@bogeychan/elysia-logger": "^0.1.10",
     "@elysiajs/cors": "latest",
-    "elysia": "latest",
+    "elysia": "catalog:",
     "openai": "^4.73.0",
     "resend": "^6.6.0"
   },
