@@ -1,0 +1,202 @@
+---
+alwaysApply: false
+---
+
+# Feature-Sliced Design (FSD) Architecture
+
+This project follows Feature-Sliced Design methodology for organizing frontend code.
+
+## Layer Hierarchy (Top → Bottom)
+
+```
+src/
+├── app/          # Application initialization, providers, global styles
+├── pages/        # Full page components, route definitions
+├── widgets/      # Large composite UI blocks (e.g., Header, Sidebar)
+├── features/     # User interactions, actions (e.g., Auth, CreatePost)
+├── entities/     # Business entities (e.g., User, Article, Modal)
+└── shared/       # Reusable utilities, UI kit, API client, hooks
+```
+
+### Import Rules (CRITICAL)
+
+Layers can ONLY import from layers BELOW them:
+
+- `app` → can import from `pages`, `widgets`, `features`, `entities`, `shared`
+- `pages` → can import from `widgets`, `features`, `entities`, `shared`
+- `widgets` → can import from `features`, `entities`, `shared`
+- `features` → can import from `entities`, `shared`
+- `entities` → can import from `shared` only
+- `shared` → cannot import from any other layer
+
+❌ NEVER import upward (e.g., `features` importing from `widgets`)
+
+## Slice Structure
+
+Each slice (feature, widget, entity, page) follows this structure:
+
+```
+sliceName/
+├── index.ts       # Public API - ONLY export what's needed externally
+├── ui/            # React components
+│   ├── index.ts
+│   └── ComponentName/
+│       └── ComponentName.tsx
+├── model/         # Business logic, state, stores
+├── api/           # API calls related to this slice
+├── lib/           # Utilities specific to this slice
+└── types/         # TypeScript types
+```
+
+### Public API Rules
+
+- Every slice MUST have an `index.ts` that explicitly exports its public API
+- Import from slices using their index: `import { Component } from "~/features/auth"`
+- NEVER import internal files directly: ❌ `import { x } from "~/features/auth/model/store"`
+
+## Helper Scripts
+
+Use these scripts to scaffold new slices with correct structure:
+
+### Create a Feature
+
+```bash
+bun run scripts/createFeature.ts <FeatureName>
+```
+
+Creates:
+
+- `features/featureName/index.tsx`
+- `features/featureName/ui/index.tsx`
+- `features/featureName/ui/FeatureName/FeatureName.tsx`
+
+### Create a Widget
+
+```bash
+bun run scripts/createWidget.ts <WidgetName>
+```
+
+Creates:
+
+- `widgets/widgetName/index.tsx`
+- `widgets/widgetName/ui/index.tsx`
+- `widgets/widgetName/ui/WidgetName/WidgetName.tsx`
+
+### Add Shared UI Component (shadcn)
+
+```bash
+bun run scripts/addUiComponent.ts <component-name>
+```
+
+- Installs shadcn component
+- Moves to `shared/ui/ComponentName/ComponentName.tsx`
+- Updates `shared/ui/index.ts` with export
+
+## Code Patterns
+
+### Page Component
+
+```typescript
+// pages/feed/index.ts
+export { FeedPage } from "./ui/FeedPage";
+export { loader } from "./api/loader";
+
+// pages/feed/ui/FeedPage.tsx
+export function FeedPage() {
+  return <div>...</div>;
+}
+```
+
+### Feature Component
+
+```typescript
+// features/auth/index.tsx
+export * from "./ui";
+
+// features/auth/ui/index.tsx
+export * from "./LoginForm/LoginForm";
+
+// features/auth/ui/LoginForm/LoginForm.tsx
+import type { FC } from "react";
+
+type LoginFormProps = {
+  onSubmit: (data: LoginData) => void;
+};
+
+export const LoginForm: FC<LoginFormProps> = ({ onSubmit }) => {
+  return <form>...</form>;
+};
+```
+
+### Entity with State
+
+```typescript
+// entities/modals/index.ts
+export { useOpenModal } from "./selectors";
+export type { ModalName, ModalProps } from "./types";
+export { useModalsStore } from "./model";
+```
+
+### Shared UI Component
+
+```typescript
+// shared/ui/index.ts
+export * from "./Button/Button";
+export * from "./Textarea/Textarea";
+
+// shared/ui/Button/Button.tsx
+import { cn } from "~/shared/lib";
+
+export const Button = ({ className, ...props }) => {
+  return <button className={cn("...", className)} {...props} />;
+};
+```
+
+### API Requests (React Query)
+
+```typescript
+// In pages or features
+import { useQuery } from "@tanstack/react-query";
+import { api } from "~/shared/lib/treaty";
+
+const { data, isLoading } from useQuery({
+  queryKey: ["articles"],
+  queryFn: () => api.articles.get(),
+});
+```
+
+## Naming Conventions
+
+| Item            | Convention                     | Example                                  |
+| --------------- | ------------------------------ | ---------------------------------------- |
+| Folder (slice)  | camelCase                      | `loginForm`, `userProfile`               |
+| Component file  | PascalCase                     | `LoginForm.tsx`, `UserProfile.tsx`       |
+| Component name  | PascalCase                     | `export const LoginForm`                 |
+| Hook file       | camelCase                      | `useAuth.ts`                             |
+| Hook name       | camelCase with `use` prefix    | `useAuth`, `useModalsStore`              |
+| Type file       | camelCase                      | `types.ts` or `index.ts` in types folder |
+| Type definition | PascalCase with `type` keyword | `type ButtonProps = { ... }`             |
+| Index file      | lowercase                      | `index.ts` or `index.tsx`                |
+
+## Best Practices
+
+1. **Keep slices cohesive** - Group related code together within a slice
+2. **Thin public API** - Export only what's necessary, hide implementation details
+3. **Avoid cross-imports between same-layer slices** - Use composition instead
+4. **Shared is generic** - Only put truly reusable code in `shared`
+5. **Features are user-centric** - Name features after user actions (e.g., `createArticle`, `auth`)
+6. **Entities are data-centric** - Name entities after business objects (e.g., `user`, `article`)
+7. **Pages are route-centric** - One page per route
+8. **Prefer `type` over `interface`** - Use `type` for props and object shapes in TypeScript
+
+## Cross-Entity References
+
+When entities need to reference each other, use the `@x` notation:
+
+```typescript
+// entities/song/@x/artist.ts
+export type { Song } from "../model/song";
+
+// entities/artist/model/artist.ts
+import type { Song } from "entities/song/@x/artist";
+```
