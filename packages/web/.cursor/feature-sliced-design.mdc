@@ -82,6 +82,17 @@ Creates:
 - `widgets/widgetName/ui/index.tsx`
 - `widgets/widgetName/ui/WidgetName/WidgetName.tsx`
 
+### Create a Page
+
+```bash
+bun run scripts/createPage.ts <PageName>
+```
+
+Creates:
+
+- `pages/pageName/index.ts`
+- `pages/pageName/ui/PageName.tsx`
+
 ### Add Shared UI Component (shadcn)
 
 ```bash
@@ -159,10 +170,153 @@ export const Button = ({ className, ...props }) => {
 import { useQuery } from "@tanstack/react-query";
 import { api } from "~/shared/lib/treaty";
 
-const { data, isLoading } from useQuery({
+const { data, isLoading } = useQuery({
   queryKey: ["articles"],
   queryFn: () => api.articles.get(),
 });
+```
+
+## React Query + FSD Integration
+
+### Query Organization
+
+**Option 1: Entity-specific queries** (recommended when requests map to entities)
+
+```
+entities/
+  └── post/
+        └── api/
+              ├── post.queries.ts    # Query factory with keys and queryOptions
+              ├── get-posts.ts       # Getter function
+              ├── get-detail-post.ts # Detail getter
+              └── index.ts           # Public API
+```
+
+**Option 2: Shared queries** (for cross-cutting concerns)
+
+```
+shared/
+  └── api/
+        └── queries/
+              ├── document.ts
+              ├── background-jobs.ts
+              └── index.ts
+```
+
+### Query Factory Pattern
+
+Use `queryOptions` from `@tanstack/react-query` for type safety and easy access to keys:
+
+```typescript
+// entities/post/api/post.queries.ts
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { getPosts } from "./get-posts";
+import { getDetailPost } from "./get-detail-post";
+
+export const postQueries = {
+  all: () => ["posts"],
+
+  lists: () => [...postQueries.all(), "list"],
+  list: (page: number, limit: number) =>
+    queryOptions({
+      queryKey: [...postQueries.lists(), page, limit],
+      queryFn: () => getPosts(page, limit),
+      placeholderData: keepPreviousData,
+    }),
+
+  details: () => [...postQueries.all(), "detail"],
+  detail: (id: number) =>
+    queryOptions({
+      queryKey: [...postQueries.details(), id],
+      queryFn: () => getDetailPost(id),
+      staleTime: 5000,
+    }),
+};
+```
+
+Usage in components:
+
+```typescript
+// pages/post/ui/PostPage.tsx
+import { postQueries } from "~/entities/post";
+import { useQuery } from "@tanstack/react-query";
+
+export const PostPage = () => {
+  const { postId } = useParams();
+  const { data: post, isLoading } = useQuery(postQueries.detail(Number(postId)));
+
+  if (isLoading) return <div>Loading...</div>;
+  return <div>{post?.title}</div>;
+};
+```
+
+### Mutations
+
+**Option 1: Custom hook in feature's api segment** (complex mutations with cache invalidation)
+
+```typescript
+// features/updatePost/api/useUpdateTitle.ts
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { postQueries } from "~/entities/post";
+import { api } from "~/shared/lib/treaty";
+
+export const useUpdateTitle = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, newTitle }: { id: number; newTitle: string }) =>
+      api.posts({ id }).patch({ title: newTitle }),
+
+    onSuccess: (newPost, { id }) => {
+      queryClient.setQueryData(postQueries.detail(id).queryKey, newPost);
+    },
+  });
+};
+```
+
+**Option 2: Inline useMutation** (simpler cases)
+
+```typescript
+// pages/postCreate/ui/PostCreatePage.tsx
+import { useMutation } from "@tanstack/react-query";
+import { api } from "~/shared/lib/treaty";
+
+export const PostCreatePage = () => {
+  const [title, setTitle] = useState("");
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (title: string) => api.posts.post({ title }),
+  });
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    mutate(title);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={title} onChange={(e) => setTitle(e.target.value)} />
+      <button type="submit" disabled={isPending}>
+        {isPending ? "Creating..." : "Create"}
+      </button>
+    </form>
+  );
+};
+```
+
+### Query Factory Benefits
+
+1. **Request structuring** - All API requests organized in one place
+2. **Convenient key access** - Easy refetching without hardcoding keys
+3. **Type safety** - `queryOptions` ensures correct types throughout
+4. **Cache invalidation** - Use factory keys for targeted invalidation:
+
+```typescript
+// Invalidate all posts
+queryClient.invalidateQueries({ queryKey: postQueries.all() });
+
+// Invalidate only lists
+queryClient.invalidateQueries({ queryKey: postQueries.lists() });
 ```
 
 ## Naming Conventions
