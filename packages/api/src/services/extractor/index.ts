@@ -27,10 +27,67 @@ Guidelines:
 
 The content is provided below:`;
 
+const METADATA_SYSTEM_PROMPT = `You are a metadata extraction assistant. Analyze the provided content and extract:
+1. The author's name - if explicitly mentioned in the content. If no author is found, return "Unknown".
+2. A concise, descriptive title for the content - this should be suitable for an e-book title. Keep it short (max 60 characters), clear, and representative of the main topic.
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "author": "Author Name or Unknown",
+  "title": "Concise Title Here"
+}`;
+
+export interface ContentMetadata {
+  author: string;
+  title: string;
+}
+
+export interface ExtractedContent {
+  markdown: string;
+  metadata: ContentMetadata;
+}
+
 /**
- * Extracts key information from text content using OpenAI
+ * Extracts metadata (author and title) from content using OpenAI
  */
-export async function extractContent(content: string): Promise<string> {
+export async function extractMetadata(content: string): Promise<ContentMetadata> {
+  const openai = getOpenAIClient();
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-5-mini-2025-08-07",
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: METADATA_SYSTEM_PROMPT,
+      },
+      {
+        role: "user",
+        content: content,
+      },
+    ],
+  });
+
+  const responseText = completion.choices[0].message.content || '{"author": "Unknown", "title": "Untitled"}';
+
+  try {
+    const parsed = JSON.parse(responseText) as ContentMetadata;
+    return {
+      author: parsed.author || "Unknown",
+      title: parsed.title || "Untitled",
+    };
+  } catch {
+    return {
+      author: "Unknown",
+      title: "Untitled",
+    };
+  }
+}
+
+/**
+ * Extracts markdown content from text using OpenAI
+ */
+export async function extractMarkdown(content: string): Promise<string> {
   const openai = getOpenAIClient();
 
   const completion = await openai.chat.completions.create({
@@ -48,4 +105,13 @@ export async function extractContent(content: string): Promise<string> {
   });
 
   return completion.choices[0].message.content || "Failed to extract content";
+}
+
+/**
+ * Extracts both markdown content and metadata from text content using OpenAI
+ */
+export async function extractContent(content: string): Promise<ExtractedContent> {
+  const [markdown, metadata] = await Promise.all([extractMarkdown(content), extractMetadata(content)]);
+
+  return { markdown, metadata };
 }

@@ -31,11 +31,17 @@ async function ensureOutputDir(): Promise<void> {
   await mkdir(OUTPUT_DIR, { recursive: true });
 }
 
+export interface EpubMetadata {
+  title?: string;
+  author?: string;
+}
+
 export async function saveEpub(
   content: string,
-  source?: string
+  source?: string,
+  metadata?: EpubMetadata
 ): Promise<{ filename: string; path: string; savedAt: string }> {
-  const { path } = await saveMarkdown(content, source);
+  const { path } = await saveMarkdown(content, source, metadata);
   await $`pandoc ${path} -o ${path.replace(".md", ".epub")} --to epub3`;
   // await $`rm ${path}`;
 
@@ -52,7 +58,8 @@ export async function saveEpub(
  */
 export async function saveMarkdown(
   content: string,
-  source?: string
+  source?: string,
+  metadata?: EpubMetadata
 ): Promise<{ filename: string; path: string; savedAt: string }> {
   await ensureOutputDir();
 
@@ -60,10 +67,13 @@ export async function saveMarkdown(
   const filepath = join(OUTPUT_DIR, filename);
   const savedAt = new Date().toISOString();
 
+  const title = metadata?.title || "Untitled";
+  const author = metadata?.author || "Unknown";
+
   // Add metadata header to the markdown
   const header = `---
-title: "My Document Title"
-author: "Author Name"
+title: "${title}"
+author: "${author}"
 language: "en-US"
 ---
 
