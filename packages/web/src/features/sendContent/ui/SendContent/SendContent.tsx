@@ -34,7 +34,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, onSuccess }) 
       onClick={handleSend}
       disabled={isPending || !content.trim()}
       size="lg"
-      className="w-full"
+      className="w-full bg-black text-white hover:bg-neutral-800 disabled:bg-neutral-300"
     >
       {isPending ? (
         <>

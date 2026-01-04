@@ -17,28 +17,21 @@ export const Root = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            Kindle Wrap
-          </h1>
-          <p className="text-slate-400">
-            Send articles and text to your Kindle device
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-black">Kindle Wrap</h1>
+          <p className="text-neutral-500">Send articles and text to your Kindle device</p>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 space-y-5">
-          <Tabs
-            value={activeTab}
-            onValueChange={(value) => setActiveTab(value as "url" | "text")}
-          >
-            <TabsList className="w-full grid grid-cols-2">
-              <TabsTrigger value="url" className="gap-2">
+        <div className="border border-neutral-200 rounded-xl p-6 space-y-5">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text")}>
+            <TabsList className="w-full grid grid-cols-2 bg-neutral-100">
+              <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-white">
                 <Link className="size-4" />
                 URL
               </TabsTrigger>
-              <TabsTrigger value="text" className="gap-2">
+              <TabsTrigger value="text" className="gap-2 data-[state=active]:bg-white">
                 <FileText className="size-4" />
                 Plain Text
               </TabsTrigger>
@@ -50,7 +43,7 @@ export const Root = () => {
                 placeholder="https://example.com/article"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                className="border-neutral-200 text-black placeholder:text-neutral-400"
               />
             </TabsContent>
 
@@ -60,16 +53,12 @@ export const Root = () => {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={8}
-                className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 resize-none"
+                className="border-neutral-200 text-black placeholder:text-neutral-400 resize-none"
               />
             </TabsContent>
           </Tabs>
 
-          <SendContent
-            type={activeTab}
-            content={activeTab === "url" ? url : text}
-            onSuccess={handleSuccess}
-          />
+          <SendContent type={activeTab} content={activeTab === "url" ? url : text} onSuccess={handleSuccess} />
         </div>
       </div>
     </div>
