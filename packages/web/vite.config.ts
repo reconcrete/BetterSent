@@ -1,6 +1,5 @@
 import { defineConfig, type PluginOption } from "vite";
 
-import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -12,12 +11,12 @@ const reactScan: () => PluginOption = () => ({
   transformIndexHtml: (html) =>
     html.replace(
       "<!-- {{ React Scan Script }} -->",
-      '<script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>'
+      '<script src="https://unpkg.com/react-scan/dist/auto.global.js"></script>',
     ),
 });
 
 export default defineConfig({
-  plugins: [tanstackRouter(), react(), tailwindcss(), reactScan()],
+  plugins: [react(), tailwindcss(), reactScan()],
   server: {
     allowedHosts: [process.env.HOST ?? "localhost"],
   },
