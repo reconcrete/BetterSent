@@ -5,10 +5,10 @@ import { cors } from "@elysiajs/cors";
 import { extractorRouter } from "./routes";
 import { auth } from "./lib/auth";
 
+
 const app = new Elysia()
   .use(cors())
   .get("/health", () => ({ status: "ok" }))
-  .all("/api/auth/*", (c) => auth.handler(c.request))
   .use(extractorRouter)
   .listen(process.env.PORT || 8080);
 

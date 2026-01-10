@@ -5,8 +5,10 @@ import { extractTextInputSchema, extractUrlInputSchema, extractOutputSchema } fr
 
 import { extractText, extractUrl } from "./extractor.service";
 
+import { authMiddleware } from "../../lib/auth";
+
 export const extractorRouter = new Elysia({ prefix: "/extract" })
-  .use(logger())
+  .use(authMiddleware)
   .post(
     "/text",
     async ({ body, set }) => {
