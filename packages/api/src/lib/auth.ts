@@ -5,7 +5,7 @@ import { db } from "../db";
 import Elysia from "elysia";
 
 export const auth = betterAuth({
-  basePath: "/",
+  basePath: "/api/auth",
   trustedOrigins: ["http://localhost:5173"],
   database: drizzleAdapter(db, {
     provider: "pg",
