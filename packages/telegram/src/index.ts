@@ -20,8 +20,6 @@ import {
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
-console.log("[Telegram Bot] Starting up - deployment test v1");
-
 if (!BOT_TOKEN) {
   console.error("BOT_TOKEN environment variable is required");
   process.exit(1);
