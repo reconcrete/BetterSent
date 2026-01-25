@@ -8,16 +8,17 @@ import { api } from "~/shared/lib/treaty";
 type SendContentProps = {
   type: "url" | "text";
   content: string;
+  kindleEmailId?: string;
   onSuccess?: () => void;
 };
 
-export const SendContent: FC<SendContentProps> = ({ type, content, onSuccess }) => {
+export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       if (type === "url") {
-        return api.extract.url.post({ url: content });
+        return api.extract.url.post({ url: content, kindleEmailId });
       }
-      return api.extract.text.post({ textContent: content });
+      return api.extract.text.post({ textContent: content, kindleEmailId });
     },
     onSuccess: () => {
       onSuccess?.();

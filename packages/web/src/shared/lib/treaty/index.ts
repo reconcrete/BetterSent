@@ -8,4 +8,8 @@ const getBaseURL = () => {
   return `http://${url}`;
 };
 
-export const api = treaty<Api>(getBaseURL());
+export const api = treaty<Api>(getBaseURL(), {
+  fetch: {
+    credentials: "include",
+  },
+});

@@ -1,8 +1,18 @@
 import { useState } from "react";
-import { Link, FileText, LogIn, LogOut, UserPlus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Link, FileText, LogIn, LogOut, UserPlus, ChevronDown } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent, Input, Button } from "~/shared/ui";
 import { SendContent } from "~/features/sendContent";
+import { KindleSettings } from "~/features/kindleSettings";
 import { signIn, signUp, signOut, useSession } from "~/shared/lib";
+import { api } from "~/shared/lib/treaty";
+
+type KindleEmail = {
+  id: string;
+  email: string;
+  label: string | null;
+  isDefault: boolean;
+};
 
 export const Root = () => {
   const { data: session, isPending } = useSession();
@@ -10,6 +20,7 @@ export const Root = () => {
   const [activeTab, setActiveTab] = useState<"url" | "text">("url");
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
+  const [selectedKindleId, setSelectedKindleId] = useState<string | undefined>(undefined);
 
   // Auth form state
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
@@ -18,6 +29,21 @@ export const Root = () => {
   const [name, setName] = useState("");
   const [authError, setAuthError] = useState("");
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+
+  // Fetch kindle emails for the selector
+  const { data: kindleEmails } = useQuery({
+    queryKey: ["kindleEmails"],
+    queryFn: async () => {
+      const response = await api.kindle.get();
+      if (response.error) return [];
+      return (response.data?.data ?? []) as KindleEmail[];
+    },
+    enabled: !!session,
+  });
+
+  // Set default kindle on initial load
+  const defaultKindle = kindleEmails?.find((k) => k.isDefault);
+  const effectiveKindleId = selectedKindleId ?? defaultKindle?.id;
 
   const handleSuccess = () => {
     if (activeTab === "url") {
@@ -209,10 +235,47 @@ export const Root = () => {
             </TabsContent>
           </Tabs>
 
-          <SendContent type={activeTab} content={activeTab === "url" ? url : text} onSuccess={handleSuccess} />
+          {/* Kindle selector */}
+          {kindleEmails && kindleEmails.length > 0 && (
+            <div className="space-y-2">
+              <label htmlFor="kindle-select" className="text-sm font-medium text-black">
+                Send to
+              </label>
+              <div className="relative">
+                <select
+                  id="kindle-select"
+                  value={effectiveKindleId ?? ""}
+                  onChange={(e) => setSelectedKindleId(e.target.value || undefined)}
+                  className="w-full appearance-none border border-neutral-200 rounded-md px-3 py-2 pr-10 text-black bg-white focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {kindleEmails.map((kindle) => (
+                    <option key={kindle.id} value={kindle.id}>
+                      {kindle.label || kindle.email}
+                      {kindle.isDefault ? " (default)" : ""}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
+              </div>
+            </div>
+          )}
+
+          {kindleEmails && kindleEmails.length === 0 && (
+            <p className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+              Please add a Kindle email address in Settings before sending content.
+            </p>
+          )}
+
+          <SendContent
+            type={activeTab}
+            content={activeTab === "url" ? url : text}
+            kindleEmailId={effectiveKindleId}
+            onSuccess={handleSuccess}
+          />
         </div>
 
-        <div className="text-center">
+        <div className="flex items-center justify-center gap-2">
+          <KindleSettings />
           <Button variant="ghost" onClick={handleSignOut} className="text-neutral-500 hover:text-black">
             <LogOut className="size-4" />
             Sign Out

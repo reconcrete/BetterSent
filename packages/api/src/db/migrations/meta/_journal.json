@@ -8,6 +8,13 @@
       "when": 1767993009313,
       "tag": "0000_better_auth_essential",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769288249189,
+      "tag": "0001_kind_gunslinger",
+      "breakpoints": true
     }
   ]
 }

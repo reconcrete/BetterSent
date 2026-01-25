@@ -11,9 +11,9 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
   .use(authMiddleware)
   .post(
     "/text",
-    async ({ body, set }) => {
+    async ({ body, set, user }) => {
       try {
-        const data = await extractText(body.textContent);
+        const data = await extractText(body.textContent, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
         console.error("❌ Extraction error:", error);
@@ -24,13 +24,13 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         };
       }
     },
-    { body: extractTextInputSchema, response: extractOutputSchema }
+    { auth: true, body: extractTextInputSchema, response: extractOutputSchema }
   )
   .post(
     "/url",
-    async ({ body, set }) => {
+    async ({ body, set, user }) => {
       try {
-        const data = await extractUrl(body.url);
+        const data = await extractUrl(body.url, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
         console.error("❌ Extraction error:", error);
@@ -41,5 +41,5 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         };
       }
     },
-    { body: extractUrlInputSchema, response: extractOutputSchema }
+    { auth: true, body: extractUrlInputSchema, response: extractOutputSchema }
   );
