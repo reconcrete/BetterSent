@@ -1,9 +1,10 @@
 import { db } from "../../db";
 import { user } from "../../db/schema";
 import { eq } from "drizzle-orm";
+import { log } from "../../lib/logger";
 
 export const getProfile = async (userId: string) => {
-  console.log("📥 [getProfile] Fetching user profile for:", userId);
+  log.debug({ userId }, "Fetching user profile");
 
   const [userData] = await db.select().from(user).where(eq(user.id, userId));
 
@@ -11,7 +12,7 @@ export const getProfile = async (userId: string) => {
     throw new Error("User not found");
   }
 
-  console.log("✅ [getProfile] User profile retrieved");
+  log.debug({ userId }, "User profile retrieved");
 
   return {
     id: userData.id,
@@ -22,7 +23,7 @@ export const getProfile = async (userId: string) => {
 };
 
 export const updateProfile = async (userId: string, data: { name?: string }) => {
-  console.log("📥 [updateProfile] Updating user profile for:", userId);
+  log.debug({ userId }, "Updating user profile");
 
   const [updatedUser] = await db
     .update(user)
@@ -34,7 +35,7 @@ export const updateProfile = async (userId: string, data: { name?: string }) => 
     throw new Error("User not found");
   }
 
-  console.log("✅ [updateProfile] User profile updated");
+  log.debug({ userId }, "User profile updated");
 
   return {
     id: updatedUser.id,

@@ -4,8 +4,10 @@ import { cors } from "@elysiajs/cors";
 
 import { extractorRouter, userRouter, kindleRouter } from "./routes";
 import { authMiddleware } from "./lib/auth";
+import { log } from "./lib/logger";
 
 const app = new Elysia()
+  .use(log.into({ autoLogging: true }))
   .use(cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -19,6 +21,6 @@ const app = new Elysia()
   .use(kindleRouter)
   .listen(process.env.PORT || 8080);
 
-console.log(`🦊 Content Extractor API running at ${app.server?.hostname}:${app.server?.port}`);
+log.info({ hostname: app.server?.hostname, port: app.server?.port }, "Content Extractor API running");
 
 export type Api = typeof app;

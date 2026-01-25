@@ -1,7 +1,19 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, FileText, LogIn, LogOut, UserPlus, ChevronDown } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent, Input, Button } from "~/shared/ui";
+import { Link, FileText, LogIn, LogOut, UserPlus } from "lucide-react";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Input,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/shared/ui";
 import { SendContent } from "~/features/sendContent";
 import { KindleSettings } from "~/features/kindleSettings";
 import { signIn, signUp, signOut, useSession } from "~/shared/lib";
@@ -238,25 +250,23 @@ export const Root = () => {
           {/* Kindle selector */}
           {kindleEmails && kindleEmails.length > 0 && (
             <div className="space-y-2">
-              <label htmlFor="kindle-select" className="text-sm font-medium text-black">
-                Send to
-              </label>
-              <div className="relative">
-                <select
-                  id="kindle-select"
-                  value={effectiveKindleId ?? ""}
-                  onChange={(e) => setSelectedKindleId(e.target.value || undefined)}
-                  className="w-full appearance-none border border-neutral-200 rounded-md px-3 py-2 pr-10 text-black bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                >
+              <label className="text-sm font-medium text-black">Send to</label>
+              <Select
+                value={effectiveKindleId ?? ""}
+                onValueChange={(value) => setSelectedKindleId(value || undefined)}
+              >
+                <SelectTrigger className="w-full border-neutral-200">
+                  <SelectValue placeholder="Select a Kindle device" />
+                </SelectTrigger>
+                <SelectContent>
                   {kindleEmails.map((kindle) => (
-                    <option key={kindle.id} value={kindle.id}>
+                    <SelectItem key={kindle.id} value={kindle.id}>
                       {kindle.label || kindle.email}
                       {kindle.isDefault ? " (default)" : ""}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
-              </div>
+                </SelectContent>
+              </Select>
             </div>
           )}
 

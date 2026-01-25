@@ -1,6 +1,7 @@
 import { db } from "../../db";
 import { kindleEmailAddress } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
+import { log } from "../../lib/logger";
 
 export type KindleEmailData = {
   id: string;
@@ -21,14 +22,14 @@ const toKindleEmailData = (row: typeof kindleEmailAddress.$inferSelect): KindleE
 });
 
 export const getKindleEmails = async (userId: string): Promise<KindleEmailData[]> => {
-  console.log("📥 [getKindleEmails] Fetching Kindle emails for user:", userId);
+  log.debug({ userId }, "Fetching Kindle emails");
 
   const emails = await db
     .select()
     .from(kindleEmailAddress)
     .where(eq(kindleEmailAddress.userId, userId));
 
-  console.log(`✅ [getKindleEmails] Found ${emails.length} Kindle email(s)`);
+  log.debug({ userId, count: emails.length }, "Found Kindle emails");
 
   return emails.map(toKindleEmailData);
 };
@@ -37,7 +38,7 @@ export const getKindleEmailById = async (
   userId: string,
   emailId: string
 ): Promise<KindleEmailData | null> => {
-  console.log("📥 [getKindleEmailById] Fetching Kindle email:", emailId);
+  log.debug({ emailId }, "Fetching Kindle email");
 
   const [email] = await db
     .select()
@@ -50,7 +51,7 @@ export const getKindleEmailById = async (
     return null;
   }
 
-  console.log("✅ [getKindleEmailById] Kindle email found");
+  log.debug({ emailId }, "Kindle email found");
 
   return toKindleEmailData(email);
 };
@@ -59,7 +60,7 @@ export const createKindleEmail = async (
   userId: string,
   data: { email: string; label?: string; isDefault?: boolean }
 ): Promise<KindleEmailData> => {
-  console.log("📥 [createKindleEmail] Creating Kindle email for user:", userId);
+  log.debug({ userId, email: data.email }, "Creating Kindle email");
 
   // Check if this should be the default (first email or explicitly set)
   const existingEmails = await db
@@ -88,7 +89,7 @@ export const createKindleEmail = async (
     })
     .returning();
 
-  console.log("✅ [createKindleEmail] Kindle email created:", newEmail.id);
+  log.info({ id: newEmail.id, email: newEmail.email }, "Kindle email created");
 
   return toKindleEmailData(newEmail);
 };
@@ -98,7 +99,7 @@ export const updateKindleEmail = async (
   emailId: string,
   data: { email?: string; label?: string | null }
 ): Promise<KindleEmailData | null> => {
-  console.log("📥 [updateKindleEmail] Updating Kindle email:", emailId);
+  log.debug({ emailId }, "Updating Kindle email");
 
   // First verify the email belongs to the user
   const [existing] = await db
@@ -122,7 +123,7 @@ export const updateKindleEmail = async (
     .where(eq(kindleEmailAddress.id, emailId))
     .returning();
 
-  console.log("✅ [updateKindleEmail] Kindle email updated");
+  log.debug({ emailId }, "Kindle email updated");
 
   return toKindleEmailData(updatedEmail);
 };
@@ -131,7 +132,7 @@ export const deleteKindleEmail = async (
   userId: string,
   emailId: string
 ): Promise<boolean> => {
-  console.log("📥 [deleteKindleEmail] Deleting Kindle email:", emailId);
+  log.debug({ emailId }, "Deleting Kindle email");
 
   // First verify the email belongs to the user and get its state
   const [existing] = await db
@@ -165,7 +166,7 @@ export const deleteKindleEmail = async (
     }
   }
 
-  console.log("✅ [deleteKindleEmail] Kindle email deleted");
+  log.info({ emailId }, "Kindle email deleted");
 
   return true;
 };
@@ -174,7 +175,7 @@ export const setDefaultKindleEmail = async (
   userId: string,
   emailId: string
 ): Promise<KindleEmailData | null> => {
-  console.log("📥 [setDefaultKindleEmail] Setting default Kindle email:", emailId);
+  log.debug({ emailId }, "Setting default Kindle email");
 
   // First verify the email belongs to the user
   const [existing] = await db
@@ -201,7 +202,7 @@ export const setDefaultKindleEmail = async (
     .where(eq(kindleEmailAddress.id, emailId))
     .returning();
 
-  console.log("✅ [setDefaultKindleEmail] Default Kindle email set");
+  log.info({ emailId }, "Default Kindle email set");
 
   return toKindleEmailData(updatedEmail);
 };

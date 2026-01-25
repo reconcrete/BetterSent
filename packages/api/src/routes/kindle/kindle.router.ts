@@ -15,6 +15,7 @@ import {
   setDefaultKindleEmail,
 } from "./kindle.service";
 import { authMiddleware } from "../../lib/auth";
+import { log } from "../../lib/logger";
 
 export const kindleRouter = new Elysia({ prefix: "/kindle" })
   .use(authMiddleware)
@@ -26,7 +27,7 @@ export const kindleRouter = new Elysia({ prefix: "/kindle" })
         const data = await getKindleEmails(user.id);
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Get Kindle emails error:", error);
+        log.error({ error }, "Get Kindle emails error");
         set.status = 500;
         return {
           success: false,
@@ -48,7 +49,7 @@ export const kindleRouter = new Elysia({ prefix: "/kindle" })
         }
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Get Kindle email error:", error);
+        log.error({ error }, "Get Kindle email error");
         set.status = 500;
         return {
           success: false,
@@ -77,7 +78,7 @@ export const kindleRouter = new Elysia({ prefix: "/kindle" })
         set.status = 201;
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Create Kindle email error:", error);
+        log.error({ error }, "Create Kindle email error");
         set.status = 500;
         return {
           success: false,
@@ -112,7 +113,7 @@ export const kindleRouter = new Elysia({ prefix: "/kindle" })
         }
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Update Kindle email error:", error);
+        log.error({ error }, "Update Kindle email error");
         set.status = 500;
         return {
           success: false,
@@ -145,7 +146,7 @@ export const kindleRouter = new Elysia({ prefix: "/kindle" })
         }
         return { success: true, data: { deleted: true } };
       } catch (error) {
-        console.error("❌ Delete Kindle email error:", error);
+        log.error({ error }, "Delete Kindle email error");
         set.status = 500;
         return {
           success: false,
@@ -184,7 +185,7 @@ export const kindleRouter = new Elysia({ prefix: "/kindle" })
         }
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Set default Kindle email error:", error);
+        log.error({ error }, "Set default Kindle email error");
         set.status = 500;
         return {
           success: false,

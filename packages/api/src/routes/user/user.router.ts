@@ -3,6 +3,7 @@ import Elysia from "elysia";
 import { updateProfileInputSchema, userProfileOutputSchema } from "./user.schema";
 import { getProfile, updateProfile } from "./user.service";
 import { authMiddleware } from "../../lib/auth";
+import { log } from "../../lib/logger";
 
 export const userRouter = new Elysia({ prefix: "/user" })
   .use(authMiddleware)
@@ -13,7 +14,7 @@ export const userRouter = new Elysia({ prefix: "/user" })
         const data = await getProfile(user.id);
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Get profile error:", error);
+        log.error({ error }, "Get profile error");
         set.status = 500;
         return {
           success: false,
@@ -30,7 +31,7 @@ export const userRouter = new Elysia({ prefix: "/user" })
         const data = await updateProfile(user.id, body);
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Update profile error:", error);
+        log.error({ error }, "Update profile error");
         set.status = 500;
         return {
           success: false,

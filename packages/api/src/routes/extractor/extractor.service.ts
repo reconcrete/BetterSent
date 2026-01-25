@@ -5,6 +5,7 @@ import { extractContent, saveEpub, scrapeUrl } from "../../services";
 import { EmailService } from "../../services/email";
 import { db } from "../../db";
 import { kindleEmailAddress } from "../../db/schema";
+import { log } from "../../lib/logger";
 
 /**
  * Get the kindle email address to send to.
@@ -46,69 +47,69 @@ const getKindleEmail = async (userId: string, kindleEmailId?: string): Promise<s
 };
 
 export const extractText = async (textContent: string, userId: string, kindleEmailId?: string) => {
-  console.log("📥 [extractText] Received text content, length:", textContent.length);
+  log.debug({ contentLength: textContent.length }, "Received text content");
 
   // Get kindle email first to fail fast if not configured
   const toEmail = await getKindleEmail(userId, kindleEmailId);
-  console.log(`📧 [extractText] Will send to: ${toEmail}`);
+  log.debug({ toEmail }, "Will send to");
 
-  console.log("🤖 [extractText] LLM process starting...");
+  log.debug("LLM process starting");
   const startTime = Date.now();
   const { markdown, metadata } = await extractContent(textContent);
   const llmDuration = Date.now() - startTime;
-  console.log(`✅ [extractText] LLM process finished in ${llmDuration}ms`);
-  console.log(`📝 [extractText] Extracted metadata - Title: "${metadata.title}", Author: "${metadata.author}"`);
+  log.debug({ duration: llmDuration }, "LLM process finished");
+  log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");
 
-  console.log("📚 [extractText] Saving EPUB...");
+  log.debug("Saving EPUB");
   const { filename, path, savedAt } = await saveEpub(markdown, "text", metadata);
-  console.log(`✅ [extractText] EPUB saved: ${filename}`);
+  log.debug({ filename }, "EPUB saved");
 
-  console.log("📧 [extractText] Sending email...");
+  log.debug("Sending email");
   const emailService = new EmailService();
   const attachmentContent = fs.readFileSync(path).toString("base64");
   const emailFilename = `${metadata.title}.epub`;
   await emailService.sendEmail(toEmail, metadata.title, "", [
     { filename: emailFilename, content: attachmentContent },
   ]);
-  console.log("✅ [extractText] Email sent successfully");
+  log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
 
   return { markdown, metadata, filename, savedAt };
 };
 
 export const extractUrl = async (url: string, userId: string, kindleEmailId?: string) => {
-  console.log("📥 [extractUrl] Received URL:", url);
+  log.debug({ url }, "Received URL");
 
   // Get kindle email first to fail fast if not configured
   const toEmail = await getKindleEmail(userId, kindleEmailId);
-  console.log(`📧 [extractUrl] Will send to: ${toEmail}`);
+  log.debug({ toEmail }, "Will send to");
 
-  console.log("🔗 [extractUrl] Scraping URL...");
+  log.debug("Scraping URL");
   const textContent = await scrapeUrl(url);
-  console.log(`✅ [extractUrl] URL scraped, content length: ${textContent.length}`);
+  log.debug({ contentLength: textContent.length }, "URL scraped");
 
-  console.log("🤖 [extractUrl] LLM process starting...");
+  log.debug("LLM process starting");
   const startTime = Date.now();
   const { markdown, metadata } = await extractContent(textContent);
   const llmDuration = Date.now() - startTime;
-  console.log(`✅ [extractUrl] LLM process finished in ${llmDuration}ms`);
-  console.log(`📝 [extractUrl] Extracted metadata - Title: "${metadata.title}", Author: "${metadata.author}"`);
+  log.debug({ duration: llmDuration }, "LLM process finished");
+  log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");
 
-  console.log("📚 [extractUrl] Saving EPUB...");
+  log.debug("Saving EPUB");
   const { filename, path, savedAt } = await saveEpub(markdown, "url", metadata);
-  console.log(`✅ [extractUrl] EPUB saved: ${filename}`);
+  log.debug({ filename }, "EPUB saved");
 
   const emailService = new EmailService();
   const attachmentContent = fs.readFileSync(path).toString("base64");
   const emailFilename = `${metadata.title}.epub`;
 
-  console.log("📧 [extractUrl] Sending email...");
+  log.debug("Sending email");
   try {
     await emailService.sendEmail(toEmail, metadata.title, "This is a extract url email", [
       { filename: emailFilename, content: attachmentContent },
     ]);
-    console.log("✅ [extractUrl] Email sent successfully");
+    log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
   } catch (error) {
-    console.error("❌ [extractUrl] Email error:", error);
+    log.error({ error, to: toEmail }, "Failed to send email");
   }
 
   return { markdown, metadata, filename, savedAt };

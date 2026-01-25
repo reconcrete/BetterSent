@@ -1,11 +1,9 @@
 import Elysia from "elysia";
-import { logger } from "@bogeychan/elysia-logger";
 
 import { extractTextInputSchema, extractUrlInputSchema, extractOutputSchema } from "./extractor.schema";
-
 import { extractText, extractUrl } from "./extractor.service";
-
 import { authMiddleware } from "../../lib/auth";
+import { log } from "../../lib/logger";
 
 export const extractorRouter = new Elysia({ prefix: "/extract" })
   .use(authMiddleware)
@@ -16,7 +14,7 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await extractText(body.textContent, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Extraction error:", error);
+        log.error({ error }, "Extraction error");
         set.status = 500;
         return {
           success: false,
@@ -33,7 +31,7 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await extractUrl(body.url, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
-        console.error("❌ Extraction error:", error);
+        log.error({ error }, "Extraction error");
         set.status = 500;
         return {
           success: false,
