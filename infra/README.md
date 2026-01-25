@@ -16,8 +16,9 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 |--------|-------------|
 | `./deploy-api.sh` | Deploy the API service |
 | `./deploy-web.sh` | Deploy the Web service |
-| `./deploy-all.sh` | Deploy both services |
-| `./redeploy.sh [api\|web]` | Redeploy without new code |
+| `./deploy-telegram.sh` | Deploy the Telegram bot service |
+| `./deploy-all.sh` | Deploy all services |
+| `./redeploy.sh [api\|web\|telegram]` | Redeploy without new code |
 
 ### Database
 
@@ -31,12 +32,13 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 | Script | Description |
 |--------|-------------|
 | `./status.sh` | Check status of all services |
-| `./logs.sh [api\|web\|postgres]` | View service logs |
+| `./logs.sh [api\|web\|telegram\|postgres]` | View service logs |
 
 ## Service URLs
 
 - **API**: https://kindle-api-production.up.railway.app
 - **Web**: https://kindle-web-production.up.railway.app
+- **Telegram**: (no URL - bot service)
 
 ## Environment Variables
 
@@ -61,6 +63,13 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 | `VITE_API_URL` | API URL for frontend |
 | `RAILPACK_BUILD_CMD` | Custom build command |
 | `RAILPACK_SPA_OUTPUT_DIR` | SPA output directory |
+
+### Telegram Service (`kindle-telegram`)
+
+| Variable | Description |
+|----------|-------------|
+| `BOT_TOKEN` | Telegram bot token from @BotFather |
+| `API_URL` | API URL for backend calls |
 
 ## Quick Commands
 

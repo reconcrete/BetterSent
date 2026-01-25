@@ -1,0 +1,28 @@
+# Use official Bun image
+FROM oven/bun:1 AS base
+
+WORKDIR /app
+
+# Copy workspace files
+COPY package.json bun.lock ./
+COPY packages/api/package.json ./packages/api/
+COPY packages/web/package.json ./packages/web/
+COPY packages/telegram/package.json ./packages/telegram/
+
+# Install dependencies
+RUN bun install --frozen-lockfile
+
+# Force cache invalidation with timestamp
+RUN echo "Build timestamp: $(date +%s)"
+
+# Copy source code
+COPY packages/telegram ./packages/telegram
+
+# Create data directory for session persistence
+RUN mkdir -p /app/packages/telegram/data
+
+# Set working directory
+WORKDIR /app
+
+# Start the Telegram bot
+CMD ["bun", "run", "--filter", "@kindle-wrap/telegram", "start"]
