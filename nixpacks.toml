@@ -1,5 +1,0 @@
-# Nixpacks configuration for Railway
-# Installs pandoc for EPUB generation
-
-[phases.setup]
-aptPkgs = ["pandoc"]
