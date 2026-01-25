@@ -36,14 +36,9 @@ const getKindleEmail = async (userId: string, kindleEmailId?: string): Promise<s
 
   if (kindleEmail) {
     return kindleEmail.email;
-  }
-
-  // Fallback to env var
-  const fallbackEmail = process.env.RESEND_TO_EMAIL;
-  if (!fallbackEmail) {
+  } else {
     throw new Error("No Kindle email configured. Please add a Kindle email in settings.");
   }
-  return fallbackEmail;
 };
 
 export const extractText = async (textContent: string, userId: string, kindleEmailId?: string) => {
