@@ -2,7 +2,6 @@ import type { FC } from "react";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  Settings,
   Plus,
   Trash2,
   Star,
@@ -14,6 +13,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 
 import { Button, Input } from "~/shared/ui";
 import { api } from "~/shared/lib/treaty";
+import type { KindleSettingsModalProps } from "~/entities/modals/types";
 
 type KindleEmail = {
   id: string;
@@ -24,8 +24,9 @@ type KindleEmail = {
   updatedAt: string;
 };
 
-export const KindleSettings: FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
+  closeModal,
+}) => {
   const [newEmail, setNewEmail] = useState("");
   const [newLabel, setNewLabel] = useState("");
   const [error, setError] = useState("");
@@ -41,14 +42,14 @@ export const KindleSettings: FC = () => {
       const response = await api.kindle.get();
       if (response.error) {
         const errorValue = response.error.value;
-        const errorMessage = typeof errorValue === 'object' && errorValue && 'error' in errorValue 
-          ? errorValue.error 
-          : "Failed to fetch Kindle emails";
+        const errorMessage =
+          typeof errorValue === "object" && errorValue && "error" in errorValue
+            ? errorValue.error
+            : "Failed to fetch Kindle emails";
         throw new Error(errorMessage);
       }
       return response.data?.data ?? [];
     },
-    enabled: isOpen,
   });
 
   const createMutation = useMutation({
@@ -56,9 +57,10 @@ export const KindleSettings: FC = () => {
       const response = await api.kindle.post({ email, label });
       if (response.error) {
         const errorValue = response.error.value;
-        const errorMessage = typeof errorValue === 'object' && errorValue && 'error' in errorValue 
-          ? errorValue.error 
-          : "Failed to create Kindle email";
+        const errorMessage =
+          typeof errorValue === "object" && errorValue && "error" in errorValue
+            ? errorValue.error
+            : "Failed to create Kindle email";
         throw new Error(errorMessage);
       }
       return response.data?.data;
@@ -79,9 +81,10 @@ export const KindleSettings: FC = () => {
       const response = await api.kindle({ id }).delete();
       if (response.error) {
         const errorValue = response.error.value;
-        const errorMessage = typeof errorValue === 'object' && errorValue && 'error' in errorValue 
-          ? errorValue.error 
-          : "Failed to delete Kindle email";
+        const errorMessage =
+          typeof errorValue === "object" && errorValue && "error" in errorValue
+            ? errorValue.error
+            : "Failed to delete Kindle email";
         throw new Error(errorMessage);
       }
       return response.data;
@@ -99,9 +102,10 @@ export const KindleSettings: FC = () => {
       const response = await api.kindle({ id }).default.patch();
       if (response.error) {
         const errorValue = response.error.value;
-        const errorMessage = typeof errorValue === 'object' && errorValue && 'error' in errorValue 
-          ? errorValue.error 
-          : "Failed to set default Kindle email";
+        const errorMessage =
+          typeof errorValue === "object" && errorValue && "error" in errorValue
+            ? errorValue.error
+            : "Failed to set default Kindle email";
         throw new Error(errorMessage);
       }
       return response.data?.data;
@@ -145,18 +149,7 @@ export const KindleSettings: FC = () => {
     setDefaultMutation.isPending;
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-      <Dialog.Trigger asChild>
-        <Button
-          variant="ghost"
-          className="text-neutral-500 hover:text-black"
-          aria-label="Kindle Settings"
-        >
-          <Settings className="size-4" />
-          Settings
-        </Button>
-      </Dialog.Trigger>
-
+    <Dialog.Root open onOpenChange={(open) => !open && closeModal()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl border border-neutral-200 shadow-lg p-6 w-full max-w-md max-h-[85vh] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">

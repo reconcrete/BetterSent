@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "~/shared/ui";
 import { SendContent } from "~/features/sendContent";
-import { KindleSettings } from "~/features/kindleSettings";
+import { KindleSettings } from "~/features/openKindleSettings";
 import { signIn, signUp, signOut, useSession } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 

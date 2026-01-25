@@ -1,4 +1,5 @@
 import { useModalsStore, type ModalName, type ModalPropsMap } from "~/entities/modals";
+import { KindleSettingsModal } from "~/widgets/kindleSettingsModal";
 
 const renderModalByName = (
   modalName: ModalName,
@@ -6,6 +7,13 @@ const renderModalByName = (
   handlers: { closeModal: () => void }
 ) => {
   switch (modalName) {
+    case "KindleSettingsModal":
+      return (
+        <KindleSettingsModal
+          {...(props as ModalPropsMap["KindleSettingsModal"])}
+          closeModal={handlers.closeModal}
+        />
+      );
     default:
       return null;
   }
