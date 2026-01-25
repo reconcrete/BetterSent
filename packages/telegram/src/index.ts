@@ -20,7 +20,7 @@ import {
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
-console.log("Telegram bot starting...");
+console.log("[Telegram Bot] Starting up - deployment test v1");
 
 if (!BOT_TOKEN) {
   console.error("BOT_TOKEN environment variable is required");
@@ -353,25 +353,10 @@ bot.catch((err, ctx) => {
   ctx.reply("An error occurred. Please try again.").catch(console.error);
 });
 
-// Start bot with retry logic
-async function startBot() {
-  // Add delay on startup to prevent 409 conflicts during restarts
-  const startupDelay = parseInt(process.env.STARTUP_DELAY || "30000", 10);
-  console.log(`Waiting ${startupDelay}ms before starting bot...`);
-  await new Promise((resolve) => setTimeout(resolve, startupDelay));
-
-  try {
-    await bot.launch({
-      dropPendingUpdates: true, // Clear any pending updates to avoid conflicts
-    });
-    console.log("Kindle Wrap Telegram bot is running");
-  } catch (error) {
-    console.error("Failed to start bot:", error);
-    process.exit(1);
-  }
-}
-
-startBot();
+// Start bot
+bot.launch().then(() => {
+  console.log("Kindle Wrap Telegram bot is running");
+});
 
 // Enable graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"));
