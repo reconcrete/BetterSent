@@ -9,7 +9,7 @@ import { log } from "./lib/logger";
 const app = new Elysia()
   .use(log.into({ autoLogging: true }))
   .use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],

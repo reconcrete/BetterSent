@@ -16,6 +16,8 @@
 
     "db:studio": "bun run --filter @kindle-wrap/api db:studio",
 
+    "api:start": "bun run --filter @kindle-wrap/api start",
+
     "reinstall": "bun run clean && bun run install",
     "install": "bun install --filter @kindle-wrap/*",
     "clean": "rm -rf node_modules ./packages/*/node_modules"

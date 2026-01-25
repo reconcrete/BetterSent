@@ -1,4 +1,4 @@
-import { t, TSchema } from "elysia";
+import { t, type TSchema } from "elysia";
 
 export const baseResponseSchema = <T extends TSchema>(dataSchema: T) => ({
   200: t.Object({
