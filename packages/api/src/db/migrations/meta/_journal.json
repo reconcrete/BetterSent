@@ -15,6 +15,13 @@
       "when": 1769288249189,
       "tag": "0001_kind_gunslinger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769342213833,
+      "tag": "0002_lying_odin",
+      "breakpoints": true
     }
   ]
 }

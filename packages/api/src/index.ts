@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 
 import { cors } from "@elysiajs/cors";
 
-import { extractorRouter, userRouter, kindleRouter } from "./routes";
+import { extractorRouter, userRouter, kindleRouter, historyRouter } from "./routes";
 import { authMiddleware } from "./lib/auth";
 import { log } from "./lib/logger";
 
@@ -19,6 +19,7 @@ const app = new Elysia()
   .use(extractorRouter)
   .use(userRouter)
   .use(kindleRouter)
+  .use(historyRouter)
   .listen(process.env.PORT || 8080);
 
 log.info({ hostname: app.server?.hostname, port: app.server?.port }, "Content Extractor API running");

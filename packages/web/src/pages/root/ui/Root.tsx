@@ -16,6 +16,7 @@ import {
 } from "~/shared/ui";
 import { SendContent } from "~/features/sendContent";
 import { KindleSettings } from "~/features/openKindleSettings";
+import { OpenHistory } from "~/features/openHistory";
 import { signIn, signUp, signOut, useSession } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 
@@ -286,6 +287,7 @@ export const Root = () => {
 
         <div className="flex items-center justify-center gap-2">
           <KindleSettings />
+          <OpenHistory />
           <Button variant="ghost" onClick={handleSignOut} className="text-neutral-500 hover:text-black">
             <LogOut className="size-4" />
             Sign Out

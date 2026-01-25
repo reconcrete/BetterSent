@@ -29,3 +29,44 @@ export const kindleEmailAddressRelations = relations(kindleEmailAddress, ({ one 
     references: [user.id],
   }),
 }));
+
+// Send history table to track content sent to Kindle
+export const sendHistory = pgTable(
+  "send_history",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    type: text("type").notNull(), // "url" | "text"
+    content: text("content").notNull(), // URL or text snippet (truncated for display)
+    title: text("title"), // Extracted title from content
+    author: text("author"), // Extracted author from content
+    status: text("status").notNull().default("pending"), // "pending" | "processing" | "completed" | "error"
+    errorMessage: text("error_message"), // Error details if status is "error"
+    kindleEmailId: text("kindle_email_id").references(() => kindleEmailAddress.id, {
+      onDelete: "set null",
+    }),
+    kindleEmail: text("kindle_email"), // Store email directly for display even if kindle deleted
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("send_history_userId_idx").on(table.userId),
+    index("send_history_createdAt_idx").on(table.createdAt),
+  ]
+);
+
+export const sendHistoryRelations = relations(sendHistory, ({ one }) => ({
+  user: one(user, {
+    fields: [sendHistory.userId],
+    references: [user.id],
+  }),
+  kindleEmailAddress: one(kindleEmailAddress, {
+    fields: [sendHistory.kindleEmailId],
+    references: [kindleEmailAddress.id],
+  }),
+}));
