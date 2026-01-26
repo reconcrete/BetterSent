@@ -12,20 +12,5 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  telegram:
-    build:
-      context: .
-      dockerfile: Dockerfile.telegram
-    container_name: kindle-wrap-telegram
-    restart: unless-stopped
-    environment:
-      BOT_TOKEN: ${BOT_TOKEN}
-      API_URL: ${API_URL:-http://host.docker.internal:8080}
-    volumes:
-      - telegram_data:/app/packages/telegram/data
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
 volumes:
   postgres_data:
-  telegram_data:

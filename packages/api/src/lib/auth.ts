@@ -1,8 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { magicLink } from "better-auth/plugins";
 
 import { db } from "../db";
 import Elysia from "elysia";
+import { EmailService } from "../services/email";
 
 const trustedOrigins = process.env.TRUSTED_ORIGINS
   ? process.env.TRUSTED_ORIGINS.split(",")
@@ -19,6 +21,19 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  plugins: [
+    magicLink({
+      sendMagicLink: async ({ email, url }) => {
+        const emailService = new EmailService();
+        await emailService.sendEmail(
+          email,
+          "Sign in to Kindle Wrap",
+          `Click here to sign in: ${url}`,
+          []
+        );
+      },
+    }),
+  ],
   advanced: {
     crossSubDomainCookies: {
       enabled: isProduction,
