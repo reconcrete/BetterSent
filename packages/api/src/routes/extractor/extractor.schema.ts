@@ -18,3 +18,22 @@ export const extractOutputSchema = baseResponseSchema(
     savedAt: t.String(),
   })
 );
+
+// Provider-safe limit (25 MB) for email attachments
+export const MAX_FILE_SIZE_MB = 25;
+export const SUPPORTED_FILE_EXTENSIONS = [
+  "pdf", "doc", "docx", "txt", "rtf", "htm", "html",
+  "png", "gif", "jpg", "jpeg", "bmp", "epub",
+] as const;
+
+export const extractFileInputSchema = t.Object({
+  file: t.File({ maxSize: "25m" }),
+  kindleEmailId: t.Optional(t.String()),
+});
+
+export const extractFileOutputSchema = baseResponseSchema(
+  t.Object({
+    filename: t.String(),
+    sentAt: t.String(),
+  })
+);

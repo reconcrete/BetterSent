@@ -10,6 +10,7 @@ import {
   createSendHistoryEntry,
   updateSendHistoryEntry,
 } from "../history/history.service";
+import { SUPPORTED_FILE_EXTENSIONS } from "./extractor.schema";
 
 /**
  * Get the kindle email address to send to.
@@ -154,6 +155,57 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
     return { markdown, metadata, filename, savedAt };
   } catch (error) {
     // Update history with error status
+    await updateSendHistoryEntry(historyId, {
+      status: "error",
+      errorMessage: error instanceof Error ? error.message : "Unknown error occurred",
+    });
+    throw error;
+  }
+};
+
+export const sendFile = async (
+  file: { name: string; type: string; size: number; arrayBuffer: () => Promise<ArrayBuffer> },
+  userId: string,
+  kindleEmailId?: string
+) => {
+  log.debug({ filename: file.name, size: file.size }, "Received file for direct send");
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (!SUPPORTED_FILE_EXTENSIONS.includes(ext as (typeof SUPPORTED_FILE_EXTENSIONS)[number])) {
+    throw new Error(
+      `Unsupported file type. Allowed: ${SUPPORTED_FILE_EXTENSIONS.join(", ")}`
+    );
+  }
+
+  const toEmail = await getKindleEmail(userId, kindleEmailId);
+  log.debug({ toEmail }, "Will send to");
+
+  const historyId = await createSendHistoryEntry(userId, {
+    type: "file",
+    content: file.name,
+    kindleEmailId,
+  });
+
+  try {
+    await updateSendHistoryEntry(historyId, {
+      title: file.name,
+      kindleEmail: toEmail,
+    });
+
+    const buffer = await file.arrayBuffer();
+    const content = Buffer.from(buffer).toString("base64");
+
+    const emailService = new EmailService();
+    await emailService.sendEmail(toEmail, file.name, "", [
+      { filename: file.name, content },
+    ]);
+    log.info({ to: toEmail, filename: file.name }, "File sent successfully");
+
+    await updateSendHistoryEntry(historyId, { status: "completed" });
+
+    const sentAt = new Date().toISOString();
+    return { filename: file.name, sentAt };
+  } catch (error) {
     await updateSendHistoryEntry(historyId, {
       status: "error",
       errorMessage: error instanceof Error ? error.message : "Unknown error occurred",

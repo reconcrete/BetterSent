@@ -1,9 +1,0 @@
-{
-  "sessions": {
-    "226770002": {
-      "cookie": "better-auth.session_token=HNTpl0i3OH5D0i5p0Er1Rr6i1IWEHFgZ.Vb6jYMuNq06jzA0dW7DO6lr3%2FXv4EnH64EvjQQYnO9c%3D; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax",
-      "email": "g@g.com",
-      "kindleEmailId": "bf9c21bb-4596-49f0-93d4-07e7edf36977"
-    }
-  }
-}

@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Link, FileText, Loader2, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, Link, FileText, Loader2, CheckCircle2, XCircle, Clock, Upload } from "lucide-react";
 
 import {
   Table,
@@ -17,7 +17,7 @@ import { useSession } from "~/shared/lib";
 
 type HistoryItem = {
   id: string;
-  type: "url" | "text";
+  type: "url" | "text" | "file";
   content: string;
   title: string | null;
   author: string | null;
@@ -76,11 +76,16 @@ const StatusBadge: FC<{ status: HistoryItem["status"]; errorMessage?: string | n
 };
 
 const TypeBadge: FC<{ type: HistoryItem["type"] }> = ({ type }) => {
-  const Icon = type === "url" ? Link : FileText;
+  const config = {
+    url: { icon: Link, label: "URL" },
+    text: { icon: FileText, label: "Text" },
+    file: { icon: Upload, label: "File" },
+  };
+  const { icon: Icon, label } = config[type];
   return (
     <span className="inline-flex items-center gap-1.5 text-neutral-500">
       <Icon className="size-4" />
-      {type === "url" ? "URL" : "Text"}
+      {label}
     </span>
   );
 };

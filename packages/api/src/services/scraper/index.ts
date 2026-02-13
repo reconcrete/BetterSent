@@ -43,7 +43,7 @@ function parseJinaReaderBody(body: string): string {
 }
 
 async function fetchViaJinaReader(url: string): Promise<string> {
-  const jinaUrl = buildJinaReaderUrl(url);
+const jinaUrl = buildJinaReaderUrl(url);
   const attempts: Array<Record<string, string>> = [
     {
       Accept: "text/markdown,text/plain;q=0.9,*/*;q=0.8",

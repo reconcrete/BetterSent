@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, FileText, LogOut } from "lucide-react";
+import { Link, FileText, LogOut, Upload } from "lucide-react";
 import {
   Tabs,
   TabsList,
@@ -28,12 +28,20 @@ type KindleEmail = {
   isDefault: boolean;
 };
 
+const MAX_FILE_SIZE_MB = 25;
+const SUPPORTED_EXTENSIONS = [
+  "pdf", "doc", "docx", "txt", "rtf", "htm", "html",
+  "png", "gif", "jpg", "jpeg", "bmp", "epub",
+];
+
 export const Root = () => {
   const { data: session, isPending } = useSession();
 
-  const [activeTab, setActiveTab] = useState<"url" | "text">("url");
+  const [activeTab, setActiveTab] = useState<"url" | "text" | "file">("url");
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [selectedKindleId, setSelectedKindleId] = useState<string | undefined>(undefined);
 
   // Fetch kindle emails for the selector
@@ -54,10 +62,60 @@ export const Root = () => {
   const handleSuccess = () => {
     if (activeTab === "url") {
       setUrl("");
-    } else {
+    } else if (activeTab === "text") {
       setText("");
+    } else {
+      setFile(null);
+      setFileError(null);
     }
   };
+
+  const getFileValidationError = useCallback((f: File): string | null => {
+    const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!SUPPORTED_EXTENSIONS.includes(ext)) {
+      return `Unsupported file type. Allowed: ${SUPPORTED_EXTENSIONS.join(", ")}`;
+    }
+    if (f.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      return `File too large. Max size is ${MAX_FILE_SIZE_MB} MB`;
+    }
+    return null;
+  }, []);
+
+  const handleFileDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setFileError(null);
+      const dropped = e.dataTransfer.files[0];
+      if (!dropped) return;
+      const err = getFileValidationError(dropped);
+      if (err) {
+        setFileError(err);
+        setFile(null);
+      } else {
+        setFile(dropped);
+      }
+    },
+    [getFileValidationError]
+  );
+
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFileError(null);
+      const selected = e.target.files?.[0];
+      e.target.value = "";
+      if (!selected) return;
+      const err = getFileValidationError(selected);
+      if (err) {
+        setFileError(err);
+        setFile(null);
+      } else {
+        setFile(selected);
+      }
+    },
+    [getFileValidationError]
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent) => e.preventDefault(), []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -89,8 +147,14 @@ export const Root = () => {
         </div>
 
         <div className="border border-neutral-200 rounded-xl p-6 space-y-5">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text")}>
-            <TabsList className="w-full grid grid-cols-2 bg-neutral-100">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => {
+              setActiveTab(value as "url" | "text" | "file");
+              if (value !== "file") setFileError(null);
+            }}
+          >
+            <TabsList className="w-full grid grid-cols-3 bg-neutral-100">
               <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-white">
                 <Link className="size-4" />
                 URL
@@ -98,6 +162,10 @@ export const Root = () => {
               <TabsTrigger value="text" className="gap-2 data-[state=active]:bg-white">
                 <FileText className="size-4" />
                 Plain Text
+              </TabsTrigger>
+              <TabsTrigger value="file" className="gap-2 data-[state=active]:bg-white">
+                <Upload className="size-4" />
+                File
               </TabsTrigger>
             </TabsList>
 
@@ -119,6 +187,46 @@ export const Root = () => {
                 rows={8}
                 className="w-full border border-neutral-200 rounded-md px-3 py-2 text-black placeholder:text-neutral-400 resize-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
+            </TabsContent>
+
+            <TabsContent value="file" className="mt-4 space-y-2">
+              <div
+                onDrop={handleFileDrop}
+                onDragOver={handleDragOver}
+                className="border-2 border-dashed border-neutral-200 rounded-lg p-6 text-center"
+              >
+                <input
+                  type="file"
+                  accept={SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(",")}
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label htmlFor="file-upload" className="cursor-pointer block">
+                  {file ? (
+                    <>
+                      <p className="text-black font-medium">{file.name}</p>
+                      <p className="text-sm text-neutral-500 mt-1">
+                        {(file.size / 1024).toFixed(1)} KB · Click or drop to replace
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="size-10 mx-auto text-neutral-400" />
+                      <p className="mt-2 text-black">Drop a file here or click to browse</p>
+                      <p className="text-xs text-neutral-500 mt-1">
+                        PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB
+                      </p>
+                      <p className="text-xs text-neutral-500">Max {MAX_FILE_SIZE_MB} MB</p>
+                    </>
+                  )}
+                </label>
+              </div>
+              {fileError && (
+                <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                  {fileError}
+                </p>
+              )}
             </TabsContent>
           </Tabs>
 
@@ -153,9 +261,10 @@ export const Root = () => {
 
           <SendContent
             type={activeTab}
-            content={activeTab === "url" ? url : text}
+            content={activeTab === "url" ? url : activeTab === "text" ? text : file}
             kindleEmailId={effectiveKindleId}
             onSuccess={handleSuccess}
+            onError={activeTab === "file" ? setFileError : undefined}
           />
         </div>
 
