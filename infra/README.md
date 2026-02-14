@@ -34,6 +34,15 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 | `./status.sh` | Check status of all services |
 | `./logs.sh [api\|web\|telegram\|postgres]` | View service logs |
 
+### Bucket (S3-compatible)
+
+Requires AWS CLI (`brew install awscli`). Uses credentials from the kindle-api service.
+
+| Script | Description |
+|--------|-------------|
+| `./bucket-ls.sh [prefix]` | List files in the Railway bucket |
+| `./bucket-get.sh <key> [path]` | Download a file from the bucket |
+
 ## Service URLs
 
 - **API**: https://kindle-api-production.up.railway.app
