@@ -162,6 +162,12 @@ export class RailwayBucketStorageService implements StorageService {
     metadata?: EpubMetadata
   ): Promise<StoredArtifact> {
     const prepared = await this.prepareMarkdown(content, source, metadata);
+    const markdownFilename = join(prepared.runFolderName, prepared.markdownFilename);
+    const markdownObjectKey = this.toObjectKey(markdownFilename);
+
+    // Persist markdown alongside epub so both artifacts are available in bucket storage.
+    await this.uploadFile(prepared.markdownPath, markdownObjectKey, "text/markdown; charset=utf-8");
+
     const epubFilename = prepared.markdownFilename.replace(/\.md$/i, ".epub");
     const epubPath = prepared.markdownPath.replace(/\.md$/i, ".epub");
     const runFolderPath = dirname(prepared.markdownPath);
