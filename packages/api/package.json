@@ -11,6 +11,7 @@
     "db:studio": "bunx drizzle-kit studio"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.990.0",
     "@bogeychan/elysia-logger": "^0.1.10",
     "@elysiajs/cors": "latest",
     "better-auth": "^1.4.10",

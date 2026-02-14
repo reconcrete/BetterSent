@@ -1,13 +1,12 @@
 import { describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
-import { scrapeUrl } from "../../src/services/scraper";
-import { extractContent, extractMarkdown, extractMetadata } from "../../src/services/extractor";
+import { scraperService } from "../../src/services/scraper";
+import { extractorService } from "../../src/services/extractor";
 import {
   extractTextInputSchema,
   extractUrlInputSchema,
   extractOutputSchema,
 } from "../../src/routes/extractor/extractor.schema";
-import * as extractorService from "../../src/routes/extractor/extractor.service";
 
 /**
  * Integration test for the URL extraction pipeline.
@@ -53,8 +52,8 @@ const createIntegrationApp = () => {
     async ({ body, set }) => {
       try {
         // Call scrapeUrl + extractContent directly (skip DB/email)
-        const textContent = await scrapeUrl(body.url);
-        const { markdown, metadata } = await extractContent(textContent);
+        const textContent = await scraperService.scrapeUrl(body.url);
+        const { markdown, metadata } = await extractorService.extractContent(textContent);
         return {
           success: true as const,
           data: {
@@ -134,7 +133,7 @@ describe(`Integration: extract pipeline for ${TEST_URL}`, () => {
   describe("Step 1b — scrapeUrl (fetch + HTML to text)", () => {
     it("should scrapeUrl and return non-empty text", async () => {
       try {
-        scrapedText = await scrapeUrl(TEST_URL);
+        scrapedText = await scraperService.scrapeUrl(TEST_URL);
       } catch (error) {
         console.log("\n--- scrapeUrl threw an error ---");
         console.log(`  Error: ${error instanceof Error ? error.message : String(error)}`);
@@ -205,7 +204,7 @@ describe(`Integration: extract pipeline for ${TEST_URL}`, () => {
 
         console.log(`  Sending ${scrapedText.length} chars to OpenAI for markdown extraction...`);
         const startTime = Date.now();
-        const markdown = await extractMarkdown(scrapedText);
+        const markdown = await extractorService.extractMarkdown(scrapedText);
         const duration = Date.now() - startTime;
 
         console.log(`  OpenAI responded in ${duration}ms`);
@@ -228,7 +227,7 @@ describe(`Integration: extract pipeline for ${TEST_URL}`, () => {
 
         console.log(`  Sending ${scrapedText.length} chars to OpenAI for metadata extraction...`);
         const startTime = Date.now();
-        const metadata = await extractMetadata(scrapedText);
+        const metadata = await extractorService.extractMetadata(scrapedText);
         const duration = Date.now() - startTime;
 
         console.log(`  OpenAI responded in ${duration}ms`);

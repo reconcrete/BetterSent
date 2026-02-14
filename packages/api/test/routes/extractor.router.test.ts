@@ -49,7 +49,7 @@ const createTestExtractorRouter = (isAuthenticated: boolean = true) => {
       "/text",
       async ({ body, set }) => {
         try {
-          const data = await extractorService.extractText(body.textContent);
+          const data = await extractorService.extractText(body.textContent, "user-123");
           return { success: true, data };
         } catch (error) {
           console.error("❌ Extraction error:", error);
@@ -66,7 +66,7 @@ const createTestExtractorRouter = (isAuthenticated: boolean = true) => {
       "/url",
       async ({ body, set }) => {
         try {
-          const data = await extractorService.extractUrl(body.url);
+          const data = await extractorService.extractUrl(body.url, "user-123");
           return { success: true, data };
         } catch (error) {
           console.error("❌ Extraction error:", error);
@@ -121,7 +121,7 @@ describe("Extractor Router", () => {
         },
       });
       expect(extractTextSpy).toHaveBeenCalledTimes(1);
-      expect(extractTextSpy).toHaveBeenCalledWith("This is test content to extract.");
+      expect(extractTextSpy).toHaveBeenCalledWith("This is test content to extract.", "user-123");
     });
 
     it("should work even when not authenticated (router doesn't require auth)", async () => {
@@ -271,7 +271,7 @@ describe("Extractor Router", () => {
 
       expect(response.status).toBe(200);
       expect(extractTextSpy).toHaveBeenCalledTimes(1);
-      expect(extractTextSpy).toHaveBeenCalledWith(longText);
+      expect(extractTextSpy).toHaveBeenCalledWith(longText, "user-123");
     });
   });
 
@@ -301,7 +301,7 @@ describe("Extractor Router", () => {
         },
       });
       expect(extractUrlSpy).toHaveBeenCalledTimes(1);
-      expect(extractUrlSpy).toHaveBeenCalledWith("https://example.com/article");
+      expect(extractUrlSpy).toHaveBeenCalledWith("https://example.com/article", "user-123");
     });
 
     it("should work even when not authenticated (router doesn't require auth)", async () => {
@@ -407,7 +407,7 @@ describe("Extractor Router", () => {
       // But we can test that the service is called
       expect(response.status).toBe(200);
       expect(extractUrlSpy).toHaveBeenCalledTimes(1);
-      expect(extractUrlSpy).toHaveBeenCalledWith("not-a-valid-url");
+      expect(extractUrlSpy).toHaveBeenCalledWith("not-a-valid-url", "user-123");
     });
 
     it("should handle invalid JSON body", async () => {

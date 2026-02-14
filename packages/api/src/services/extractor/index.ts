@@ -1,21 +1,5 @@
 import OpenAI from "openai";
 
-let openaiClient: OpenAI | null = null;
-
-function getOpenAIClient(): OpenAI {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY environment variable is not set");
-  }
-
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  }
-
-  return openaiClient;
-}
-
 const SYSTEM_PROMPT = `You are an extraction and normalization engine.
 
 Your task is to extract ONLY the primary content (e.g., article body, documentation text, or main readable content) from the provided input and output it as clean, well-structured Markdown.
@@ -91,71 +75,94 @@ export interface ExtractedContent {
   metadata: ContentMetadata;
 }
 
-/**
- * Extracts metadata (author and title) from content using OpenAI
- */
-export async function extractMetadata(content: string): Promise<ContentMetadata> {
-  const openai = getOpenAIClient();
+export class ExtractorService {
+  private static openaiClient: OpenAI | null = null;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-5-mini-2025-08-07",
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content: METADATA_SYSTEM_PROMPT,
-      },
-      {
-        role: "user",
-        content: content,
-      },
-    ],
-  });
+  private getOpenAIClient(): OpenAI {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY environment variable is not set");
+    }
 
-  const responseText = completion.choices[0].message.content || '{"author": "Unknown", "title": "Untitled"}';
+    if (!ExtractorService.openaiClient) {
+      ExtractorService.openaiClient = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    }
 
-  try {
-    const parsed = JSON.parse(responseText) as ContentMetadata;
-    return {
-      author: parsed.author || "Unknown",
-      title: parsed.title || "Untitled",
-    };
-  } catch {
-    return {
-      author: "Unknown",
-      title: "Untitled",
-    };
+    return ExtractorService.openaiClient;
+  }
+
+  /**
+   * Extracts metadata (author and title) from content using OpenAI
+   */
+  public async extractMetadata(content: string): Promise<ContentMetadata> {
+    const openai = this.getOpenAIClient();
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-5-mini-2025-08-07",
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: METADATA_SYSTEM_PROMPT,
+        },
+        {
+          role: "user",
+          content: content,
+        },
+      ],
+    });
+
+    const responseText = completion.choices[0].message.content || '{"author": "Unknown", "title": "Untitled"}';
+
+    try {
+      const parsed = JSON.parse(responseText) as ContentMetadata;
+      return {
+        author: parsed.author || "Unknown",
+        title: parsed.title || "Untitled",
+      };
+    } catch {
+      return {
+        author: "Unknown",
+        title: "Untitled",
+      };
+    }
+  }
+
+  /**
+   * Extracts markdown content from text using OpenAI
+   */
+  public async extractMarkdown(content: string): Promise<string> {
+    const openai = this.getOpenAIClient();
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-5-mini-2025-08-07",
+      messages: [
+        {
+          role: "system",
+          content: SYSTEM_PROMPT,
+        },
+        {
+          role: "user",
+          content: content,
+        },
+      ],
+    });
+
+    return completion.choices[0].message.content || "Failed to extract content";
+  }
+
+  /**
+   * Extracts both markdown content and metadata from text content using OpenAI
+   */
+  public async extractContent(content: string): Promise<ExtractedContent> {
+    const [markdown, metadata] = await Promise.all([
+      this.extractMarkdown(content),
+      this.extractMetadata(content),
+    ]);
+
+    return { markdown, metadata };
   }
 }
 
-/**
- * Extracts markdown content from text using OpenAI
- */
-export async function extractMarkdown(content: string): Promise<string> {
-  const openai = getOpenAIClient();
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-5-mini-2025-08-07",
-    messages: [
-      {
-        role: "system",
-        content: SYSTEM_PROMPT,
-      },
-      {
-        role: "user",
-        content: content,
-      },
-    ],
-  });
-
-  return completion.choices[0].message.content || "Failed to extract content";
-}
-
-/**
- * Extracts both markdown content and metadata from text content using OpenAI
- */
-export async function extractContent(content: string): Promise<ExtractedContent> {
-  const [markdown, metadata] = await Promise.all([extractMarkdown(content), extractMetadata(content)]);
-
-  return { markdown, metadata };
-}
+export const extractorService = new ExtractorService();

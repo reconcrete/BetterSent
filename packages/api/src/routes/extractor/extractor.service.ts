@@ -1,7 +1,6 @@
-import fs from "fs";
 import { eq, and } from "drizzle-orm";
 
-import { extractContent, saveEpub, scrapeUrl } from "../../services";
+import { extractorService, scraperService, storageService } from "../../services";
 import { EmailService } from "../../services/email";
 import { db } from "../../db";
 import { kindleEmailAddress } from "../../db/schema";
@@ -63,7 +62,7 @@ export const extractText = async (textContent: string, userId: string, kindleEma
   try {
     log.debug("LLM process starting");
     const startTime = Date.now();
-    const { markdown, metadata } = await extractContent(textContent);
+    const { markdown, metadata } = await extractorService.extractContent(textContent);
     const llmDuration = Date.now() - startTime;
     log.debug({ duration: llmDuration }, "LLM process finished");
     log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");
@@ -76,12 +75,12 @@ export const extractText = async (textContent: string, userId: string, kindleEma
     });
 
     log.debug("Saving EPUB");
-    const { filename, path, savedAt } = await saveEpub(markdown, "text", metadata);
+    const { filename, path, savedAt } = await storageService.saveEpub(markdown, "text", metadata);
     log.debug({ filename }, "EPUB saved");
 
     log.debug("Sending email");
     const emailService = new EmailService();
-    const attachmentContent = fs.readFileSync(path).toString("base64");
+    const attachmentContent = await storageService.readFileAsBase64(path);
     const emailFilename = `${metadata.title}.epub`;
     await emailService.sendEmail(toEmail, metadata.title, "", [
       { filename: emailFilename, content: attachmentContent },
@@ -118,12 +117,12 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
 
   try {
     log.debug("Scraping URL");
-    const textContent = await scrapeUrl(url);
+    const textContent = await scraperService.scrapeUrl(url);
     log.debug({ contentLength: textContent.length }, "URL scraped");
 
     log.debug("LLM process starting");
     const startTime = Date.now();
-    const { markdown, metadata } = await extractContent(textContent);
+    const { markdown, metadata } = await extractorService.extractContent(textContent);
     const llmDuration = Date.now() - startTime;
     log.debug({ duration: llmDuration }, "LLM process finished");
     log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");
@@ -136,11 +135,11 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
     });
 
     log.debug("Saving EPUB");
-    const { filename, path, savedAt } = await saveEpub(markdown, "url", metadata);
+    const { filename, path, savedAt } = await storageService.saveEpub(markdown, "url", metadata);
     log.debug({ filename }, "EPUB saved");
 
     const emailService = new EmailService();
-    const attachmentContent = fs.readFileSync(path).toString("base64");
+    const attachmentContent = await storageService.readFileAsBase64(path);
     const emailFilename = `${metadata.title}.epub`;
 
     log.debug("Sending email");

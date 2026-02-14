@@ -1,18 +1,19 @@
 import { describe, expect, it } from "bun:test";
 import { readFile, readdir } from "fs/promises";
 import { dirname, join } from "path";
-import { saveMarkdown, saveEpub } from "../../src/services/storage.ts";
+import { FileSystemStorageService } from "../../src/services/storage/index.js";
 
 /**
  * Storage service tests for image localization and EPUB generation.
  * Uses a public image URL (httpbin) for download tests. EPUB tests require pandoc.
  */
 const SAMPLE_IMAGE_URL = "https://httpbin.org/image/png";
+const storageService = new FileSystemStorageService();
 
 describe("Storage service — image localization and EPUB", () => {
   it("should save markdown without images and not create images folder", async () => {
     const content = "# Hello\n\nNo images here.";
-    const { path } = await saveMarkdown(content, "no-images", {
+    const { path } = await storageService.saveMarkdown(content, "no-images", {
       title: "No Images",
       author: "Test",
     });
@@ -26,7 +27,7 @@ describe("Storage service — image localization and EPUB", () => {
 
   it("should create images folder and rewrite markdown when content has image URLs", async () => {
     const content = `# Article\n\n![alt](${SAMPLE_IMAGE_URL})`;
-    const { path } = await saveMarkdown(content, "with-image", {
+    const { path } = await storageService.saveMarkdown(content, "with-image", {
       title: "With Image",
       author: "Test",
     });
@@ -44,7 +45,7 @@ describe("Storage service — image localization and EPUB", () => {
 
   it("should produce EPUB with resource-path when markdown has images", async () => {
     const content = `# EPUB Test\n\n![pic](${SAMPLE_IMAGE_URL})`;
-    const { path: epubPath } = await saveEpub(content, "epub-images", {
+    const { path: epubPath } = await storageService.saveEpub(content, "epub-images", {
       title: "EPUB With Images",
       author: "Test",
     });
