@@ -12,7 +12,6 @@ export function createStorageService(): StorageService {
   const provider = resolveProvider();
   if (provider === "railway") {
     return new FileSystemStorageService();
-    //comm
   }
   return new FileSystemStorageService();
 }
