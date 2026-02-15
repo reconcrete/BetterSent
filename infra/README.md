@@ -34,6 +34,14 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 | `./status.sh` | Check status of all services |
 | `./logs.sh [api\|web\|telegram\|postgres]` | View service logs |
 
+### Storage
+
+| Script | Description |
+|--------|-------------|
+| `./bucket-list.sh [prefix]` | List files in Railway S3 bucket (optionally filter by prefix) |
+| `./bucket-download.sh [prefix] [destination]` | Download files from bucket prefix to local directory |
+| `./bucket-clear.sh [--yes]` | Delete all files from Railway S3 bucket (prompts for confirmation) |
+
 ## Service URLs
 
 - **API**: https://kindle-api-production.up.railway.app
@@ -55,6 +63,21 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 | `RESEND_API_KEY` | Resend API key for emails |
 | `RESEND_FROM_EMAIL` | From email address |
 | `NODE_ENV` | Environment (production) |
+| `STORAGE_S3_ENDPOINT` | S3-compatible endpoint for Railway bucket |
+| `STORAGE_S3_BUCKET` | Bucket name for persisted extraction artifacts |
+| `AWS_REGION` | Region for S3 client configuration |
+| `AWS_ACCESS_KEY_ID` | Access key for bucket access |
+| `AWS_SECRET_ACCESS_KEY` | Secret key for bucket access |
+| `STORAGE_S3_PREFIX` | Optional object key prefix (defaults to `extract`) |
+
+Storage script requirements:
+- `aws` CLI installed locally (`brew install awscli`).
+- Railway service `kindle-api` contains S3 env vars (`STORAGE_S3_BUCKET`, `STORAGE_S3_ENDPOINT`, `AWS_REGION`, credentials).
+
+Production behavior:
+- In `NODE_ENV=production` with full S3 configuration, extractor artifacts (`.md`, `images/*`, `.epub`) are uploaded to the bucket.
+- In local/dev environments, filesystem storage is used and artifacts are kept in `OUTPUT_DIR`.
+- If production has partial S3 configuration, API storage throws a startup/runtime error listing missing variables.
 
 ### Web Service (`kindle-web`)
 
