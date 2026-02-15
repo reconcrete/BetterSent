@@ -28,6 +28,23 @@ const SUPPORTED_FILE_EXTENSIONS = new Set([
   "epub",
 ]);
 
+const isProductionEnv = process.env.NODE_ENV === "production";
+
+const getSentFilename = (filename: string): string => {
+  if (isProductionEnv) {
+    return filename;
+  }
+
+  const dotIndex = filename.lastIndexOf(".");
+  if (dotIndex <= 0) {
+    return `${filename} (dev)`;
+  }
+
+  const name = filename.slice(0, dotIndex);
+  const extension = filename.slice(dotIndex);
+  return `${name} (dev)${extension}`;
+};
+
 const validateDirectFile = (file: File) => {
   if (!file.name) {
     throw new Error("Uploaded file must have a filename.");
@@ -119,7 +136,7 @@ export const extractText = async (textContent: string, userId: string, kindleEma
     log.debug("Sending email");
     const emailService = new EmailService();
     const attachmentContent = fs.readFileSync(path).toString("base64");
-    const emailFilename = `${metadata.title}.epub`;
+    const emailFilename = getSentFilename(`${metadata.title}.epub`);
     await emailService.sendEmail(toEmail, metadata.title, "", [
       { filename: emailFilename, content: attachmentContent },
     ]);
@@ -178,7 +195,7 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
 
     const emailService = new EmailService();
     const attachmentContent = fs.readFileSync(path).toString("base64");
-    const emailFilename = `${metadata.title}.epub`;
+    const emailFilename = getSentFilename(`${metadata.title}.epub`);
 
     log.debug("Sending email");
     await emailService.sendEmail(toEmail, metadata.title, "This is a extract url email", [
@@ -224,7 +241,7 @@ export const extractFile = async (file: File, userId: string, kindleEmailId?: st
     });
 
     await emailService.sendEmail(toEmail, file.name, "", [
-      { filename: file.name, content: attachmentContent },
+      { filename: getSentFilename(file.name), content: attachmentContent },
     ]);
     log.info({ to: toEmail, filename: file.name }, "File sent to Kindle successfully");
 
