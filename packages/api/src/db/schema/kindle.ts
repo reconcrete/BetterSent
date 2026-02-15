@@ -38,7 +38,7 @@ export const sendHistory = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    type: text("type").notNull(), // "url" | "text"
+    type: text("type").notNull(), // "url" | "text" | "file"
     content: text("content").notNull(), // URL or text snippet (truncated for display)
     title: text("title"), // Extracted title from content
     author: text("author"), // Extracted author from content

@@ -6,8 +6,8 @@ import { Button } from "~/shared/ui";
 import { api } from "~/shared/lib/treaty";
 
 type SendContentProps = {
-  type: "url" | "text";
-  content: string;
+  type: "url" | "text" | "file";
+  content: string | File | null;
   kindleEmailId?: string;
   onSuccess?: () => void;
 };
@@ -15,25 +15,37 @@ type SendContentProps = {
 export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      if (type === "url") {
-        return api.extract.url.post({ url: content, kindleEmailId });
+      if (type === "file") {
+        if (!(content instanceof File)) {
+          throw new Error("No file selected.");
+        }
+        return api.extract.file.post({ file: content, kindleEmailId });
       }
-      return api.extract.text.post({ textContent: content, kindleEmailId });
+
+      if (type === "url") {
+        return api.extract.url.post({ url: content as string, kindleEmailId });
+      }
+      return api.extract.text.post({ textContent: content as string, kindleEmailId });
     },
     onSuccess: () => {
       onSuccess?.();
     },
   });
 
+  const canSend =
+    type === "file"
+      ? content instanceof File
+      : typeof content === "string" && content.trim().length > 0;
+
   const handleSend = () => {
-    if (!content.trim()) return;
+    if (!canSend) return;
     mutate();
   };
 
   return (
     <Button
       onClick={handleSend}
-      disabled={isPending || !content.trim()}
+      disabled={isPending || !canSend}
       size="lg"
       className="w-full bg-black text-white hover:bg-neutral-800 disabled:bg-neutral-300"
     >

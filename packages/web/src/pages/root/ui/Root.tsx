@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, FileText, LogOut } from "lucide-react";
+import { Link, FileText, File as FileIcon, Upload, LogOut } from "lucide-react";
 import {
   Tabs,
   TabsList,
@@ -28,13 +28,74 @@ type KindleEmail = {
   isDefault: boolean;
 };
 
+const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
+const ACCEPTED_FILE_EXTENSIONS = [
+  "pdf",
+  "doc",
+  "docx",
+  "txt",
+  "rtf",
+  "htm",
+  "html",
+  "png",
+  "gif",
+  "jpg",
+  "jpeg",
+  "bmp",
+  "epub",
+];
+const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",");
+
 export const Root = () => {
   const { data: session, isPending } = useSession();
 
-  const [activeTab, setActiveTab] = useState<"url" | "text">("url");
+  const [activeTab, setActiveTab] = useState<"url" | "text" | "file">("url");
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
   const [selectedKindleId, setSelectedKindleId] = useState<string | undefined>(undefined);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const validateFile = (nextFile: File): string | null => {
+    if (nextFile.size > MAX_FILE_SIZE_BYTES) {
+      return "File size exceeds 200 MB limit.";
+    }
+
+    const extension = nextFile.name.split(".").pop()?.toLowerCase();
+    if (!extension || !ACCEPTED_FILE_EXTENSIONS.includes(extension)) {
+      return "Unsupported file type.";
+    }
+
+    return null;
+  };
+
+  const applyFile = (nextFile: File | null) => {
+    if (!nextFile) return;
+    const validationError = validateFile(nextFile);
+    if (validationError) {
+      setFile(null);
+      setFileError(validationError);
+      return;
+    }
+    setFile(nextFile);
+    setFileError(null);
+  };
+
+  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextFile = event.target.files?.[0] ?? null;
+    applyFile(nextFile);
+    event.target.value = "";
+  };
+
+  const handleFileDrop = (event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDraggingFile(false);
+    const nextFile = event.dataTransfer.files?.[0] ?? null;
+    applyFile(nextFile);
+  };
 
   // Fetch kindle emails for the selector
   const { data: kindleEmails } = useQuery({
@@ -54,8 +115,11 @@ export const Root = () => {
   const handleSuccess = () => {
     if (activeTab === "url") {
       setUrl("");
-    } else {
+    } else if (activeTab === "text") {
       setText("");
+    } else {
+      setFile(null);
+      setFileError(null);
     }
   };
 
@@ -89,8 +153,8 @@ export const Root = () => {
         </div>
 
         <div className="border border-neutral-200 rounded-xl p-6 space-y-5">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text")}>
-            <TabsList className="w-full grid grid-cols-2 bg-neutral-100">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text" | "file")}>
+            <TabsList className="w-full grid grid-cols-3 bg-neutral-100">
               <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-white">
                 <Link className="size-4" />
                 URL
@@ -98,6 +162,10 @@ export const Root = () => {
               <TabsTrigger value="text" className="gap-2 data-[state=active]:bg-white">
                 <FileText className="size-4" />
                 Plain Text
+              </TabsTrigger>
+              <TabsTrigger value="file" className="gap-2 data-[state=active]:bg-white">
+                <FileIcon className="size-4" />
+                File
               </TabsTrigger>
             </TabsList>
 
@@ -119,6 +187,50 @@ export const Root = () => {
                 rows={8}
                 className="w-full border border-neutral-200 rounded-md px-3 py-2 text-black placeholder:text-neutral-400 resize-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
+            </TabsContent>
+
+            <TabsContent value="file" className="mt-4 space-y-3">
+              <label
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setIsDraggingFile(true);
+                }}
+                onDragLeave={(event) => {
+                  event.preventDefault();
+                  setIsDraggingFile(false);
+                }}
+                onDrop={handleFileDrop}
+                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center transition-colors ${
+                  isDraggingFile
+                    ? "border-black bg-neutral-100"
+                    : "border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50"
+                }`}
+              >
+                <Upload className="size-5 text-neutral-500" />
+                <p className="text-sm text-black">Drop a file here or click to choose</p>
+                <p className="text-xs text-neutral-500">
+                  PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB up to 200 MB
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={FILE_INPUT_ACCEPT}
+                  onChange={handleFileInputChange}
+                  className="hidden"
+                />
+              </label>
+
+              {file && (
+                <p className="text-sm text-neutral-600">
+                  Selected: <span className="text-black">{file.name}</span>
+                </p>
+              )}
+
+              {fileError && (
+                <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                  {fileError}
+                </p>
+              )}
             </TabsContent>
           </Tabs>
 
@@ -153,7 +265,7 @@ export const Root = () => {
 
           <SendContent
             type={activeTab}
-            content={activeTab === "url" ? url : text}
+            content={activeTab === "url" ? url : activeTab === "text" ? text : file}
             kindleEmailId={effectiveKindleId}
             onSuccess={handleSuccess}
           />

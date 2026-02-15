@@ -11,6 +11,44 @@ import {
   updateSendHistoryEntry,
 } from "../history/history.service";
 
+const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
+const SUPPORTED_FILE_EXTENSIONS = new Set([
+  "pdf",
+  "doc",
+  "docx",
+  "txt",
+  "rtf",
+  "htm",
+  "html",
+  "png",
+  "gif",
+  "jpg",
+  "jpeg",
+  "bmp",
+  "epub",
+]);
+
+const validateDirectFile = (file: File) => {
+  if (!file.name) {
+    throw new Error("Uploaded file must have a filename.");
+  }
+
+  if (file.size <= 0) {
+    throw new Error("Uploaded file is empty.");
+  }
+
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    throw new Error("File size exceeds 200 MB limit.");
+  }
+
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (!extension || !SUPPORTED_FILE_EXTENSIONS.has(extension)) {
+    throw new Error(
+      "Unsupported file type. Allowed: PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB."
+    );
+  }
+};
+
 /**
  * Get the kindle email address to send to.
  * If kindleEmailId is provided, use that specific one.
@@ -154,6 +192,49 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
     return { markdown, metadata, filename, savedAt };
   } catch (error) {
     // Update history with error status
+    await updateSendHistoryEntry(historyId, {
+      status: "error",
+      errorMessage: error instanceof Error ? error.message : "Unknown error occurred",
+    });
+    throw error;
+  }
+};
+
+export const extractFile = async (file: File, userId: string, kindleEmailId?: string) => {
+  validateDirectFile(file);
+  log.debug({ filename: file.name, size: file.size }, "Received file for direct send");
+
+  const toEmail = await getKindleEmail(userId, kindleEmailId);
+  log.debug({ toEmail }, "Will send to");
+
+  const historyId = await createSendHistoryEntry(userId, {
+    type: "file",
+    content: file.name,
+    kindleEmailId,
+  });
+
+  try {
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const attachmentContent = fileBuffer.toString("base64");
+    const emailService = new EmailService();
+
+    await updateSendHistoryEntry(historyId, {
+      title: file.name,
+      kindleEmail: toEmail,
+    });
+
+    await emailService.sendEmail(toEmail, file.name, "", [
+      { filename: file.name, content: attachmentContent },
+    ]);
+    log.info({ to: toEmail, filename: file.name }, "File sent to Kindle successfully");
+
+    await updateSendHistoryEntry(historyId, { status: "completed" });
+
+    return {
+      filename: file.name,
+      sentAt: new Date().toISOString(),
+    };
+  } catch (error) {
     await updateSendHistoryEntry(historyId, {
       status: "error",
       errorMessage: error instanceof Error ? error.message : "Unknown error occurred",
