@@ -11,7 +11,7 @@ function resolveProvider(): StorageProvider {
 export function createStorageService(): StorageService {
   const provider = resolveProvider();
   if (provider === "railway") {
-    return new RailwayBucketStorageService();
+    return new FileSystemStorageService();
   }
   return new FileSystemStorageService();
 }
