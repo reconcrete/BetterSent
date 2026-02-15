@@ -240,7 +240,7 @@ export const extractFile = async (file: File, userId: string, kindleEmailId?: st
       kindleEmail: toEmail,
     });
 
-    await emailService.sendEmail(toEmail, file.name, "", [
+    await emailService.sendEmail(toEmail, file.name, "This is a extract file email", [
       { filename: getSentFilename(file.name), content: attachmentContent },
     ]);
     log.info({ to: toEmail, filename: file.name }, "File sent to Kindle successfully");
