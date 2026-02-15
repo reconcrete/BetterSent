@@ -1,9 +1,14 @@
 # Use official Bun image
 FROM oven/bun:1 AS base
 
-# Install Pandoc
-RUN apt-get update && apt-get install -y \
-    pandoc \
+# Install Pandoc (pin to release version)
+ARG PANDOC_VERSION=3.8.3
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    wget \
+    && wget -O /tmp/pandoc.deb "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb" \
+    && apt-get install -y /tmp/pandoc.deb \
+    && rm -f /tmp/pandoc.deb \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
