@@ -4,7 +4,7 @@ import { magicLink } from "better-auth/plugins";
 
 import { db } from "../db";
 import Elysia from "elysia";
-import { EmailService } from "../services/email";
+import { createEmailService } from "../services/email";
 
 const trustedOrigins = process.env.TRUSTED_ORIGINS
   ? process.env.TRUSTED_ORIGINS.split(",")
@@ -24,7 +24,7 @@ export const auth = betterAuth({
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }) => {
-        const emailService = new EmailService();
+        const emailService = createEmailService();
         await emailService.sendEmail(
           email,
           "Sign in to Kindle Wrap",
