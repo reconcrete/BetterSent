@@ -5,18 +5,18 @@ WORKDIR /app
 
 # Copy workspace files
 COPY package.json bun.lock ./
-COPY packages/api/package.json ./packages/api/
-COPY packages/web/package.json ./packages/web/
-COPY packages/telegram/package.json ./packages/telegram/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+COPY apps/telegram/package.json ./apps/telegram/
 
 # Install dependencies
 RUN bun install
 
 # Copy source code
-COPY packages/telegram ./packages/telegram
+COPY apps/telegram ./apps/telegram
 
 # Create data directory for session persistence
-RUN mkdir -p /app/packages/telegram/data
+RUN mkdir -p /app/apps/telegram/data
 
 # Set working directory
 WORKDIR /app

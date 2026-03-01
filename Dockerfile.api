@@ -15,17 +15,17 @@ WORKDIR /app
 
 # Copy workspace files
 COPY package.json bun.lock ./
-COPY packages/api/package.json ./packages/api/
-COPY packages/web/package.json ./packages/web/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
 
 # Install dependencies
 RUN bun install
 
 # Copy source code
-COPY packages/api ./packages/api
+COPY apps/api ./apps/api
 
 # Create output directory
-RUN mkdir -p /app/packages/api/output
+RUN mkdir -p /app/apps/api/output
 
 # Set working directory to api package
 WORKDIR /app
