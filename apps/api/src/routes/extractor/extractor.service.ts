@@ -1,7 +1,7 @@
-import fs from "fs";
 import { eq, and } from "drizzle-orm";
 
-import { extractContent, saveEpub, scrapeUrl } from "../../services";
+import { extractContent, scrapeUrl } from "../../services";
+import { createStorageService } from "../../services/storage";
 import { EmailService } from "../../services/email";
 import { db } from "../../db";
 import { kindleEmailAddress } from "../../db/schema";
@@ -130,12 +130,13 @@ export const extractText = async (textContent: string, userId: string, kindleEma
     });
 
     log.debug("Saving EPUB");
-    const { filename, path, savedAt } = await saveEpub(markdown, "text", metadata);
+    const storageService = createStorageService();
+    const { filename, path, savedAt } = await storageService.saveEpub(markdown, "text", metadata);
     log.debug({ filename }, "EPUB saved");
 
     log.debug("Sending email");
     const emailService = new EmailService();
-    const attachmentContent = fs.readFileSync(path).toString("base64");
+    const attachmentContent = (await storageService.getFile(path)).toString("base64");
     const emailFilename = getSentFilename(`${metadata.title}.epub`);
     await emailService.sendEmail(toEmail, metadata.title, "", [
       { filename: emailFilename, content: attachmentContent },
@@ -190,11 +191,12 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
     });
 
     log.debug("Saving EPUB");
-    const { filename, path, savedAt } = await saveEpub(markdown, "url", metadata);
+    const storageService = createStorageService();
+    const { filename, path, savedAt } = await storageService.saveEpub(markdown, "url", metadata);
     log.debug({ filename }, "EPUB saved");
 
     const emailService = new EmailService();
-    const attachmentContent = fs.readFileSync(path).toString("base64");
+    const attachmentContent = (await storageService.getFile(path)).toString("base64");
     const emailFilename = getSentFilename(`${metadata.title}.epub`);
 
     log.debug("Sending email");
