@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { readFile, readdir } from "fs/promises";
 import { dirname, join } from "path";
-import { saveMarkdown, saveEpub } from "../../src/services/storage.ts";
+import { saveMarkdown, saveEpub } from "../../src/services/storage/index.js";
 
 /**
  * Storage service tests for image localization and EPUB generation.

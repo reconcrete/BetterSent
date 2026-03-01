@@ -3,9 +3,9 @@ import { mkdtemp, mkdir, rm, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 
-import { FileSystemStorageAdapter } from "../../src/services/storage.ts/filesystem.adapter";
-import { createStorageAdapterFromEnv } from "../../src/services/storage.ts";
-import { S3StorageAdapter } from "../../src/services/storage.ts/s3.adapter";
+import { FileSystemStorageAdapter } from "../../src/services/storage/filesystem.adapter";
+import { createStorageAdapterFromEnv } from "../../src/services/storage";
+import { S3StorageAdapter } from "../../src/services/storage/s3.adapter";
 
 describe("Storage adapters", () => {
   it("FileSystemStorageAdapter returns output-relative epub filename", async () => {
@@ -56,7 +56,7 @@ describe("Storage adapters", () => {
           secretAccessKey: "secret",
           prefix: "extract",
         },
-        mockClient
+        mockClient,
       );
 
       const result = await adapter.persistRunArtifacts({
