@@ -1,8 +1,9 @@
-import Elysia from "elysia";
+import Elysia, { t } from "elysia";
 
-import { historyArrayOutputSchema } from "./history.schema";
-import { getSendHistory } from "./history.service";
+import { historyArrayOutputSchema, previewOutputSchema } from "./history.schema";
+import { getSendHistory, getHistoryEntry } from "./history.service";
 import { authMiddleware } from "../../lib/auth";
+import { createStorageService } from "../../services/storage";
 import { log } from "../../lib/logger";
 
 export const historyRouter = new Elysia({ prefix: "/history" })
@@ -24,4 +25,43 @@ export const historyRouter = new Elysia({ prefix: "/history" })
       }
     },
     { auth: true, response: historyArrayOutputSchema }
+  )
+  // Get markdown preview for a history entry
+  .get(
+    "/:id/preview",
+    async ({ user, params, set }) => {
+      try {
+        const entry = await getHistoryEntry(params.id, user.id);
+
+        if (!entry) {
+          set.status = 404;
+          return { success: false, error: "History entry not found" };
+        }
+
+        if (!entry.markdownPath) {
+          set.status = 404;
+          return { success: false, error: "No markdown preview available for this entry" };
+        }
+
+        const storageService = createStorageService();
+        const buffer = await storageService.getFile(entry.markdownPath);
+
+        return {
+          success: true,
+          data: { content: buffer.toString("utf-8") },
+        };
+      } catch (error) {
+        log.error({ error, historyId: params.id }, "Get preview error");
+        set.status = 500;
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error occurred",
+        };
+      }
+    },
+    {
+      auth: true,
+      params: t.Object({ id: t.String() }),
+      response: previewOutputSchema,
+    }
   );

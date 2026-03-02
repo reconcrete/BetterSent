@@ -20,6 +20,7 @@ export class FileSystemStorageService implements IStorageService {
     return {
       filename: relative(this.outputDir, epubPath),
       path: epubPath,
+      markdownPath: relative(this.outputDir, markdownPath),
       savedAt: new Date().toISOString(),
     };
   }

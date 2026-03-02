@@ -121,6 +121,8 @@ export const updateSendHistoryEntry = async (
     author?: string;
     errorMessage?: string;
     kindleEmail?: string;
+    markdownPath?: string;
+    epubPath?: string;
   }
 ): Promise<void> => {
   log.debug({ historyId, status: data.status }, "Updating send history entry");
@@ -133,9 +135,27 @@ export const updateSendHistoryEntry = async (
       ...(data.author !== undefined && { author: data.author }),
       ...(data.errorMessage !== undefined && { errorMessage: data.errorMessage }),
       ...(data.kindleEmail !== undefined && { kindleEmail: data.kindleEmail }),
+      ...(data.markdownPath !== undefined && { markdownPath: data.markdownPath }),
+      ...(data.epubPath !== undefined && { epubPath: data.epubPath }),
       updatedAt: new Date(),
     })
     .where(eq(sendHistory.id, historyId));
 
   log.debug({ historyId }, "Send history entry updated");
+};
+
+/**
+ * Get a single send history entry with ownership check
+ */
+export const getHistoryEntry = async (
+  historyId: string,
+  userId: string
+) => {
+  const [entry] = await db
+    .select()
+    .from(sendHistory)
+    .where(and(eq(sendHistory.id, historyId), eq(sendHistory.userId, userId)))
+    .limit(1);
+
+  return entry ?? null;
 };

@@ -48,6 +48,8 @@ export const sendHistory = pgTable(
       onDelete: "set null",
     }),
     kindleEmail: text("kindle_email"), // Store email directly for display even if kindle deleted
+    markdownPath: text("markdown_path"), // Path/key to the stored .md file
+    epubPath: text("epub_path"), // Path/key to the stored .epub file
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

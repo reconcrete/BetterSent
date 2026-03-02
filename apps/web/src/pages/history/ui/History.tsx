@@ -14,6 +14,7 @@ import {
 } from "~/shared/ui";
 import { api } from "~/shared/lib/treaty";
 import { useSession } from "~/shared/lib";
+import { PreviewExtraction } from "~/features/previewExtraction";
 
 type HistoryItem = {
   id: string;
@@ -172,6 +173,7 @@ export const History: FC = () => {
                   <TableHead>Status</TableHead>
                   <TableHead>Kindle</TableHead>
                   <TableHead className="text-right">Date</TableHead>
+                  <TableHead className="w-[70px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -206,6 +208,11 @@ export const History: FC = () => {
                     </TableCell>
                     <TableCell className="text-right text-neutral-500">
                       {formatDate(item.createdAt)}
+                    </TableCell>
+                    <TableCell>
+                      {item.status === "completed" && item.type !== "file" && (
+                        <PreviewExtraction historyId={item.id} />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

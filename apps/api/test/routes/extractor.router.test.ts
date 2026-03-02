@@ -49,7 +49,7 @@ const createTestExtractorRouter = (isAuthenticated: boolean = true) => {
       "/text",
       async ({ body, set }) => {
         try {
-          const data = await extractorService.extractText(body.textContent);
+          const data = await extractorService.extractText(body.textContent, "user-123");
           return { success: true, data };
         } catch (error) {
           console.error("❌ Extraction error:", error);
@@ -66,7 +66,7 @@ const createTestExtractorRouter = (isAuthenticated: boolean = true) => {
       "/url",
       async ({ body, set }) => {
         try {
-          const data = await extractorService.extractUrl(body.url);
+          const data = await extractorService.extractUrl(body.url, "user-123");
           return { success: true, data };
         } catch (error) {
           console.error("❌ Extraction error:", error);

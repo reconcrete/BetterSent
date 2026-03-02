@@ -133,8 +133,11 @@ export const extractText = async (textContent: string, userId: string, kindleEma
 
     log.debug("Saving EPUB");
     const storageService = createStorageService();
-    const { filename, path, savedAt } = await storageService.saveEpub(markdown, "text", metadata);
+    const { filename, path, markdownPath, savedAt } = await storageService.saveEpub(markdown, "text", metadata);
     log.debug({ filename }, "EPUB saved");
+
+    // Store file paths in history
+    await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
     log.debug("Sending email");
     const emailService = createEmailService();
@@ -196,8 +199,11 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
 
     log.debug("Saving EPUB");
     const storageService = createStorageService();
-    const { filename, path, savedAt } = await storageService.saveEpub(markdown, "url", metadata);
+    const { filename, path, markdownPath, savedAt } = await storageService.saveEpub(markdown, "url", metadata);
     log.debug({ filename }, "EPUB saved");
+
+    // Store file paths in history
+    await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
     const emailService = createEmailService();
     const attachmentContent = (await storageService.getFile(path)).toString("base64");

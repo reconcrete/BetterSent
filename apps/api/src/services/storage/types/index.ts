@@ -6,6 +6,7 @@ export interface EpubMetadata {
 export interface SaveResult {
   filename: string;
   path: string;
+  markdownPath: string;
   savedAt: string;
 }
 

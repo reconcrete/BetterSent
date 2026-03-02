@@ -8,6 +8,7 @@
  */
 export type ModalPropsMap = {
   KindleSettingsModal: KindleSettingsModalProps;
+  MarkdownPreviewModal: MarkdownPreviewModalProps;
 };
 
 // ============================================
@@ -15,6 +16,10 @@ export type ModalPropsMap = {
 // ============================================
 
 export type KindleSettingsModalProps = ModalPropsBase;
+
+export type MarkdownPreviewModalProps = ModalPropsBase & {
+  historyId: string;
+};
 
 /**
  * Union of all modal names derived from ModalPropsMap.

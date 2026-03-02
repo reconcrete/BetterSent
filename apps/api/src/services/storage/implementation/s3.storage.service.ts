@@ -66,9 +66,13 @@ export class S3StorageService implements IStorageService {
       const epubRelativePath = toPosixPath(relative(runFolderPath, epubPath));
       const epubKey = posix.join(this.prefix, basename(runFolderPath), epubRelativePath);
 
+      const mdRelativePath = toPosixPath(relative(runFolderPath, markdownPath));
+      const mdKey = posix.join(this.prefix, basename(runFolderPath), mdRelativePath);
+
       return {
         filename: epubKey,
         path: epubKey,
+        markdownPath: mdKey,
         savedAt: new Date().toISOString(),
       };
     } finally {

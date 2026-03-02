@@ -28,3 +28,20 @@ export const historyArrayOutputSchema = {
     error: t.String(),
   }),
 };
+
+export const previewOutputSchema = {
+  200: t.Object({
+    success: t.Literal(true),
+    data: t.Object({
+      content: t.String(),
+    }),
+  }),
+  404: t.Object({
+    success: t.Literal(false),
+    error: t.String(),
+  }),
+  500: t.Object({
+    success: t.Literal(false),
+    error: t.String(),
+  }),
+};
