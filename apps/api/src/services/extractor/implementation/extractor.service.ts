@@ -4,7 +4,11 @@ import type { ContentMetadata, ExtractedContent } from "../types";
 import { METADATA_SYSTEM_PROMPT, SYSTEM_PROMPT } from "../constants";
 
 export class ExtractorService {
-  constructor(private readonly client: OpenAI) {}
+  private readonly client: OpenAI;
+
+  constructor(client: OpenAI) {
+    this.client = client;
+  }
 
   async extractContent(content: string): Promise<ExtractedContent> {
     const [markdown, metadata] = await Promise.all([

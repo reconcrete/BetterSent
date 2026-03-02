@@ -3,10 +3,13 @@ import { Resend } from "resend";
 import type { EmailAttachment } from "../types";
 
 export class EmailService {
-  constructor(
-    private readonly client: Resend,
-    private readonly fromEmail: string,
-  ) {}
+  private readonly client: Resend;
+  private readonly fromEmail: string;
+
+  constructor(client: Resend, fromEmail: string) {
+    this.client = client;
+    this.fromEmail = fromEmail;
+  }
 
   async sendEmail(to: string | string[], subject: string, text: string, attachments: EmailAttachment[]): Promise<void> {
     await this.client.emails.send({
