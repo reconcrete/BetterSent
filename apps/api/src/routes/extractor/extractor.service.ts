@@ -104,9 +104,9 @@ const getKindleEmail = async (userId: string, kindleEmailId?: string): Promise<s
 export const extractText = async (textContent: string, userId: string, kindleEmailId?: string) => {
   log.debug({ contentLength: textContent.length }, "Received text content");
 
-  // Get kindle email first to fail fast if not configured
-  const toEmail = await getKindleEmail(userId, kindleEmailId);
-  log.debug({ toEmail }, "Will send to");
+  // In production, resolve kindle email first to fail fast if not configured
+  const toEmail = isProductionEnv ? await getKindleEmail(userId, kindleEmailId) : null;
+  if (toEmail) log.debug({ toEmail }, "Will send to");
 
   // Create history entry with processing status
   const historyId = await createSendHistoryEntry(userId, {
@@ -128,7 +128,7 @@ export const extractText = async (textContent: string, userId: string, kindleEma
     await updateSendHistoryEntry(historyId, {
       title: metadata.title,
       author: metadata.author,
-      kindleEmail: toEmail,
+      ...(toEmail && { kindleEmail: toEmail }),
     });
 
     log.debug("Saving EPUB");
@@ -139,14 +139,19 @@ export const extractText = async (textContent: string, userId: string, kindleEma
     // Store file paths in history
     await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
-    log.debug("Sending email");
-    const emailService = createEmailService();
-    const attachmentContent = (await storageService.getFile(path)).toString("base64");
-    const emailFilename = getSentFilename(`${metadata.title}.epub`);
-    await emailService.sendEmail(toEmail, metadata.title, "", [
-      { filename: emailFilename, content: attachmentContent },
-    ]);
-    log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
+    // Send email only in production
+    if (isProductionEnv && toEmail) {
+      log.debug("Sending email");
+      const emailService = createEmailService();
+      const attachmentContent = (await storageService.getFile(path)).toString("base64");
+      const emailFilename = getSentFilename(`${metadata.title}.epub`);
+      await emailService.sendEmail(toEmail, metadata.title, "", [
+        { filename: emailFilename, content: attachmentContent },
+      ]);
+      log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
+    } else {
+      log.info({ filename }, "Dev mode: skipping email, epub stored locally");
+    }
 
     // Update history to completed
     await updateSendHistoryEntry(historyId, { status: "completed" });
@@ -165,9 +170,9 @@ export const extractText = async (textContent: string, userId: string, kindleEma
 export const extractUrl = async (url: string, userId: string, kindleEmailId?: string) => {
   log.debug({ url }, "Received URL");
 
-  // Get kindle email first to fail fast if not configured
-  const toEmail = await getKindleEmail(userId, kindleEmailId);
-  log.debug({ toEmail }, "Will send to");
+  // In production, resolve kindle email first to fail fast if not configured
+  const toEmail = isProductionEnv ? await getKindleEmail(userId, kindleEmailId) : null;
+  if (toEmail) log.debug({ toEmail }, "Will send to");
 
   // Create history entry with processing status
   const historyId = await createSendHistoryEntry(userId, {
@@ -194,7 +199,7 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
     await updateSendHistoryEntry(historyId, {
       title: metadata.title,
       author: metadata.author,
-      kindleEmail: toEmail,
+      ...(toEmail && { kindleEmail: toEmail }),
     });
 
     log.debug("Saving EPUB");
@@ -205,15 +210,20 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
     // Store file paths in history
     await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
-    const emailService = createEmailService();
-    const attachmentContent = (await storageService.getFile(path)).toString("base64");
-    const emailFilename = getSentFilename(`${metadata.title}.epub`);
+    // Send email only in production
+    if (isProductionEnv && toEmail) {
+      const emailService = createEmailService();
+      const attachmentContent = (await storageService.getFile(path)).toString("base64");
+      const emailFilename = getSentFilename(`${metadata.title}.epub`);
 
-    log.debug("Sending email");
-    await emailService.sendEmail(toEmail, metadata.title, "This is a extract url email", [
-      { filename: emailFilename, content: attachmentContent },
-    ]);
-    log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
+      log.debug("Sending email");
+      await emailService.sendEmail(toEmail, metadata.title, "This is a extract url email", [
+        { filename: emailFilename, content: attachmentContent },
+      ]);
+      log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
+    } else {
+      log.info({ filename }, "Dev mode: skipping email, epub stored locally");
+    }
 
     // Update history to completed
     await updateSendHistoryEntry(historyId, { status: "completed" });
