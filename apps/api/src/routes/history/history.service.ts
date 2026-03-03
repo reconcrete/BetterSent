@@ -14,6 +14,7 @@ export type SendHistoryData = {
   status: SendHistoryStatus;
   errorMessage: string | null;
   kindleEmail: string | null;
+  hasPreview: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -27,6 +28,7 @@ const toSendHistoryData = (row: typeof sendHistory.$inferSelect): SendHistoryDat
   status: row.status as SendHistoryStatus,
   errorMessage: row.errorMessage,
   kindleEmail: row.kindleEmail,
+  hasPreview: !!row.markdownPath,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
 });

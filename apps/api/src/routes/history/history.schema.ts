@@ -14,6 +14,7 @@ export const historyItemSchema = t.Object({
   ]),
   errorMessage: t.Nullable(t.String()),
   kindleEmail: t.Nullable(t.String()),
+  hasPreview: t.Boolean(),
   createdAt: t.String(),
   updatedAt: t.String(),
 });

@@ -25,6 +25,7 @@ type HistoryItem = {
   status: "pending" | "processing" | "completed" | "error";
   errorMessage: string | null;
   kindleEmail: string | null;
+  hasPreview: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -210,7 +211,7 @@ export const History: FC = () => {
                       {formatDate(item.createdAt)}
                     </TableCell>
                     <TableCell>
-                      {item.status === "completed" && item.type !== "file" && (
+                      {item.hasPreview && (
                         <PreviewExtraction historyId={item.id} />
                       )}
                     </TableCell>
