@@ -1,4 +1,4 @@
-# Wrap
+# Bettersent
 
 A service that allows you to easily grab content from URLs and send it to your Kindle device.
 

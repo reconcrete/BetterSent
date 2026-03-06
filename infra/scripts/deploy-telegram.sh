@@ -3,10 +3,10 @@
 
 set -e
 
-echo "Deploying kindle-telegram..."
-railway service link kindle-telegram
+echo "Deploying bettersent-telegram..."
+railway service link bettersent-telegram
 railway up --detach
 
 echo ""
 echo "Deployment started. View logs at:"
-railway logs --service kindle-telegram
+railway logs --service bettersent-telegram

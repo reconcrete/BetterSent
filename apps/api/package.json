@@ -1,5 +1,5 @@
 {
-  "name": "@kindle-wrap/api",
+  "name": "@bettersent/api",
   "version": "1.0.50",
   "scripts": {
     "test": "bun test",

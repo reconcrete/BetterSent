@@ -14,4 +14,4 @@ if [ -z "$DATABASE_PUBLIC_URL" ]; then
 fi
 
 echo "Opening Drizzle Studio..."
-DATABASE_URL="$DATABASE_PUBLIC_URL" bun run --filter @kindle-wrap/api db:studio
+DATABASE_URL="$DATABASE_PUBLIC_URL" bun run --filter @bettersent/api db:studio

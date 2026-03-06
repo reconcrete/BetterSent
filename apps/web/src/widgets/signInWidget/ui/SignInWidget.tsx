@@ -15,7 +15,7 @@ export const SignInWidget: FC = () => {
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-black">Kindle Wrap</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-black">Bettersent</h1>
           <p className="text-neutral-500">
             {activeTab === "signup"
               ? "Create a new account"

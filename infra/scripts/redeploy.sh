@@ -6,16 +6,16 @@ SERVICE=${1:-api}
 
 case $SERVICE in
   api)
-    echo "Redeploying kindle-api..."
-    railway redeploy --service kindle-api
+    echo "Redeploying bettersent-api..."
+    railway redeploy --service bettersent-api
     ;;
   web)
-    echo "Redeploying kindle-web..."
-    railway redeploy --service kindle-web
+    echo "Redeploying bettersent-web..."
+    railway redeploy --service bettersent-web
     ;;
   telegram|bot)
-    echo "Redeploying kindle-telegram..."
-    railway redeploy --service kindle-telegram
+    echo "Redeploying bettersent-telegram..."
+    railway redeploy --service bettersent-telegram
     ;;
   *)
     echo "Usage: ./redeploy.sh [api|web|telegram]"

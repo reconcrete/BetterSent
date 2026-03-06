@@ -34,4 +34,4 @@ WORKDIR /app
 EXPOSE 8080
 
 # Start the API
-CMD ["bun", "run", "--filter", "@kindle-wrap/api", "start"]
+CMD ["bun", "run", "--filter", "@bettersent/api", "start"]

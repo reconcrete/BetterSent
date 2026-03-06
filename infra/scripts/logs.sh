@@ -6,13 +6,13 @@ SERVICE=${1:-api}
 
 case $SERVICE in
   api)
-    railway logs --service kindle-api
+    railway logs --service bettersent-api
     ;;
   web)
-    railway logs --service kindle-web
+    railway logs --service bettersent-web
     ;;
   telegram|bot)
-    railway logs --service kindle-telegram
+    railway logs --service bettersent-telegram
     ;;
   postgres|db)
     railway logs --service Postgres

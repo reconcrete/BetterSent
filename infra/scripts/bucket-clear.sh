@@ -31,11 +31,11 @@ fi
 echo "Clearing all bucket objects..."
 echo ""
 
-railway run --service kindle-api -- bash -lc '
+railway run --service bettersent-api -- bash -lc '
 set -euo pipefail
 
 if [ -z "${STORAGE_S3_BUCKET:-}" ] || [ -z "${STORAGE_S3_ENDPOINT:-}" ] || [ -z "${AWS_REGION:-}" ]; then
-  echo "Missing required env vars in Railway service kindle-api."
+  echo "Missing required env vars in Railway service bettersent-api."
   echo "Required: STORAGE_S3_BUCKET, STORAGE_S3_ENDPOINT, AWS_REGION"
   exit 1
 fi

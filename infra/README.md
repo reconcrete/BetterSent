@@ -1,6 +1,6 @@
 # Infrastructure Scripts
 
-Utility scripts for deploying and managing the Kindle Wrap application on Railway.
+Utility scripts for deploying and managing the Bettersent application on Railway.
 
 ## Prerequisites
 
@@ -44,13 +44,13 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 
 ## Service URLs
 
-- **API**: https://kindle-api-production.up.railway.app
-- **Web**: https://kindle-web-production.up.railway.app
+- **API**: https://bettersent-api-production.up.railway.app
+- **Web**: https://bettersent-web-production.up.railway.app
 - **Telegram**: (no URL - bot service)
 
 ## Environment Variables
 
-### API Service (`kindle-api`)
+### API Service (`bettersent-api`)
 
 | Variable | Description |
 |----------|-------------|
@@ -72,14 +72,14 @@ Utility scripts for deploying and managing the Kindle Wrap application on Railwa
 
 Storage script requirements:
 - `aws` CLI installed locally (`brew install awscli`).
-- Railway service `kindle-api` contains S3 env vars (`STORAGE_S3_BUCKET`, `STORAGE_S3_ENDPOINT`, `AWS_REGION`, credentials).
+- Railway service `bettersent-api` contains S3 env vars (`STORAGE_S3_BUCKET`, `STORAGE_S3_ENDPOINT`, `AWS_REGION`, credentials).
 
 Production behavior:
 - In `NODE_ENV=production` with full S3 configuration, extractor artifacts (`.md`, `images/*`, `.epub`) are uploaded to the bucket.
 - In local/dev environments, filesystem storage is used and artifacts are kept in `OUTPUT_DIR`.
 - If production has partial S3 configuration, API storage throws a startup/runtime error listing missing variables.
 
-### Web Service (`kindle-web`)
+### Web Service (`bettersent-web`)
 
 | Variable | Description |
 |----------|-------------|
@@ -87,7 +87,7 @@ Production behavior:
 | `RAILPACK_BUILD_CMD` | Custom build command |
 | `RAILPACK_SPA_OUTPUT_DIR` | SPA output directory |
 
-### Telegram Service (`kindle-telegram`)
+### Telegram Service (`bettersent-telegram`)
 
 | Variable | Description |
 |----------|-------------|
@@ -98,13 +98,13 @@ Production behavior:
 
 ```bash
 # Check service status
-railway service status --service kindle-api
+railway service status --service bettersent-api
 
 # View logs
-railway logs --service kindle-api
+railway logs --service bettersent-api
 
 # Set environment variable
-railway variable set KEY=value --service kindle-api
+railway variable set KEY=value --service bettersent-api
 
 # Open Railway dashboard
 railway open

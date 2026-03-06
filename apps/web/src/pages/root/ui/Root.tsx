@@ -145,7 +145,7 @@ export const Root = () => {
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-black">Kindle Wrap</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-black">Bettersent</h1>
           <p className="text-neutral-500">Send articles and text to your Kindle device</p>
           <p className="text-sm text-neutral-400">
             Signed in as <span className="text-black">{session.user.email}</span>

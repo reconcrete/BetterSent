@@ -27,7 +27,7 @@ export const auth = betterAuth({
         const emailService = createEmailService();
         await emailService.sendEmail(
           email,
-          "Sign in to Kindle Wrap",
+          "Sign in to Bettersent",
           `Click here to sign in: ${url}`,
           []
         );

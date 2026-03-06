@@ -49,7 +49,7 @@ async function requireAuth(
   const session = getSession(userId);
   if (!session?.cookie) {
     await ctx.reply(
-      "You need to log in first. Use /login to authenticate with your Kindle Wrap account."
+      "You need to log in first. Use /login to authenticate with your Bettersent account."
     );
     return null;
   }
@@ -74,7 +74,7 @@ bot.start(async (ctx) => {
 
   if (isLoggedIn) {
     await ctx.reply(
-      "Welcome back to Kindle Wrap!\n\n" +
+      "Welcome back to Bettersent!\n\n" +
         "You can:\n" +
         "- Send a URL to extract and send to your Kindle\n" +
         "- Send text to convert and send to your Kindle\n" +
@@ -83,9 +83,9 @@ bot.start(async (ctx) => {
     );
   } else {
     await ctx.reply(
-      "Welcome to Kindle Wrap Bot!\n\n" +
+      "Welcome to Bettersent Bot!\n\n" +
         "This bot lets you send articles and text to your Kindle device.\n\n" +
-        "To get started, please log in with your Kindle Wrap account using /login"
+        "To get started, please log in with your Bettersent account using /login"
     );
   }
 });
@@ -200,9 +200,9 @@ bot.action(/^select_kindle:(.+)$/, async (ctx) => {
 // /help command
 bot.command("help", async (ctx) => {
   await ctx.reply(
-    "Kindle Wrap Bot Commands:\n\n" +
+    "Bettersent Bot Commands:\n\n" +
       "/start - Start the bot\n" +
-      "/login - Log in with your Kindle Wrap account\n" +
+      "/login - Log in with your Bettersent account\n" +
       "/logout - Log out\n" +
       "/kindle - List and select Kindle email\n" +
       "/add_kindle - Add a new Kindle email\n" +
@@ -353,7 +353,7 @@ bot.catch((err, ctx) => {
 
 // Start bot
 bot.launch().then(() => {
-  console.log("Kindle Wrap Telegram bot is running");
+  console.log("Bettersent Telegram bot is running");
 });
 
 // Enable graceful stop

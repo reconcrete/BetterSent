@@ -22,4 +22,4 @@ RUN mkdir -p /app/apps/telegram/data
 WORKDIR /app
 
 # Start the Telegram bot
-CMD ["bun", "run", "--filter", "@kindle-wrap/telegram", "start"]
+CMD ["bun", "run", "--filter", "@bettersent/telegram", "start"]

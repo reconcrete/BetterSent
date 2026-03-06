@@ -1,10 +1,10 @@
-# Kindle Wrap Telegram Bot
+# Bettersent Telegram Bot
 
 A Telegram bot interface for sending content to your Kindle device.
 
 ## Features
 
-- Authenticate with your existing Kindle Wrap account (email + password)
+- Authenticate with your existing Bettersent account (email + password)
 - List and select from your configured Kindle email addresses
 - Add new Kindle email addresses
 - Send URLs to extract articles and deliver to Kindle
@@ -35,7 +35,7 @@ A Telegram bot interface for sending content to your Kindle device.
 | Command | Description |
 |---------|-------------|
 | `/start` | Welcome message and current status |
-| `/login` | Log in with your Kindle Wrap account |
+| `/login` | Log in with your Bettersent account |
 | `/logout` | Log out and clear session |
 | `/kindle` | List and select Kindle email addresses |
 | `/add_kindle` | Add a new Kindle email address |
@@ -81,7 +81,7 @@ Both use your selected Kindle email (or the default one).
 packages/telegram/
 ├── src/
 │   ├── index.ts      # Bot entrypoint and command handlers
-│   ├── api.ts        # API client for Better Auth and Kindle Wrap API
+│   ├── api.ts        # API client for Better Auth and Bettersent API
 │   └── storage.ts    # Local JSON session storage
 ├── test/
 │   ├── api.test.ts   # API client tests
@@ -97,7 +97,7 @@ packages/telegram/
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `BOT_TOKEN` | Telegram bot token from @BotFather | (required) |
-| `API_URL` | Kindle Wrap API URL | `http://localhost:8080` |
+| `API_URL` | Bettersent API URL | `http://localhost:8080` |
 
 ## Development
 

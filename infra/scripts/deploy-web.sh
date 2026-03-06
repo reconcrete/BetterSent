@@ -3,10 +3,10 @@
 
 set -e
 
-echo "Deploying kindle-web..."
-railway service link kindle-web
+echo "Deploying bettersent-web..."
+railway service link bettersent-web
 railway up --detach
 
 echo ""
 echo "Deployment started. View logs at:"
-railway logs --service kindle-web
+railway logs --service bettersent-web

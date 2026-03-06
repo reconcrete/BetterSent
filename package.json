@@ -1,5 +1,5 @@
 {
-  "name": "kindle-wrap",
+  "name": "bettersent",
   "private": true,
   "packageManager": "bun@1.3.3",
   "workspaces": {
@@ -15,17 +15,20 @@
     "test": "turbo test",
     "lint": "turbo lint",
     "build": "turbo build",
-    "build:web": "turbo build --filter=@kindle-wrap/web",
+    "build:web": "turbo build --filter=@bettersent/web",
 
-    "db:studio": "bun run --filter @kindle-wrap/api db:studio",
-    "db:generate": "bun run --filter @kindle-wrap/api db:generate",
-    "db:migrate": "bun run --filter @kindle-wrap/api db:migrate",
-    "db:push": "bun run --filter @kindle-wrap/api db:push",
+    "db:studio": "bun run --filter @bettersent/api db:studio",
+    "db:generate": "bun run --filter @bettersent/api db:generate",
+    "db:migrate": "bun run --filter @bettersent/api db:migrate",
+    "db:push": "bun run --filter @bettersent/api db:push",
 
-    "api:start": "bun run --filter @kindle-wrap/api start",
+    "api:start": "bun run --filter @bettersent/api start",
 
     "reinstall": "bun run clean && bun install",
     "clean": "rm -rf node_modules ./apps/*/node_modules .turbo ./apps/*/.turbo"
+  },
+  "overrides": {
+    "elysia": "1.4.20"
   },
   "devDependencies": {
     "turbo": "^2.8.10"
