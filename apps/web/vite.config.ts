@@ -1,4 +1,4 @@
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig, loadEnv, type PluginOption } from "vite";
 
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -15,21 +15,24 @@ const reactScan: () => PluginOption = () => ({
     ),
 });
 
-export default defineConfig({
-  plugins: [react(), tailwindcss(), reactScan()],
-  server: {
-    allowedHosts: [process.env.HOST ?? "localhost"],
-  },
-  resolve: {
-    alias: {
-      "~/backend": path.resolve(__dirname, "../backend/src"),
-
-      "~/app": path.resolve(__dirname, "./src/app"),
-      "~/pages": path.resolve(__dirname, "./src/pages"),
-      "~/widgets": path.resolve(__dirname, "./src/widgets"),
-      "~/features": path.resolve(__dirname, "./src/features"),
-      "~/entities": path.resolve(__dirname, "./src/entities"),
-      "~/shared": path.resolve(__dirname, "./src/shared"),
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, __dirname, "");
+  return {
+    plugins: [react(), tailwindcss(), reactScan()],
+    server: {
+      allowedHosts: [env.HOST ?? "localhost"],
     },
-  },
+    resolve: {
+      alias: {
+        "~/backend": path.resolve(__dirname, "../backend/src"),
+
+        "~/app": path.resolve(__dirname, "./src/app"),
+        "~/pages": path.resolve(__dirname, "./src/pages"),
+        "~/widgets": path.resolve(__dirname, "./src/widgets"),
+        "~/features": path.resolve(__dirname, "./src/features"),
+        "~/entities": path.resolve(__dirname, "./src/entities"),
+        "~/shared": path.resolve(__dirname, "./src/shared"),
+      },
+    },
+  };
 });
