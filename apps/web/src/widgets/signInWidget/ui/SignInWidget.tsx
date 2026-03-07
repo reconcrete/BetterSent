@@ -27,7 +27,7 @@ export const SignInWidget: FC = () => {
         <div className="border border-neutral-200 rounded-xl p-6 space-y-5">
           <button
             type="button"
-            onClick={() => signIn.social({ provider: "google" })}
+            onClick={() => signIn.social({ provider: "google", callbackURL: "/" })}
             className="w-full flex items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
