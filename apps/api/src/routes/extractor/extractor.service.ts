@@ -5,7 +5,7 @@ import { createScraperService } from "../../services/scraper";
 import { createStorageService } from "../../services/storage";
 import { createEmailService } from "../../services/email";
 import { db } from "../../db";
-import { kindleEmailAddress } from "../../db/schema";
+import { kindleEmailAddress } from "@bettersent/db/schema";
 import { log } from "../../lib/logger";
 import {
   createSendHistoryEntry,

@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "start": "bun run src/index.ts",
-    "test": "bun test"
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
-    "telegraf": "latest"
+    "@bettersent/db": "workspace:*",
+    "grammy": "^1.35.0",
+    "@grammyjs/conversations": "^2.0.3",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "bun-types": "latest",

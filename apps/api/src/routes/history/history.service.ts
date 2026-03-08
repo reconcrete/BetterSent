@@ -1,5 +1,5 @@
 import { db } from "../../db";
-import { sendHistory, kindleEmailAddress } from "../../db/schema";
+import { sendHistory, kindleEmailAddress } from "@bettersent/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { log } from "../../lib/logger";
 

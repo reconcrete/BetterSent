@@ -1,5 +1,5 @@
 import { db } from "../../db";
-import { user } from "../../db/schema";
+import { user } from "@bettersent/db/schema";
 import { eq } from "drizzle-orm";
 import { log } from "../../lib/logger";
 

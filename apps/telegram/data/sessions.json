@@ -1,4 +1,9 @@
 {
+  "226770002": {
+    "userId": "QA20JILs87BbZhXtzFKqvW6xihPHzVop",
+    "email": "antonmorozoff64@gmail.com",
+    "selectedDeviceId": "6e31d4e9-c776-484a-8af4-808c15443eec"
+  },
   "sessions": {
     "226770002": {
       "cookie": "better-auth.session_token=HNTpl0i3OH5D0i5p0Er1Rr6i1IWEHFgZ.Vb6jYMuNq06jzA0dW7DO6lr3%2FXv4EnH64EvjQQYnO9c%3D; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax",

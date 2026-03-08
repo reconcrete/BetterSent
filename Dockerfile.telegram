@@ -8,11 +8,13 @@ COPY package.json bun.lock ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY apps/telegram/package.json ./apps/telegram/
+COPY packages/db/package.json ./packages/db/
 
 # Install dependencies
 RUN bun install
 
 # Copy source code
+COPY packages/db ./packages/db
 COPY apps/telegram ./apps/telegram
 
 # Create data directory for session persistence
