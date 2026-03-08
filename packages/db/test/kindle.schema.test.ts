@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { kindleEmailAddress, kindleEmailAddressRelations } from "../../src/db/schema/kindle";
+import { kindleEmailAddress, kindleEmailAddressRelations } from "@bettersent/db/schema";
 import { getTableName, getTableColumns } from "drizzle-orm";
 
 describe("Kindle Email Address Schema", () => {
