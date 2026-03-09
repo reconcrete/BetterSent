@@ -35,7 +35,7 @@ export async function authConversation(
   }
 
   // Generate and send verification code
-  const code = generateCode();
+  const code = await conversation.external(() => generateCode());
   const sent = await conversation.external(() => sendVerificationCode(email!, code));
 
   if (!sent) {
