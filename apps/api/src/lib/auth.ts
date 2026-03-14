@@ -59,7 +59,7 @@ export const authMiddleware = new Elysia({ name: 'auth-middleware' })
   .mount(auth.handler)
   .macro({
     auth: {
-      async resolve({ status, request: { headers }, store }) {
+      async resolve({ status, request: { headers } }) {
         // Allow internal API key auth (e.g. from telegram bot)
         const apiKey = headers.get("x-internal-api-key");
         const userId = headers.get("x-user-id");
