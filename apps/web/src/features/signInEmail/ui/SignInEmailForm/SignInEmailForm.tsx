@@ -3,7 +3,7 @@ import { useState } from "react";
 import { LogIn } from "lucide-react";
 
 import { Button, Input } from "~/shared/ui";
-import { signIn } from "~/shared/lib";
+import { signIn, useAnalytics } from "~/shared/lib";
 
 type SignInEmailFormProps = {
   onSuccess?: () => void;
@@ -14,6 +14,7 @@ export const SignInEmailForm: FC<SignInEmailFormProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const analytics = useAnalytics();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +26,7 @@ export const SignInEmailForm: FC<SignInEmailFormProps> = ({ onSuccess }) => {
       if (error) {
         setError(error.message ?? "Login failed");
       } else {
+        analytics.capture("sign_in_email");
         onSuccess?.();
       }
     } catch (err) {

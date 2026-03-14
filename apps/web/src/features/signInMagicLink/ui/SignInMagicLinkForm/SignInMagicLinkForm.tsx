@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Mail, CheckCircle } from "lucide-react";
 
 import { Button, Input } from "~/shared/ui";
-import { signIn } from "~/shared/lib";
+import { signIn, useAnalytics } from "~/shared/lib";
 
 type SignInMagicLinkFormProps = {
   callbackURL?: string;
@@ -16,6 +16,7 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const analytics = useAnalytics();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +36,7 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
       if (error) {
         setError(error.message ?? "Failed to send magic link");
       } else {
+        analytics.capture("sign_in_magic_link");
         setIsSent(true);
       }
     } catch (err) {

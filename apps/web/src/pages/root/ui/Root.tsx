@@ -17,7 +17,7 @@ import {
 import { SendContent } from "~/features/sendContent";
 import { KindleSettings } from "~/features/openKindleSettings";
 import { OpenHistory } from "~/features/openHistory";
-import { signOut, useSession } from "~/shared/lib";
+import { signOut, useSession, useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 import { SignInWidget } from "~/widgets/signInWidget";
 
@@ -48,6 +48,7 @@ const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(
 
 export const Root = () => {
   const { data: session, isPending } = useSession();
+  const analytics = useAnalytics();
 
   const [activeTab, setActiveTab] = useState<"url" | "text" | "file">("url");
   const [url, setUrl] = useState("");
@@ -124,6 +125,7 @@ export const Root = () => {
   };
 
   const handleSignOut = async () => {
+    analytics.reset();
     await signOut();
   };
 

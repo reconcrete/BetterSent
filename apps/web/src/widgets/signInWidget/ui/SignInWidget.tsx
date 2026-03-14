@@ -6,11 +6,13 @@ import { SignInEmailForm } from "~/features/signInEmail";
 import { SignInMagicLinkForm } from "~/features/signInMagicLink";
 import { SignUpEmailForm } from "~/features/signUpEmail";
 import { signIn } from "~/shared/lib/auth";
+import { useAnalytics } from "~/shared/lib";
 
 type AuthTab = "signin" | "magic-link" | "signup";
 
 export const SignInWidget: FC = () => {
   const [activeTab, setActiveTab] = useState<AuthTab>("signin");
+  const analytics = useAnalytics();
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
@@ -27,7 +29,10 @@ export const SignInWidget: FC = () => {
         <div className="border border-neutral-200 rounded-xl p-6 space-y-5">
           <button
             type="button"
-            onClick={() => signIn.social({ provider: "google", callbackURL: window.location.origin })}
+            onClick={() => {
+              analytics.capture("sign_in_google");
+              signIn.social({ provider: "google", callbackURL: window.location.origin });
+            }}
             className="w-full flex items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">

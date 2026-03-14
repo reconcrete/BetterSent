@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader2 as Loader, Send } from "lucide-react";
 
 import { Button } from "~/shared/ui";
+import { useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 
 type SendContentProps = {
@@ -13,6 +14,7 @@ type SendContentProps = {
 };
 
 export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess }) => {
+  const analytics = useAnalytics();
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       if (type === "file") {
@@ -28,6 +30,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       return api.extract.text.post({ textContent: content as string, kindleEmailId });
     },
     onSuccess: () => {
+      analytics.capture("extraction_sent", { type });
       onSuccess?.();
     },
   });

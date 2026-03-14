@@ -3,7 +3,7 @@ import { useState } from "react";
 import { UserPlus } from "lucide-react";
 
 import { Button, Input } from "~/shared/ui";
-import { signUp } from "~/shared/lib";
+import { signUp, useAnalytics } from "~/shared/lib";
 
 type SignUpEmailFormProps = {
   onSuccess?: () => void;
@@ -15,6 +15,7 @@ export const SignUpEmailForm: FC<SignUpEmailFormProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const analytics = useAnalytics();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +27,7 @@ export const SignUpEmailForm: FC<SignUpEmailFormProps> = ({ onSuccess }) => {
       if (error) {
         setError(error.message ?? "Sign up failed");
       } else {
+        analytics.capture("sign_up_email");
         onSuccess?.();
       }
     } catch (err) {
