@@ -29,6 +29,19 @@ function getHeaders(userId: string): Record<string, string> {
   };
 }
 
+async function handleResponse<T>(res: Response): Promise<ApiResponse<T>> {
+  if (!res.ok) {
+    const text = await res.text();
+    console.error(`API error ${res.status}: ${text}`);
+    return { success: false, error: `API returned ${res.status}` };
+  }
+  const json = await res.json();
+  if (!json) {
+    return { success: false, error: "Empty response from API" };
+  }
+  return json;
+}
+
 export async function extractUrl(
   url: string,
   userId: string,
@@ -39,7 +52,7 @@ export async function extractUrl(
     headers: getHeaders(userId),
     body: JSON.stringify({ url, kindleEmailId }),
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function extractText(
@@ -52,7 +65,7 @@ export async function extractText(
     headers: getHeaders(userId),
     body: JSON.stringify({ textContent, kindleEmailId }),
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function extractFile(
@@ -73,5 +86,5 @@ export async function extractFile(
     },
     body: formData,
   });
-  return res.json();
+  return handleResponse(res);
 }
