@@ -10,6 +10,10 @@ interface ExtractResult {
   markdown: string;
   filename: string;
   savedAt: string;
+  metadata?: {
+    title: string;
+    author?: string;
+  };
 }
 
 interface ExtractFileResult {

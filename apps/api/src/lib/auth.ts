@@ -3,6 +3,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins";
 
 import { db } from "../db";
+import { user as userTable } from "@bettersent/db/schema";
+import { eq } from "drizzle-orm";
 import Elysia from "elysia";
 import { createEmailService } from "../services/email";
 
@@ -51,11 +53,27 @@ export const auth = betterAuth({
   },
 });
 
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
+
 export const authMiddleware = new Elysia({ name: 'auth-middleware' })
   .mount(auth.handler)
   .macro({
     auth: {
-      async resolve({ status, request: { headers } }) {
+      async resolve({ status, request: { headers }, store }) {
+        // Allow internal API key auth (e.g. from telegram bot)
+        const apiKey = headers.get("x-internal-api-key");
+        const userId = headers.get("x-user-id");
+        if (apiKey && userId && INTERNAL_API_KEY && apiKey === INTERNAL_API_KEY) {
+          const dbUser = await db.query.user.findFirst({
+            where: eq(userTable.id, userId),
+          });
+          if (!dbUser) return status(401);
+          return {
+            user: dbUser as any,
+            session: null as any,
+          };
+        }
+
         const session = await auth.api.getSession({
           headers,
         });

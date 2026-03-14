@@ -146,7 +146,8 @@ bot.callbackQuery(/^confirm_text:/, async (ctx) => {
     await ctx.editMessageText("⏳ Processing text...");
     const result = await apiClient.extractText(text, ctx.session.userId!, ctx.session.selectedDeviceId);
     if (result.success) {
-      await ctx.editMessageText(`✅ Sent to your Kindle!\n📄 ${result.data?.filename || "Document"}`);
+      const title = result.data?.metadata?.title || result.data?.filename || "Document";
+      await ctx.editMessageText(`✅ Sent to your Kindle!\n📄 ${title}`);
     } else {
       await ctx.editMessageText(`❌ Failed: ${result.error || "Unknown error"}`);
     }
