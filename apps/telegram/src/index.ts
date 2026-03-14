@@ -12,4 +12,5 @@ await bot.api.setMyCommands([
 ]);
 
 console.log("Bot starting...");
+await bot.api.deleteWebhook({ drop_pending_updates: true });
 bot.start();
