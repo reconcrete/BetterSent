@@ -15,7 +15,7 @@ if [ -z "$DATABASE_PUBLIC_URL" ]; then
 fi
 
 echo "Running migrations..."
-DATABASE_URL="$DATABASE_PUBLIC_URL" bun run --filter @bettersent/api db:migrate
+DATABASE_URL="$DATABASE_PUBLIC_URL" bun run --filter @bettersent/db db:migrate
 
 echo ""
 echo "Migrations completed successfully!"
