@@ -1,48 +1,33 @@
 import { session } from "grammy";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { dirname } from "path";
+import { eq } from "@bettersent/db";
+import { db, telegramSession } from "../db";
 import type { SessionData } from "../types/session";
 import type { BotContext } from "../types/context";
-
-const SESSION_FILE = "data/sessions.json";
-
-function ensureDataDir() {
-  const dir = dirname(SESSION_FILE);
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
-  }
-}
-
-function readSessions(): Record<string, SessionData> {
-  ensureDataDir();
-  if (!existsSync(SESSION_FILE)) return {};
-  try {
-    return JSON.parse(readFileSync(SESSION_FILE, "utf-8"));
-  } catch {
-    return {};
-  }
-}
-
-function writeSessions(sessions: Record<string, SessionData>) {
-  ensureDataDir();
-  writeFileSync(SESSION_FILE, JSON.stringify(sessions, null, 2));
-}
 
 export function sessionMiddleware() {
   return session<SessionData, BotContext>({
     initial: () => ({}),
     getSessionKey: (ctx) => ctx.chat?.id?.toString(),
     storage: {
-      read: (key) => readSessions()[key],
-      write: (key, value) => {
-        const sessions = readSessions();
-        sessions[key] = value;
-        writeSessions(sessions);
+      read: async (key) => {
+        const row = await db
+          .select()
+          .from(telegramSession)
+          .where(eq(telegramSession.key, key))
+          .then((rows) => rows[0]);
+        return (row?.data as SessionData) ?? undefined;
       },
-      delete: (key) => {
-        const sessions = readSessions();
-        delete sessions[key];
-        writeSessions(sessions);
+      write: async (key, value) => {
+        await db
+          .insert(telegramSession)
+          .values({ key, data: value })
+          .onConflictDoUpdate({
+            target: telegramSession.key,
+            set: { data: value, updatedAt: new Date() },
+          });
+      },
+      delete: async (key) => {
+        await db.delete(telegramSession).where(eq(telegramSession.key, key));
       },
     },
   });
