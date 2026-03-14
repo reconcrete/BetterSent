@@ -11,6 +11,22 @@ await bot.api.setMyCommands([
   { command: "logout", description: "Log out" },
 ]);
 
-console.log("Bot starting...");
-await bot.api.deleteWebhook({ drop_pending_updates: true });
-bot.start();
+async function startBot(retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      console.log("Bot starting...");
+      await bot.api.deleteWebhook({ drop_pending_updates: true });
+      await bot.start();
+      return;
+    } catch (err: any) {
+      if (err?.error_code === 409 && i < retries - 1) {
+        console.log(`409 conflict, retrying in ${(i + 1) * 2}s...`);
+        await new Promise((r) => setTimeout(r, (i + 1) * 2000));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
+startBot();
