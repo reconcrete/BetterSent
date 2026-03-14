@@ -1,0 +1,17 @@
+{
+  "name": "@bettersent/storage-browser",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.990.0",
+    "elysia": "catalog:"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}
