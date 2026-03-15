@@ -22,7 +22,7 @@ import { SendContent } from "~/features/sendContent";
 import { KindleSettings } from "~/features/openKindleSettings";
 import { OpenHistory } from "~/features/openHistory";
 
-import { SignInWidget } from "~/widgets/signInWidget";
+import { SignInCard } from "~/widgets/signInCard";
 
 import { useOnboardingGuard } from "../hooks";
 
@@ -146,7 +146,7 @@ export const Root = () => {
 
   // Show auth widget if not logged in
   if (!session) {
-    return <SignInWidget />;
+    return <SignInCard />;
   }
 
   // Show main app if logged in
