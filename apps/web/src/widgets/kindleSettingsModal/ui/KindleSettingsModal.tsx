@@ -7,13 +7,20 @@ import {
   Star,
   Loader2 as Loader,
   Mail,
-  X,
 } from "lucide-react";
-import * as Dialog from "@radix-ui/react-dialog";
 
-import { Button, Input } from "~/shared/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogHeader,
+  Button,
+  Input,
+} from "~/shared/ui";
 import { api } from "~/shared/lib/treaty";
 import type { KindleSettingsModalProps } from "~/entities/modals/types";
+import { useCreateDevice } from "~/entities/device";
 
 type KindleEmail = {
   id: string;
@@ -52,27 +59,11 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: async ({ email, label }: { email: string; label?: string }) => {
-      const response = await api.kindle.post({ email, label });
-      if (response.error) {
-        const errorValue = response.error.value;
-        const errorMessage =
-          typeof errorValue === "object" && errorValue && "error" in errorValue
-            ? errorValue.error
-            : "Failed to create Kindle email";
-        throw new Error(errorMessage);
-      }
-      return response.data?.data;
-    },
+  const createMutation = useCreateDevice({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["kindleEmails"] });
       setNewEmail("");
       setNewLabel("");
       setError("");
-    },
-    onError: (err: Error) => {
-      setError(err.message);
     },
   });
 
@@ -123,16 +114,15 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
     if (!newEmail.trim()) return;
 
     // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newEmail.trim())) {
-      setError("Please enter a valid email address");
+    if (!newEmail.trim().toLowerCase().endsWith("@kindle.com")) {
+      setError("Please enter a valid Kindle email address (must end with @kindle.com)");
       return;
     }
 
-    createMutation.mutate({
-      email: newEmail.trim(),
-      label: newLabel.trim() || undefined,
-    });
+    createMutation.mutate(
+      { email: newEmail.trim(), label: newLabel.trim() || undefined },
+      { onError: (err: Error) => setError(err.message) },
+    );
   };
 
   const handleDelete = (id: string) => {
@@ -149,26 +139,17 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
     setDefaultMutation.isPending;
 
   return (
-    <Dialog.Root open onOpenChange={(open) => !open && closeModal()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl border border-neutral-200 shadow-lg p-6 w-full max-w-md max-h-[85vh] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
-          <Dialog.Title className="text-xl font-bold text-black">
+    <Dialog open onOpenChange={(open) => !open && closeModal()}>
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto p-6">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-black">
             Kindle Settings
-          </Dialog.Title>
-          <Dialog.Description className="text-sm text-neutral-500 mt-1 mb-4">
+          </DialogTitle>
+          <DialogDescription className="text-sm text-neutral-500">
             Manage your Kindle email addresses. Content will be sent to your
             default address.
-          </Dialog.Description>
-
-          <Dialog.Close asChild>
-            <button
-              className="absolute top-4 right-4 text-neutral-400 hover:text-black transition-colors"
-              aria-label="Close"
-            >
-              <X className="size-4" />
-            </button>
-          </Dialog.Close>
+          </DialogDescription>
+        </DialogHeader>
 
           {/* Add new email form */}
           <form onSubmit={handleAddEmail} className="space-y-3 mb-6">
@@ -310,8 +291,7 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
               </ul>
             )}
           </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   );
 };

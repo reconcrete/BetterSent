@@ -9,6 +9,7 @@ const mockProfileData = {
   email: "test@example.com",
   name: "Test User",
   createdAt: "2024-01-01T00:00:00.000Z",
+  onboarded: false,
 };
 
 const mockUpdatedProfileData = {
@@ -16,6 +17,7 @@ const mockUpdatedProfileData = {
   email: "test@example.com",
   name: "Updated Name",
   createdAt: "2024-01-01T00:00:00.000Z",
+  onboarded: false,
 };
 
 // Helper to create test router with mock auth

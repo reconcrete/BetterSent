@@ -1,6 +1,7 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, FileText, File as FileIcon, Upload, LogOut } from "lucide-react";
+
 import {
   Tabs,
   TabsList,
@@ -14,12 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/shared/ui";
+import { api } from "~/shared/lib/treaty";
+import { signOut, useSession, useAnalytics } from "~/shared/lib";
+
 import { SendContent } from "~/features/sendContent";
 import { KindleSettings } from "~/features/openKindleSettings";
 import { OpenHistory } from "~/features/openHistory";
-import { signOut, useSession, useAnalytics } from "~/shared/lib";
-import { api } from "~/shared/lib/treaty";
+
 import { SignInWidget } from "~/widgets/signInWidget";
+
+import { useOnboardingGuard } from "../hooks";
 
 type KindleEmail = {
   id: string;
@@ -49,6 +54,8 @@ const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(
 export const Root = () => {
   const { data: session, isPending } = useSession();
   const analytics = useAnalytics();
+  
+  useOnboardingGuard();
 
   const [activeTab, setActiveTab] = useState<"url" | "text" | "file">("url");
   const [url, setUrl] = useState("");

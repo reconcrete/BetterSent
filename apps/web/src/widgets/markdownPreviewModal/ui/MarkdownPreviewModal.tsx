@@ -1,11 +1,16 @@
 import type { FC } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { X } from "lucide-react";
-import * as Dialog from "@radix-ui/react-dialog";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { api } from "~/shared/lib/treaty";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogHeader,
+} from "~/shared/ui";
 import type { MarkdownPreviewModalProps } from "~/entities/modals/types";
 
 export const MarkdownPreviewModal: FC<MarkdownPreviewModalProps> = ({
@@ -33,25 +38,16 @@ export const MarkdownPreviewModal: FC<MarkdownPreviewModalProps> = ({
   });
 
   return (
-    <Dialog.Root open onOpenChange={(open) => !open && closeModal()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl border border-neutral-200 shadow-lg p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
-          <Dialog.Title className="text-xl font-bold text-black">
+    <Dialog open onOpenChange={(open) => !open && closeModal()}>
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto p-6">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-black">
             Markdown Preview
-          </Dialog.Title>
-          <Dialog.Description className="text-sm text-neutral-500 mt-1 mb-4">
+          </DialogTitle>
+          <DialogDescription className="text-sm text-neutral-500">
             Preview of the extracted content in markdown format.
-          </Dialog.Description>
-
-          <Dialog.Close asChild>
-            <button
-              className="absolute top-4 right-4 text-neutral-400 hover:text-black transition-colors"
-              aria-label="Close"
-            >
-              <X className="size-4" />
-            </button>
-          </Dialog.Close>
+          </DialogDescription>
+        </DialogHeader>
 
           {isLoading && (
             <div className="space-y-3 animate-pulse">
@@ -75,8 +71,7 @@ export const MarkdownPreviewModal: FC<MarkdownPreviewModalProps> = ({
               <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
             </div>
           )}
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   );
 };

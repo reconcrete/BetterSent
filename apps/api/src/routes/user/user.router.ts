@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 
 import { updateProfileInputSchema, userProfileOutputSchema } from "./user.schema";
-import { getProfile, updateProfile } from "./user.service";
+import { getProfile, updateProfile, markOnboarded } from "./user.service";
 import { authMiddleware } from "../../lib/auth";
 import { log } from "../../lib/logger";
 
@@ -40,4 +40,21 @@ export const userRouter = new Elysia({ prefix: "/user" })
       }
     },
     { auth: true, body: updateProfileInputSchema, response: userProfileOutputSchema }
+  )
+  .post(
+    "/me/onboard",
+    async ({ user, set }) => {
+      try {
+        const data = await markOnboarded(user.id);
+        return { success: true, data };
+      } catch (error) {
+        log.error({ error }, "Mark onboarded error");
+        set.status = 500;
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error occurred",
+        };
+      }
+    },
+    { auth: true, response: userProfileOutputSchema }
   );

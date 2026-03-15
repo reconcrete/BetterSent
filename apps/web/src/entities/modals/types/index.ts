@@ -9,6 +9,7 @@
 export type ModalPropsMap = {
   KindleSettingsModal: KindleSettingsModalProps;
   MarkdownPreviewModal: MarkdownPreviewModalProps;
+  OnboardingModal: OnboardingModalProps;
 };
 
 // ============================================
@@ -20,6 +21,8 @@ export type KindleSettingsModalProps = ModalPropsBase;
 export type MarkdownPreviewModalProps = ModalPropsBase & {
   historyId: string;
 };
+
+export type OnboardingModalProps = ModalPropsBase;
 
 /**
  * Union of all modal names derived from ModalPropsMap.

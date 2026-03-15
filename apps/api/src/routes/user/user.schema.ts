@@ -6,6 +6,7 @@ export const userProfileSchema = t.Object({
   email: t.String(),
   name: t.String(),
   createdAt: t.String(),
+  onboarded: t.Boolean(),
 });
 
 export const updateProfileInputSchema = t.Object({

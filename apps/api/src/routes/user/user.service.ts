@@ -19,6 +19,7 @@ export const getProfile = async (userId: string) => {
     email: userData.email,
     name: userData.name,
     createdAt: userData.createdAt.toISOString(),
+    onboarded: userData.onboarded,
   };
 };
 
@@ -42,5 +43,30 @@ export const updateProfile = async (userId: string, data: { name?: string }) => 
     email: updatedUser.email,
     name: updatedUser.name,
     createdAt: updatedUser.createdAt.toISOString(),
+    onboarded: updatedUser.onboarded,
+  };
+};
+
+export const markOnboarded = async (userId: string) => {
+  log.debug({ userId }, "Marking user as onboarded");
+
+  const [updatedUser] = await db
+    .update(user)
+    .set({ onboarded: true, updatedAt: new Date() })
+    .where(eq(user.id, userId))
+    .returning();
+
+  if (!updatedUser) {
+    throw new Error("User not found");
+  }
+
+  log.debug({ userId }, "User marked as onboarded");
+
+  return {
+    id: updatedUser.id,
+    email: updatedUser.email,
+    name: updatedUser.name,
+    createdAt: updatedUser.createdAt.toISOString(),
+    onboarded: updatedUser.onboarded,
   };
 };

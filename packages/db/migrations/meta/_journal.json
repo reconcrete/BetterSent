@@ -36,6 +36,13 @@
       "when": 1773492717790,
       "tag": "0004_absurd_bruce_banner",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773525266611,
+      "tag": "0005_add-onboarded-to-user",
+      "breakpoints": true
     }
   ]
 }
