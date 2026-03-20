@@ -18,7 +18,7 @@ export const KindleSettings = memo(() => {
   return (
     <Button
       variant="ghost"
-      className="text-neutral-500 hover:text-black"
+      className="text-muted-foreground hover:text-foreground"
       aria-label="Kindle Settings"
       onClick={handleClick}
     >

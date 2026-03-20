@@ -38,22 +38,22 @@ const StatusBadge: FC<{ status: HistoryItem["status"]; errorMessage?: string | n
     pending: {
       icon: Clock,
       label: "Pending",
-      className: "bg-neutral-100 text-neutral-700",
+      className: "bg-muted text-muted-foreground",
     },
     processing: {
       icon: Loader2,
       label: "Processing",
-      className: "bg-amber-100 text-amber-700",
+      className: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
     },
     completed: {
       icon: CheckCircle2,
       label: "Completed",
-      className: "bg-green-100 text-green-700",
+      className: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400",
     },
     error: {
       icon: XCircle,
       label: "Error",
-      className: "bg-red-100 text-red-700",
+      className: "bg-destructive/10 text-destructive",
     },
   };
 
@@ -69,7 +69,7 @@ const StatusBadge: FC<{ status: HistoryItem["status"]; errorMessage?: string | n
         {config.label}
       </span>
       {status === "error" && errorMessage && (
-        <div className="absolute left-0 top-full mt-1 z-10 hidden group-hover:block w-64 p-2 text-xs bg-neutral-900 text-white rounded-lg shadow-lg">
+        <div className="absolute left-0 top-full mt-1 z-10 hidden group-hover:block w-64 p-2 text-xs bg-foreground text-background rounded-lg shadow-lg">
           {errorMessage}
         </div>
       )}
@@ -80,7 +80,7 @@ const StatusBadge: FC<{ status: HistoryItem["status"]; errorMessage?: string | n
 const TypeBadge: FC<{ type: HistoryItem["type"] }> = ({ type }) => {
   const Icon = type === "url" ? Link : type === "text" ? FileText : File;
   return (
-    <span className="inline-flex items-center gap-1.5 text-neutral-500">
+    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
       <Icon className="size-4" />
       {type === "url" ? "URL" : type === "text" ? "Text" : "File"}
     </span>
@@ -119,18 +119,18 @@ export const History: FC = () => {
 
   if (isSessionPending) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-neutral-500">Loading...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-black">Please sign in</h1>
-          <p className="text-neutral-500">You need to be signed in to view your history.</p>
+          <h1 className="text-2xl font-bold text-foreground">Please sign in</h1>
+          <p className="text-muted-foreground">You need to be signed in to view your history.</p>
           <Button onClick={() => navigate("/")}>Go to Home</Button>
         </div>
       </div>
@@ -138,14 +138,14 @@ export const History: FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate("/")}
-            className="text-neutral-500 hover:text-black"
+            className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="size-4" />
             Back
@@ -153,22 +153,22 @@ export const History: FC = () => {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-black">Send History</h1>
-          <p className="text-neutral-500">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Send History</h1>
+          <p className="text-muted-foreground">
             Track what you've sent to your Kindle device
           </p>
         </div>
 
-        <div className="border border-neutral-200 rounded-xl overflow-hidden">
+        <div className="border border-border rounded-xl overflow-hidden">
           {isLoading ? (
             <div className="p-8 text-center">
-              <Loader2 className="size-6 animate-spin mx-auto text-neutral-400" />
-              <p className="mt-2 text-neutral-500">Loading history...</p>
+              <Loader2 className="size-6 animate-spin mx-auto text-muted-foreground" />
+              <p className="mt-2 text-muted-foreground">Loading history...</p>
             </div>
           ) : historyItems && historyItems.length > 0 ? (
             <Table>
               <TableHeader>
-                <TableRow className="bg-neutral-50">
+                <TableRow className="bg-muted">
                   <TableHead className="w-[200px]">Title</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Status</TableHead>
@@ -186,7 +186,7 @@ export const History: FC = () => {
                           {item.title || truncateContent(item.content)}
                         </div>
                         {item.author && (
-                          <div className="text-xs text-neutral-400 truncate">
+                          <div className="text-xs text-muted-foreground truncate">
                             by {item.author}
                           </div>
                         )}
@@ -198,16 +198,16 @@ export const History: FC = () => {
                     <TableCell>
                       <StatusBadge status={item.status} errorMessage={item.errorMessage} />
                     </TableCell>
-                    <TableCell className="text-neutral-500">
+                    <TableCell className="text-muted-foreground">
                       {item.kindleEmail ? (
                         <span className="text-sm truncate max-w-[150px] block">
                           {item.kindleEmail}
                         </span>
                       ) : (
-                        <span className="text-neutral-400">-</span>
+                        <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right text-neutral-500">
+                    <TableCell className="text-right text-muted-foreground">
                       {formatDate(item.createdAt)}
                     </TableCell>
                     <TableCell>
@@ -221,8 +221,8 @@ export const History: FC = () => {
             </Table>
           ) : (
             <div className="p-8 text-center">
-              <p className="text-neutral-500">No history yet</p>
-              <p className="mt-1 text-sm text-neutral-400">
+              <p className="text-muted-foreground">No history yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Content you send to your Kindle will appear here.
               </p>
             </div>

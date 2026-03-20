@@ -142,10 +142,10 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
     <Dialog open onOpenChange={(open) => !open && closeModal()}>
       <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto p-6">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-black">
+          <DialogTitle className="text-xl font-bold">
             Kindle Settings
           </DialogTitle>
-          <DialogDescription className="text-sm text-neutral-500">
+          <DialogDescription>
             Manage your Kindle email addresses. Content will be sent to your
             default address.
           </DialogDescription>
@@ -156,7 +156,7 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
             <div className="space-y-2">
               <label
                 htmlFor="kindle-email"
-                className="text-sm font-medium text-black"
+                className="text-sm font-medium text-foreground"
               >
                 Kindle Email
               </label>
@@ -166,14 +166,13 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
                 placeholder="your-kindle@kindle.com"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                className="border-neutral-200 text-black placeholder:text-neutral-400"
                 disabled={isPending}
               />
             </div>
             <div className="space-y-2">
               <label
                 htmlFor="kindle-label"
-                className="text-sm font-medium text-black"
+                className="text-sm font-medium text-foreground"
               >
                 Label (optional)
               </label>
@@ -183,18 +182,17 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
                 placeholder="e.g., My Kindle Paperwhite"
                 value={newLabel}
                 onChange={(e) => setNewLabel(e.target.value)}
-                className="border-neutral-200 text-black placeholder:text-neutral-400"
                 disabled={isPending}
               />
             </div>
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+              <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
                 {error}
               </p>
             )}
             <Button
               type="submit"
-              className="w-full bg-black text-white hover:bg-neutral-800"
+              className="w-full"
               disabled={isPending || !newEmail.trim()}
             >
               {createMutation.isPending ? (
@@ -213,27 +211,27 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
 
           {/* Email list */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-black">
+            <h3 className="text-sm font-medium text-foreground">
               Your Kindle Addresses
             </h3>
 
             {isLoading && (
               <div className="flex items-center justify-center py-8">
-                <Loader className="animate-spin size-6 text-neutral-400" />
+                <Loader className="animate-spin size-6 text-muted-foreground" />
               </div>
             )}
 
             {fetchError && (
-              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+              <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
                 Failed to load Kindle emails
               </p>
             )}
 
             {!isLoading && !fetchError && kindleEmails?.length === 0 && (
-              <div className="text-center py-8 text-neutral-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <Mail className="size-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No Kindle addresses yet</p>
-                <p className="text-xs text-neutral-400 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Add your first Kindle email above
                 </p>
               </div>
@@ -244,19 +242,19 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
                 {kindleEmails.map((kindle: KindleEmail) => (
                   <li
                     key={kindle.id}
-                    className="flex items-center justify-between p-3 border border-neutral-200 rounded-lg"
+                    className="flex items-center justify-between p-3 border border-border rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         {kindle.isDefault && (
                           <Star className="size-4 text-amber-500 fill-amber-500 shrink-0" />
                         )}
-                        <span className="text-sm font-medium text-black truncate">
+                        <span className="text-sm font-medium text-foreground truncate">
                           {kindle.label || kindle.email}
                         </span>
                       </div>
                       {kindle.label && (
-                        <p className="text-xs text-neutral-500 truncate">
+                        <p className="text-xs text-muted-foreground truncate">
                           {kindle.email}
                         </p>
                       )}
@@ -279,7 +277,7 @@ export const KindleSettingsModal: FC<KindleSettingsModalProps> = ({
                         size="icon-sm"
                         onClick={() => handleDelete(kindle.id)}
                         disabled={isPending}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         title="Delete"
                         aria-label="Delete"
                       >

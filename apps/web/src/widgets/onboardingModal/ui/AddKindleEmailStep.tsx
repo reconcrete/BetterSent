@@ -41,8 +41,8 @@ export const AddKindleEmailStep: FC<AddKindleEmailStepProps> = ({ onComplete, on
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <h2 className="text-xl font-bold text-black">Add Your Kindle Email</h2>
-        <p className="text-sm text-neutral-500">
+        <h2 className="text-xl font-bold text-foreground">Add Your Kindle Email</h2>
+        <p className="text-sm text-muted-foreground">
           Enter your Kindle email address so we know where to send your content.
           You can find it in your Amazon Kindle settings.
         </p>
@@ -50,7 +50,7 @@ export const AddKindleEmailStep: FC<AddKindleEmailStepProps> = ({ onComplete, on
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="space-y-2">
-          <label htmlFor="onboard-kindle-email" className="text-sm font-medium text-black">
+          <label htmlFor="onboard-kindle-email" className="text-sm font-medium text-foreground">
             Kindle Email
           </label>
           <Input
@@ -59,13 +59,12 @@ export const AddKindleEmailStep: FC<AddKindleEmailStepProps> = ({ onComplete, on
             placeholder="your-kindle@kindle.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border-neutral-200 text-black placeholder:text-neutral-400"
             disabled={createDevice.isPending}
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="onboard-kindle-label" className="text-sm font-medium text-black">
+          <label htmlFor="onboard-kindle-label" className="text-sm font-medium text-foreground">
             Label (optional)
           </label>
           <Input
@@ -74,13 +73,12 @@ export const AddKindleEmailStep: FC<AddKindleEmailStepProps> = ({ onComplete, on
             placeholder="e.g., My Kindle Paperwhite"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
-            className="border-neutral-200 text-black placeholder:text-neutral-400"
             disabled={createDevice.isPending}
           />
         </div>
 
         {error && (
-          <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+          <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
             {error}
           </p>
         )}
@@ -97,7 +95,7 @@ export const AddKindleEmailStep: FC<AddKindleEmailStepProps> = ({ onComplete, on
           </Button>
           <Button
             type="submit"
-            className="flex-1 bg-black text-white hover:bg-neutral-800"
+            className="flex-1"
             disabled={createDevice.isPending || !email.trim()}
           >
             {createDevice.isPending ? (

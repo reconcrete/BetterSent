@@ -138,8 +138,8 @@ export const Root = () => {
 
   if (isPending) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-neutral-500">Loading...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -151,28 +151,28 @@ export const Root = () => {
 
   // Show main app if logged in
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-black">Bettersent</h1>
-          <p className="text-neutral-500">Send articles and text to your Kindle device</p>
-          <p className="text-sm text-neutral-400">
-            Signed in as <span className="text-black">{session.user.email}</span>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Bettersent</h1>
+          <p className="text-muted-foreground">Send articles and text to your Kindle device</p>
+          <p className="text-sm text-muted-foreground">
+            Signed in as <span className="text-foreground">{session.user.email}</span>
           </p>
         </div>
 
-        <div className="border border-neutral-200 rounded-xl p-6 space-y-5">
+        <div className="border border-border rounded-xl p-6 space-y-5">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text" | "file")}>
-            <TabsList className="w-full grid grid-cols-3 bg-neutral-100">
-              <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-white">
+            <TabsList className="w-full grid grid-cols-3 bg-muted">
+              <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-background">
                 <Link className="size-4" />
                 URL
               </TabsTrigger>
-              <TabsTrigger value="text" className="gap-2 data-[state=active]:bg-white">
+              <TabsTrigger value="text" className="gap-2 data-[state=active]:bg-background">
                 <FileText className="size-4" />
                 Plain Text
               </TabsTrigger>
-              <TabsTrigger value="file" className="gap-2 data-[state=active]:bg-white">
+              <TabsTrigger value="file" className="gap-2 data-[state=active]:bg-background">
                 <FileIcon className="size-4" />
                 File
               </TabsTrigger>
@@ -184,7 +184,6 @@ export const Root = () => {
                 placeholder="https://example.com/article"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="border-neutral-200 text-black placeholder:text-neutral-400"
               />
             </TabsContent>
 
@@ -194,7 +193,7 @@ export const Root = () => {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={8}
-                className="w-full border border-neutral-200 rounded-md px-3 py-2 text-black placeholder:text-neutral-400 resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full border border-border rounded-md px-3 py-2 text-foreground placeholder:text-muted-foreground bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </TabsContent>
 
@@ -211,13 +210,13 @@ export const Root = () => {
                 onDrop={handleFileDrop}
                 className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center transition-colors ${
                   isDraggingFile
-                    ? "border-black bg-neutral-100"
-                    : "border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50"
+                    ? "border-foreground bg-muted"
+                    : "border-border hover:border-foreground/30 hover:bg-accent"
                 }`}
               >
-                <Upload className="size-5 text-neutral-500" />
-                <p className="text-sm text-black">Drop a file here or click to choose</p>
-                <p className="text-xs text-neutral-500">
+                <Upload className="size-5 text-muted-foreground" />
+                <p className="text-sm text-foreground">Drop a file here or click to choose</p>
+                <p className="text-xs text-muted-foreground">
                   PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB up to 200 MB
                 </p>
                 <input
@@ -230,13 +229,13 @@ export const Root = () => {
               </label>
 
               {file && (
-                <p className="text-sm text-neutral-600">
-                  Selected: <span className="text-black">{file.name}</span>
+                <p className="text-sm text-muted-foreground">
+                  Selected: <span className="text-foreground">{file.name}</span>
                 </p>
               )}
 
               {fileError && (
-                <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
                   {fileError}
                 </p>
               )}
@@ -246,12 +245,12 @@ export const Root = () => {
           {/* Kindle selector */}
           {kindleEmails && kindleEmails.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-black">Send to</label>
+              <label className="text-sm font-medium text-foreground">Send to</label>
               <Select
                 value={effectiveKindleId ?? ""}
                 onValueChange={(value) => setSelectedKindleId(value || undefined)}
               >
-                <SelectTrigger className="w-full border-neutral-200">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a Kindle device" />
                 </SelectTrigger>
                 <SelectContent>
@@ -267,7 +266,7 @@ export const Root = () => {
           )}
 
           {kindleEmails && kindleEmails.length === 0 && (
-            <p className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+            <p className="text-sm text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950 px-3 py-2 rounded-lg">
               Please add a Kindle email address in Settings before sending content.
             </p>
           )}
@@ -283,7 +282,7 @@ export const Root = () => {
         <div className="flex items-center justify-center gap-2">
           <KindleSettings />
           <OpenHistory />
-          <Button variant="ghost" onClick={handleSignOut} className="text-neutral-500 hover:text-black">
+          <Button variant="ghost" onClick={handleSignOut} className="text-muted-foreground hover:text-foreground">
             <LogOut className="size-4" />
             Sign Out
           </Button>

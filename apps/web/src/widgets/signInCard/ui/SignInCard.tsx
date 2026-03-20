@@ -8,21 +8,21 @@ export const SignInCard: FC = () => {
   const analytics = useAnalytics();
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-black">Bettersent</h1>
-          <p className="text-neutral-500">Sign in to your account</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Bettersent</h1>
+          <p className="text-muted-foreground">Sign in to your account</p>
         </div>
 
-        <div className="border border-neutral-200 rounded-xl p-6 space-y-5">
+        <div className="border border-border rounded-xl p-6 space-y-5">
           <button
             type="button"
             onClick={() => {
               analytics.capture("sign_in_google");
               signIn.social({ provider: "google", callbackURL: window.location.origin });
             }}
-            className="w-full flex items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors"
           >
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
               <path
@@ -46,9 +46,9 @@ export const SignInCard: FC = () => {
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-neutral-200" />
-            <span className="text-xs text-neutral-400">or</span>
-            <div className="h-px flex-1 bg-neutral-200" />
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">or</span>
+            <div className="h-px flex-1 bg-border" />
           </div>
 
           <SignInMagicLinkForm />

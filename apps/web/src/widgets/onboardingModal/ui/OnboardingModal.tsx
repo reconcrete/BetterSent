@@ -33,7 +33,7 @@ export const OnboardingModal: FC<OnboardingModalProps> = ({ closeModal }) => {
         <DialogTitle className="sr-only">Onboarding</DialogTitle>
 
           <div className="mb-6">
-            <p className="text-sm text-neutral-400 text-center">
+            <p className="text-sm text-muted-foreground text-center">
               Step {step} of 3
             </p>
             <div className="flex gap-2 mt-2">
@@ -41,7 +41,7 @@ export const OnboardingModal: FC<OnboardingModalProps> = ({ closeModal }) => {
                 <div
                   key={s}
                   className={`h-1 flex-1 rounded-full ${
-                    s <= step ? "bg-black" : "bg-neutral-200"
+                    s <= step ? "bg-primary" : "bg-muted"
                   }`}
                 />
               ))}

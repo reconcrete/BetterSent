@@ -50,7 +50,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       onClick={handleSend}
       disabled={isPending || !canSend}
       size="lg"
-      className="w-full bg-black text-white hover:bg-neutral-800 disabled:bg-neutral-300"
+      className="w-full"
     >
       {isPending ? (
         <>

@@ -30,18 +30,18 @@ export const ApprovedSendersStep: FC<ApprovedSendersStepProps> = ({ onNext, onBa
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <h2 className="text-xl font-bold text-black">Add Approved Sender</h2>
-        <p className="text-sm text-neutral-500">
+        <h2 className="text-xl font-bold text-foreground">Add Approved Sender</h2>
+        <p className="text-sm text-muted-foreground">
           Amazon only delivers emails from approved senders. Add our email address to your
           approved senders list so your content gets delivered.
         </p>
       </div>
 
-      <div className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-3">
-        <span className="text-sm font-medium text-black">{SENDER_EMAIL}</span>
+      <div className="flex items-center justify-between bg-accent border border-border rounded-lg px-4 py-3">
+        <span className="text-sm font-medium text-foreground">{SENDER_EMAIL}</span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 text-sm text-neutral-500 hover:text-black transition-colors"
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           {copied ? (
             <>
@@ -61,31 +61,31 @@ export const ApprovedSendersStep: FC<ApprovedSendersStepProps> = ({ onNext, onBa
         href={AMAZON_SETTINGS_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+        className="flex items-center gap-2 text-sm text-secondary hover:text-secondary/80 transition-colors"
       >
         <ExternalLink className="size-4" />
         Open Amazon Kindle Settings
       </a>
 
       <div className="space-y-3">
-        <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           Where to add the email
         </p>
         <img
           src="/images/add-email-instruction.png"
           alt="Screenshot showing where to add approved sender email in Amazon settings"
-          className="w-full rounded-lg border border-neutral-200"
+          className="w-full rounded-lg border border-border"
         />
       </div>
 
       <div className="space-y-3">
-        <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           Where to find your Kindle email
         </p>
         <img
           src="/images/copy-kindle-address.png"
           alt="Screenshot showing where to find your Kindle email address"
-          className="w-full rounded-lg border border-neutral-200"
+          className="w-full rounded-lg border border-border"
         />
       </div>
 
@@ -99,7 +99,7 @@ export const ApprovedSendersStep: FC<ApprovedSendersStepProps> = ({ onNext, onBa
         </Button>
         <Button
           onClick={handleClick}
-          className="flex-1 bg-black text-white hover:bg-neutral-800"
+          className="flex-1"
         >
           I've done this
         </Button>

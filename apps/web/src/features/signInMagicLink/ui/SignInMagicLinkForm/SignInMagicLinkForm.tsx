@@ -51,11 +51,11 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
     return (
       <div className="text-center py-4 space-y-3">
         <CheckCircle className="size-12 text-green-500 mx-auto" />
-        <h3 className="text-lg font-medium text-black">Check your email</h3>
-        <p className="text-sm text-neutral-500">
-          We sent a magic link to <span className="font-medium text-black">{email}</span>
+        <h3 className="text-lg font-medium text-foreground">Check your email</h3>
+        <p className="text-sm text-muted-foreground">
+          We sent a magic link to <span className="font-medium text-foreground">{email}</span>
         </p>
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-muted-foreground">
           Click the link in the email to sign in. The link expires in 5 minutes.
         </p>
         <Button
@@ -75,7 +75,7 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label htmlFor="magic-link-email" className="text-sm font-medium text-black">
+        <label htmlFor="magic-link-email" className="text-sm font-medium text-foreground">
           Email
         </label>
         <Input
@@ -85,16 +85,15 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="border-neutral-200 text-black placeholder:text-neutral-400"
         />
       </div>
 
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-muted-foreground">
         We'll send you a magic link to sign in without a password.
       </p>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+        <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">{error}</p>
       )}
 
       <Button type="submit" className="w-full" disabled={isLoading}>

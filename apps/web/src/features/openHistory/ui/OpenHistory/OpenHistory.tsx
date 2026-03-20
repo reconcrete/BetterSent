@@ -17,7 +17,7 @@ export const OpenHistory = memo(() => {
   return (
     <Button
       variant="ghost"
-      className="text-neutral-500 hover:text-black"
+      className="text-muted-foreground hover:text-foreground"
       aria-label="View History"
       onClick={handleClick}
     >
