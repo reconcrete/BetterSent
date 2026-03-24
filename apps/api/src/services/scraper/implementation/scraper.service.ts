@@ -1,28 +1,50 @@
-import { ensureHttpUrl, extractTextFromHtml, fetchHtml, fetchViaJinaReader } from "../lib";
+import Firecrawl from "@mendable/firecrawl-js";
 
-const DEFAULT_JINA_BASE_URL = "https://r.jina.ai/";
+import type { IScraperService } from "../interface";
+import { ensureHttpUrl, extractTextFromHtml, fetchHtml } from "../lib";
+import type { ScrapeResult } from "../types";
 
-export class ScraperService {
-  private readonly jinaBaseUrl: string;
+export class FirecrawlScraperService implements IScraperService {
+  private readonly firecrawl: Firecrawl;
 
-  constructor(jinaBaseUrl?: string) {
-    this.jinaBaseUrl = jinaBaseUrl ?? DEFAULT_JINA_BASE_URL;
+  constructor(apiKey: string) {
+    this.firecrawl = new Firecrawl({ apiKey });
   }
 
-  async scrapeUrl(url: string): Promise<string> {
+  async scrapeUrl(url: string): Promise<ScrapeResult> {
     const parsedUrl = ensureHttpUrl(url);
     const scrapeErrors: string[] = [];
 
     try {
-      return await fetchViaJinaReader(this.jinaBaseUrl, parsedUrl.toString());
+      const result = await this.firecrawl.scrape(parsedUrl.toString(), {
+        formats: ["markdown"],
+      });
+
+      if (result.markdown) {
+        return {
+          markdown: result.markdown,
+          metadata: {
+            title: result.metadata?.title || "Untitled",
+            author: "Unknown",
+          },
+          needsLlmProcessing: false,
+        };
+      }
+
+      scrapeErrors.push("Firecrawl returned empty markdown");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown Jina Reader error";
+      const message = error instanceof Error ? error.message : "Unknown Firecrawl error";
       scrapeErrors.push(message);
     }
 
     try {
       const html = await fetchHtml(parsedUrl.toString());
-      return extractTextFromHtml(html);
+      const text = extractTextFromHtml(html);
+      return {
+        markdown: text,
+        metadata: { title: "Untitled", author: "Unknown" },
+        needsLlmProcessing: true,
+      };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown direct fetch error";
       scrapeErrors.push(message);

@@ -184,15 +184,27 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
   try {
     log.debug("Scraping URL");
     const scraperService = createScraperService();
-    const textContent = await scraperService.scrapeUrl(url);
-    log.debug({ contentLength: textContent.length }, "URL scraped");
+    const scrapeResult = await scraperService.scrapeUrl(url);
+    log.debug({ contentLength: scrapeResult.markdown.length, needsLlmProcessing: scrapeResult.needsLlmProcessing }, "URL scraped");
 
-    log.debug("LLM process starting");
-    const extractorService = createExtractorService();
-    const startTime = Date.now();
-    const { markdown, metadata } = await extractorService.extractContent(textContent);
-    const llmDuration = Date.now() - startTime;
-    log.debug({ duration: llmDuration }, "LLM process finished");
+    let markdown: string;
+    let metadata: { title: string; author: string };
+
+    if (scrapeResult.needsLlmProcessing) {
+      log.debug("LLM process starting (fallback scraper used)");
+      const extractorService = createExtractorService();
+      const startTime = Date.now();
+      const extracted = await extractorService.extractContent(scrapeResult.markdown);
+      const llmDuration = Date.now() - startTime;
+      log.debug({ duration: llmDuration }, "LLM process finished");
+      markdown = extracted.markdown;
+      metadata = extracted.metadata;
+    } else {
+      log.debug("Using Firecrawl markdown directly (skipping LLM)");
+      markdown = scrapeResult.markdown;
+      metadata = scrapeResult.metadata;
+    }
+
     log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");
 
     // Update history with extracted metadata

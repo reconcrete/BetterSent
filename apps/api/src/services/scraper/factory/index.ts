@@ -1,5 +1,10 @@
-import { ScraperService } from "../implementation";
+import { FirecrawlScraperService } from "../implementation";
+import type { IScraperService } from "../interface";
 
-export function createScraperService(): ScraperService {
-  return new ScraperService(process.env.JINA_READER_BASE_URL);
+export function createScraperService(): IScraperService {
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (!apiKey) {
+    throw new Error("FIRECRAWL_API_KEY environment variable is required");
+  }
+  return new FirecrawlScraperService(apiKey);
 }

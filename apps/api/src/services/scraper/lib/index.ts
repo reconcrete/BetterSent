@@ -16,60 +16,6 @@ export function ensureHttpUrl(url: string): URL {
   return parsed;
 }
 
-export function buildJinaReaderUrl(baseUrl: string, url: string): string {
-  const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-  return `${base}${url}`;
-}
-
-export function parseJinaReaderBody(body: string): string {
-  const marker = "Markdown Content:";
-  const markerIndex = body.indexOf(marker);
-
-  if (markerIndex === -1) {
-    return body.trim();
-  }
-
-  return body.slice(markerIndex + marker.length).trim();
-}
-
-export async function fetchViaJinaReader(jinaBaseUrl: string, url: string): Promise<string> {
-  const jinaUrl = buildJinaReaderUrl(jinaBaseUrl, url);
-  const attempts: Array<Record<string, string>> = [
-    {
-      Accept: "text/markdown,text/plain;q=0.9,*/*;q=0.8",
-      "X-Respond-With": "markdown",
-      "X-Retain-Images": "all",
-    },
-    {
-      Accept: "text/markdown,text/plain;q=0.9,*/*;q=0.8",
-    },
-  ];
-  const errors: string[] = [];
-
-  for (const headers of attempts) {
-    try {
-      const response = await fetch(jinaUrl, { headers });
-      if (!response.ok) {
-        errors.push(`${response.status} ${response.statusText}`);
-        continue;
-      }
-
-      const rawBody = await response.text();
-      const content = parseJinaReaderBody(rawBody);
-      if (!content) {
-        errors.push("empty body");
-        continue;
-      }
-
-      return content;
-    } catch (error) {
-      errors.push(error instanceof Error ? error.message : "unknown error");
-    }
-  }
-
-  throw new Error(`Jina Reader failed: ${errors.join(" | ")}`);
-}
-
 export async function fetchHtml(url: string): Promise<string> {
   const response = await fetch(url, {
     headers: {
