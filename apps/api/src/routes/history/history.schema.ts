@@ -2,7 +2,7 @@ import { t } from "elysia";
 
 export const historyItemSchema = t.Object({
   id: t.String(),
-  type: t.Union([t.Literal("url"), t.Literal("text"), t.Literal("file")]),
+  type: t.Union([t.Literal("url"), t.Literal("text"), t.Literal("file"), t.Literal("youtube")]),
   content: t.String(),
   title: t.Nullable(t.String()),
   author: t.Nullable(t.String()),

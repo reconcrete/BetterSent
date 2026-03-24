@@ -11,6 +11,11 @@ export const extractUrlInputSchema = t.Object({
   kindleEmailId: t.Optional(t.String()),
 });
 
+export const extractYoutubeInputSchema = t.Object({
+  url: t.String({ minLength: 1 }),
+  kindleEmailId: t.Optional(t.String()),
+});
+
 export const extractFileInputSchema = t.Object({
   file: t.File(),
   kindleEmailId: t.Optional(t.String()),

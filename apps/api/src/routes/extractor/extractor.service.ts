@@ -251,6 +251,77 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
   }
 };
 
+const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|live\/)|youtu\.be\/)/;
+
+export const extractYoutube = async (url: string, userId: string, kindleEmailId?: string) => {
+  if (!YOUTUBE_URL_REGEX.test(url)) {
+    throw new Error("Invalid YouTube URL. Please provide a valid YouTube video link.");
+  }
+
+  log.debug({ url }, "Received YouTube URL");
+
+  const toEmail = isProductionEnv ? await getKindleEmail(userId, kindleEmailId) : null;
+  if (toEmail) log.debug({ toEmail }, "Will send to");
+
+  const historyId = await createSendHistoryEntry(userId, {
+    type: "youtube",
+    content: url,
+    kindleEmailId,
+  });
+
+  try {
+    log.debug("Scraping YouTube URL");
+    const scraperService = createScraperService();
+    const scrapeResult = await scraperService.scrapeUrl(url);
+    log.debug({ contentLength: scrapeResult.markdown.length }, "YouTube page scraped");
+
+    log.debug("LLM process starting (YouTube content)");
+    const extractorService = createExtractorService();
+    const startTime = Date.now();
+    const { markdown, metadata } = await extractorService.extractYoutubeContent(scrapeResult.markdown);
+    const llmDuration = Date.now() - startTime;
+    log.debug({ duration: llmDuration }, "LLM process finished");
+    log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");
+
+    await updateSendHistoryEntry(historyId, {
+      title: metadata.title,
+      author: metadata.author,
+      ...(toEmail && { kindleEmail: toEmail }),
+    });
+
+    log.debug("Saving EPUB");
+    const storageService = createStorageService();
+    const { filename, path, markdownPath, savedAt } = await storageService.saveEpub(markdown, "youtube", metadata);
+    log.debug({ filename }, "EPUB saved");
+
+    await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
+
+    if (isProductionEnv && toEmail) {
+      const emailService = createEmailService();
+      const attachmentContent = (await storageService.getFile(path)).toString("base64");
+      const emailFilename = getSentFilename(`${metadata.title}.epub`);
+
+      log.debug("Sending email");
+      await emailService.sendEmail(toEmail, metadata.title, "", [
+        { filename: emailFilename, content: attachmentContent },
+      ]);
+      log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
+    } else {
+      log.info({ filename }, "Dev mode: skipping email, epub stored locally");
+    }
+
+    await updateSendHistoryEntry(historyId, { status: "completed" });
+
+    return { markdown, metadata, filename, savedAt };
+  } catch (error) {
+    await updateSendHistoryEntry(historyId, {
+      status: "error",
+      errorMessage: error instanceof Error ? error.message : "Unknown error occurred",
+    });
+    throw error;
+  }
+};
+
 export const extractFile = async (file: File, userId: string, kindleEmailId?: string) => {
   validateDirectFile(file);
   log.debug({ filename: file.name, size: file.size }, "Received file for direct send");

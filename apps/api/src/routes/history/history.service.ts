@@ -7,7 +7,7 @@ export type SendHistoryStatus = "pending" | "processing" | "completed" | "error"
 
 export type SendHistoryData = {
   id: string;
-  type: "url" | "text" | "file";
+  type: "url" | "text" | "file" | "youtube";
   content: string;
   title: string | null;
   author: string | null;
@@ -21,7 +21,7 @@ export type SendHistoryData = {
 
 const toSendHistoryData = (row: typeof sendHistory.$inferSelect): SendHistoryData => ({
   id: row.id,
-  type: row.type as "url" | "text" | "file",
+  type: row.type as "url" | "text" | "file" | "youtube",
   content: row.content,
   title: row.title,
   author: row.author,
@@ -56,7 +56,7 @@ export const getSendHistory = async (userId: string): Promise<SendHistoryData[]>
 export const createSendHistoryEntry = async (
   userId: string,
   data: {
-    type: "url" | "text" | "file";
+    type: "url" | "text" | "file" | "youtube";
     content: string;
     kindleEmailId?: string;
   }
@@ -93,7 +93,7 @@ export const createSendHistoryEntry = async (
   }
 
   // Truncate content for storage (keep first 500 chars for text)
-  const truncatedContent = data.type === "url" ? data.content : data.content.slice(0, 500);
+  const truncatedContent = data.type === "url" || data.type === "youtube" ? data.content : data.content.slice(0, 500);
 
   const id = crypto.randomUUID();
 

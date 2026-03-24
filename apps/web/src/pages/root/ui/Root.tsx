@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, FileText, File as FileIcon, Upload, LogOut } from "lucide-react";
+import { Link, FileText, File as FileIcon, Upload, LogOut, Youtube } from "lucide-react";
 
 import {
   Tabs,
@@ -21,6 +21,7 @@ import { signOut, useSession, useAnalytics } from "~/shared/lib";
 import { SendContent } from "~/features/sendContent";
 import { KindleSettings } from "~/features/openKindleSettings";
 import { OpenHistory } from "~/features/openHistory";
+import { ThemeToggle } from "~/features/toggleTheme";
 
 import { SignInCard } from "~/widgets/signInCard";
 
@@ -57,14 +58,27 @@ export const Root = () => {
   
   useOnboardingGuard();
 
-  const [activeTab, setActiveTab] = useState<"url" | "text" | "file">("url");
+  const [activeTab, setActiveTab] = useState<"url" | "text" | "file" | "youtube">("url");
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [youtubeError, setYoutubeError] = useState<string | null>(null);
   const [selectedKindleId, setSelectedKindleId] = useState<string | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|live\/)|youtu\.be\/)/;
+
+  const handleYoutubeUrlChange = (value: string) => {
+    setYoutubeUrl(value);
+    if (value.trim() && !YOUTUBE_URL_REGEX.test(value)) {
+      setYoutubeError("Please enter a valid YouTube URL");
+    } else {
+      setYoutubeError(null);
+    }
+  };
 
   const validateFile = (nextFile: File): string | null => {
     if (nextFile.size > MAX_FILE_SIZE_BYTES) {
@@ -125,6 +139,9 @@ export const Root = () => {
       setUrl("");
     } else if (activeTab === "text") {
       setText("");
+    } else if (activeTab === "youtube") {
+      setYoutubeUrl("");
+      setYoutubeError(null);
     } else {
       setFile(null);
       setFileError(null);
@@ -151,7 +168,10 @@ export const Root = () => {
 
   // Show main app if logged in
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Bettersent</h1>
@@ -162,8 +182,8 @@ export const Root = () => {
         </div>
 
         <div className="border border-border rounded-xl p-6 space-y-5">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text" | "file")}>
-            <TabsList className="w-full grid grid-cols-3 bg-muted">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text" | "file" | "youtube")}>
+            <TabsList className="w-full grid grid-cols-4 bg-muted">
               <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-background">
                 <Link className="size-4" />
                 URL
@@ -171,6 +191,10 @@ export const Root = () => {
               <TabsTrigger value="text" className="gap-2 data-[state=active]:bg-background">
                 <FileText className="size-4" />
                 Plain Text
+              </TabsTrigger>
+              <TabsTrigger value="youtube" className="gap-2 data-[state=active]:bg-background">
+                <Youtube className="size-4" />
+                YouTube
               </TabsTrigger>
               <TabsTrigger value="file" className="gap-2 data-[state=active]:bg-background">
                 <FileIcon className="size-4" />
@@ -195,6 +219,20 @@ export const Root = () => {
                 rows={8}
                 className="w-full border border-border rounded-md px-3 py-2 text-foreground placeholder:text-muted-foreground bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
+            </TabsContent>
+
+            <TabsContent value="youtube" className="mt-4 space-y-3">
+              <Input
+                type="url"
+                placeholder="https://youtube.com/watch?v=..."
+                value={youtubeUrl}
+                onChange={(e) => handleYoutubeUrlChange(e.target.value)}
+              />
+              {youtubeError && (
+                <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+                  {youtubeError}
+                </p>
+              )}
             </TabsContent>
 
             <TabsContent value="file" className="mt-4 space-y-3">
@@ -273,7 +311,7 @@ export const Root = () => {
 
           <SendContent
             type={activeTab}
-            content={activeTab === "url" ? url : activeTab === "text" ? text : file}
+            content={activeTab === "url" ? url : activeTab === "text" ? text : activeTab === "youtube" ? youtubeUrl : file}
             kindleEmailId={effectiveKindleId}
             onSuccess={handleSuccess}
           />
