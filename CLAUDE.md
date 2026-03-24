@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Bettersent is a service that lets users grab content from URLs and send it to their Kindle. It has web, API, and Telegram bot interfaces.
+Bettersent is a service for sending content to e-book readers (currently Kindle) from various sources: URLs, plain text, files, and YouTube videos. It provides web, API, and Telegram bot interfaces.
 
 ## Monorepo Structure
 

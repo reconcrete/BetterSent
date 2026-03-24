@@ -1,1 +1,1 @@
-export { FirecrawlScraperService } from "./scraper.service";
+export { ScraperService } from "./scraper.service";

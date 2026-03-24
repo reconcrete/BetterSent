@@ -1,10 +1,9 @@
 import Firecrawl from "@mendable/firecrawl-js";
 
-import type { IScraperService } from "../interface";
 import { ensureHttpUrl, extractTextFromHtml, fetchHtml } from "../lib";
 import type { ScrapeResult } from "../types";
 
-export class FirecrawlScraperService implements IScraperService {
+export class ScraperService {
   private readonly firecrawl: Firecrawl;
 
   constructor(apiKey: string) {
