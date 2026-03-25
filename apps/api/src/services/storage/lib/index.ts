@@ -4,6 +4,7 @@ import { $ } from "bun";
 
 import type { EpubMetadata } from "../types";
 import { INLINE_IMAGE_RE } from "../constants";
+import { DEFAULT_USER_AGENT } from "../../scraper/constants";
 
 export function getExtensionFromUrl(url: string): string {
   try {
@@ -31,9 +32,17 @@ export async function localizeMarkdownImages(markdown: string, runFolderPath: st
 
   for (const imageUrl of imageUrls) {
     try {
-      const res = await fetch(imageUrl, { redirect: "follow" });
+      const res = await fetch(imageUrl, {
+        redirect: "follow",
+        headers: {
+          "User-Agent": DEFAULT_USER_AGENT,
+          Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+          Referer: imageUrl,
+        },
+      });
       if (!res.ok) continue;
       const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.startsWith("image/")) continue;
       const ext =
         contentType.includes("jpeg") || contentType.includes("jpg")
           ? "jpg"
