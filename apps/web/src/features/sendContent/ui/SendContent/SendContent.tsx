@@ -7,7 +7,7 @@ import { useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 
 type SendContentProps = {
-  type: "url" | "text" | "file" | "youtube";
+  type: "url" | "text" | "file" | "youtube" | "topic";
   content: string | File | null;
   kindleEmailId?: string;
   onSuccess?: () => void;
@@ -26,6 +26,10 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
 
       if (type === "youtube") {
         return api.extract.youtube.post({ url: content as string, kindleEmailId });
+      }
+
+      if (type === "topic") {
+        return api.extract.topic.post({ topic: content as string, kindleEmailId });
       }
 
       if (type === "url") {

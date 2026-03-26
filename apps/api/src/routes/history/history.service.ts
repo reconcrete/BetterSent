@@ -7,7 +7,7 @@ export type SendHistoryStatus = "pending" | "processing" | "completed" | "error"
 
 export type SendHistoryData = {
   id: string;
-  type: "url" | "text" | "file" | "youtube";
+  type: "url" | "text" | "file" | "youtube" | "topic";
   content: string;
   title: string | null;
   author: string | null;
@@ -21,7 +21,7 @@ export type SendHistoryData = {
 
 const toSendHistoryData = (row: typeof sendHistory.$inferSelect): SendHistoryData => ({
   id: row.id,
-  type: row.type as "url" | "text" | "file" | "youtube",
+  type: row.type as "url" | "text" | "file" | "youtube" | "topic",
   content: row.content,
   title: row.title,
   author: row.author,
@@ -56,7 +56,7 @@ export const getSendHistory = async (userId: string): Promise<SendHistoryData[]>
 export const createSendHistoryEntry = async (
   userId: string,
   data: {
-    type: "url" | "text" | "file" | "youtube";
+    type: "url" | "text" | "file" | "youtube" | "topic";
     content: string;
     kindleEmailId?: string;
   }

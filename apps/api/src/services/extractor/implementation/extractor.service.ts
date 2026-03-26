@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 import type { ContentMetadata, ExtractedContent } from "../types";
-import { METADATA_SYSTEM_PROMPT, SYSTEM_PROMPT, YOUTUBE_SYSTEM_PROMPT } from "../constants";
+import { METADATA_SYSTEM_PROMPT, SYSTEM_PROMPT, TOPIC_SYSTEM_PROMPT, YOUTUBE_SYSTEM_PROMPT } from "../constants";
 
 export class ExtractorService {
   private readonly client: OpenAI;
@@ -50,6 +50,27 @@ export class ExtractorService {
     });
 
     return completion.choices[0].message.content || "Failed to extract content";
+  }
+
+  async generateTopicContent(topic: string): Promise<ExtractedContent> {
+    const [markdown, metadata] = await Promise.all([
+      this.generateTopicMarkdown(topic),
+      this.extractMetadata(topic),
+    ]);
+
+    return { markdown, metadata };
+  }
+
+  private async generateTopicMarkdown(topic: string): Promise<string> {
+    const completion = await this.client.chat.completions.create({
+      model: "chatgpt-5.4-latest",
+      messages: [
+        { role: "system", content: TOPIC_SYSTEM_PROMPT },
+        { role: "user", content: topic },
+      ],
+    });
+
+    return completion.choices[0].message.content || "Failed to generate content";
   }
 
   async extractMetadata(content: string): Promise<ContentMetadata> {

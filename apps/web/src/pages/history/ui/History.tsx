@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Link, FileText, File, Loader2, CheckCircle2, XCircle, Clock, Youtube } from "lucide-react";
+import { ArrowLeft, Link, FileText, File, Loader2, CheckCircle2, XCircle, Clock, Youtube, BookOpen } from "lucide-react";
 
 import {
   Table,
@@ -18,7 +18,7 @@ import { PreviewExtraction } from "~/features/previewExtraction";
 
 type HistoryItem = {
   id: string;
-  type: "url" | "text" | "file" | "youtube";
+  type: "url" | "text" | "file" | "youtube" | "topic";
   content: string;
   title: string | null;
   author: string | null;
@@ -78,11 +78,11 @@ const StatusBadge: FC<{ status: HistoryItem["status"]; errorMessage?: string | n
 };
 
 const TypeBadge: FC<{ type: HistoryItem["type"] }> = ({ type }) => {
-  const Icon = type === "url" ? Link : type === "text" ? FileText : type === "youtube" ? Youtube : File;
+  const Icon = type === "url" ? Link : type === "text" ? FileText : type === "youtube" ? Youtube : type === "topic" ? BookOpen : File;
   return (
     <span className="inline-flex items-center gap-1.5 text-muted-foreground">
       <Icon className="size-4" />
-      {type === "url" ? "URL" : type === "text" ? "Text" : type === "youtube" ? "YouTube" : "File"}
+      {type === "url" ? "URL" : type === "text" ? "Text" : type === "youtube" ? "YouTube" : type === "topic" ? "Topic" : "File"}
     </span>
   );
 };

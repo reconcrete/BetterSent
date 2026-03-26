@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, FileText, File as FileIcon, Upload, LogOut, Youtube } from "lucide-react";
+import { Link, FileText, File as FileIcon, Upload, LogOut, Youtube, BookOpen } from "lucide-react";
 
 import {
   Tabs,
@@ -58,9 +58,10 @@ export const Root = () => {
   
   useOnboardingGuard();
 
-  const [activeTab, setActiveTab] = useState<"url" | "text" | "file" | "youtube">("url");
+  const [activeTab, setActiveTab] = useState<"url" | "text" | "file" | "youtube" | "topic">("url");
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
+  const [topic, setTopic] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
@@ -142,6 +143,8 @@ export const Root = () => {
     } else if (activeTab === "youtube") {
       setYoutubeUrl("");
       setYoutubeError(null);
+    } else if (activeTab === "topic") {
+      setTopic("");
     } else {
       setFile(null);
       setFileError(null);
@@ -182,8 +185,8 @@ export const Root = () => {
         </div>
 
         <div className="border border-border rounded-xl p-6 space-y-5">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text" | "file" | "youtube")}>
-            <TabsList className="w-full grid grid-cols-4 bg-muted">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text" | "file" | "youtube" | "topic")}>
+            <TabsList className="w-full grid grid-cols-5 bg-muted">
               <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-background">
                 <Link className="size-4" />
                 URL
@@ -195,6 +198,10 @@ export const Root = () => {
               <TabsTrigger value="youtube" className="gap-2 data-[state=active]:bg-background">
                 <Youtube className="size-4" />
                 YouTube
+              </TabsTrigger>
+              <TabsTrigger value="topic" className="gap-2 data-[state=active]:bg-background">
+                <BookOpen className="size-4" />
+                Topic
               </TabsTrigger>
               <TabsTrigger value="file" className="gap-2 data-[state=active]:bg-background">
                 <FileIcon className="size-4" />
@@ -233,6 +240,16 @@ export const Root = () => {
                   {youtubeError}
                 </p>
               )}
+            </TabsContent>
+
+            <TabsContent value="topic" className="mt-4">
+              <textarea
+                placeholder="Enter a topic or question, e.g. 'How stablecoins work and why USDT is priced at exactly 1 USD'"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                rows={4}
+                className="w-full border border-border rounded-md px-3 py-2 text-foreground placeholder:text-muted-foreground bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+              />
             </TabsContent>
 
             <TabsContent value="file" className="mt-4 space-y-3">
@@ -311,7 +328,7 @@ export const Root = () => {
 
           <SendContent
             type={activeTab}
-            content={activeTab === "url" ? url : activeTab === "text" ? text : activeTab === "youtube" ? youtubeUrl : file}
+            content={activeTab === "url" ? url : activeTab === "text" ? text : activeTab === "youtube" ? youtubeUrl : activeTab === "topic" ? topic : file}
             kindleEmailId={effectiveKindleId}
             onSuccess={handleSuccess}
           />
