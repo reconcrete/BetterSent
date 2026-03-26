@@ -11,8 +11,8 @@ export async function authGuard(ctx: BotContext, next: NextFunction) {
     return next();
   }
 
-  // Allow callback queries related to auth conversation
-  if (ctx.callbackQuery) {
+  // Only allow auth-related callback queries through without authentication
+  if (ctx.callbackQuery?.data?.startsWith("auth:")) {
     return next();
   }
 

@@ -21,7 +21,7 @@ import { meCommand } from "./commands/me";
 
 // Helpers
 import { db, kindleEmailAddress } from "./db";
-import { eq } from "@bettersent/db";
+import { eq, and } from "@bettersent/db";
 import { isUrl } from "./utils/validators";
 import { buildConfirmKeyboard } from "./keyboards/extraction";
 import * as apiClient from "./api/client";
@@ -54,8 +54,13 @@ bot.callbackQuery(/^device_select:/, async (ctx) => {
   const deviceId = ctx.callbackQuery.data.split(":")[1];
   ctx.session.selectedDeviceId = deviceId;
 
+  if (!ctx.session.userId) {
+    await ctx.answerCallbackQuery({ text: "Please login first." });
+    return;
+  }
+
   const device = await db.query.kindleEmailAddress.findFirst({
-    where: eq(kindleEmailAddress.id, deviceId),
+    where: and(eq(kindleEmailAddress.id, deviceId), eq(kindleEmailAddress.userId, ctx.session.userId)),
   });
 
   await ctx.editMessageText(`✅ Selected: ${device?.label || device?.email || "device"}`);
