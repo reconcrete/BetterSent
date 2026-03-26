@@ -7,7 +7,6 @@
  * Add new modal types here when creating new modals.
  */
 export type ModalPropsMap = {
-  KindleSettingsModal: KindleSettingsModalProps;
   MarkdownPreviewModal: MarkdownPreviewModalProps;
   OnboardingModal: OnboardingModalProps;
 };
@@ -15,8 +14,6 @@ export type ModalPropsMap = {
 // ============================================
 // Modal Props Definitions
 // ============================================
-
-export type KindleSettingsModalProps = ModalPropsBase;
 
 export type MarkdownPreviewModalProps = ModalPropsBase & {
   historyId: string;
