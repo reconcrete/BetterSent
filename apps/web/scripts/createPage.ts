@@ -15,17 +15,24 @@ const pagesDir = path.join(cwd, "src/pages");
 const folderName = pageName.charAt(0).toLowerCase() + pageName.slice(1);
 const pageFolderPath = path.join(pagesDir, folderName);
 const uiPath = path.join(pageFolderPath, "ui");
+const componentFolderPath = path.join(uiPath, pageName);
 
 // Create all directories
-fs.mkdirSync(uiPath, { recursive: true });
+fs.mkdirSync(componentFolderPath, { recursive: true });
 
-// Create index.ts in page folder
-const pageIndexTemplate = `export { ${pageName} } from "./ui/${pageName}";
+// Create index.tsx in page folder
+const pageIndexTemplate = `export * from "./ui";
 `;
 
-fs.writeFileSync(path.join(pageFolderPath, "index.ts"), pageIndexTemplate);
+fs.writeFileSync(path.join(pageFolderPath, "index.tsx"), pageIndexTemplate);
 
-// Create ui/{pageName}.tsx
+// Create ui/index.tsx
+const uiIndexTemplate = `export * from "./${pageName}/${pageName}";
+`;
+
+fs.writeFileSync(path.join(uiPath, "index.tsx"), uiIndexTemplate);
+
+// Create ui/{pageName}/{pageName}.tsx
 const componentTemplate = `import type { FC } from "react";
 
 export const ${pageName}: FC = () => {
@@ -37,8 +44,9 @@ export const ${pageName}: FC = () => {
 };
 `;
 
-fs.writeFileSync(path.join(uiPath, `${pageName}.tsx`), componentTemplate);
+fs.writeFileSync(path.join(componentFolderPath, `${pageName}.tsx`), componentTemplate);
 
 console.log(`Created page ${pageName} with the following structure:`);
-console.log(`- pages/${folderName}/index.ts`);
-console.log(`- pages/${folderName}/ui/${pageName}.tsx`);
+console.log(`- pages/${folderName}/index.tsx`);
+console.log(`- pages/${folderName}/ui/index.tsx`);
+console.log(`- pages/${folderName}/ui/${pageName}/${pageName}.tsx`);

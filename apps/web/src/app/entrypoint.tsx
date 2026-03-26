@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { Root } from "~/pages/root";
 import { History } from "~/pages/history";
+import { Settings } from "~/pages/settings";
 
 import { AppLayout } from "~/widgets/appLayout";
 
@@ -21,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
             <Route element={<AppLayout />}>
               <Route path="/" element={<Root />} />
               <Route path="/history" element={<History />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
           </Routes>
         </BrowserRouter>

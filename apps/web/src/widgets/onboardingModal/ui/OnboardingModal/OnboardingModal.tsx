@@ -2,7 +2,7 @@ import { useEffect, useState, type FC } from "react";
 import { Dialog, DialogContent, DialogTitle } from "~/shared/ui";
 import type { OnboardingModalProps } from "~/entities/modals/types";
 import { useAnalytics } from "~/shared/lib";
-import { useMarkOnboarded } from "../api/useMarkOnboarded";
+import { useMarkOnboarded } from "../../api/useMarkOnboarded";
 import { WelcomeStep } from "./WelcomeStep";
 import { ApprovedSendersStep } from "./ApprovedSendersStep";
 import { AddKindleEmailStep } from "./AddKindleEmailStep";
