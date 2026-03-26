@@ -2,23 +2,23 @@ import { t } from "elysia";
 import { baseResponseSchema } from "../../shared/schemas/api";
 
 export const extractTextInputSchema = t.Object({
-  textContent: t.String({ minLength: 1 }),
-  kindleEmailId: t.Optional(t.String()),
+  textContent: t.String({ minLength: 1, maxLength: 1_000_000 }),
+  kindleEmailId: t.Optional(t.String({ maxLength: 256 })),
 });
 
 export const extractUrlInputSchema = t.Object({
-  url: t.String({ minLength: 1 }),
-  kindleEmailId: t.Optional(t.String()),
+  url: t.String({ minLength: 1, maxLength: 2048 }),
+  kindleEmailId: t.Optional(t.String({ maxLength: 256 })),
 });
 
 export const extractYoutubeInputSchema = t.Object({
-  url: t.String({ minLength: 1 }),
-  kindleEmailId: t.Optional(t.String()),
+  url: t.String({ minLength: 1, maxLength: 2048 }),
+  kindleEmailId: t.Optional(t.String({ maxLength: 256 })),
 });
 
 export const extractTopicInputSchema = t.Object({
-  topic: t.String({ minLength: 1 }),
-  kindleEmailId: t.Optional(t.String()),
+  topic: t.String({ minLength: 1, maxLength: 10_000 }),
+  kindleEmailId: t.Optional(t.String({ maxLength: 256 })),
 });
 
 export const extractFileInputSchema = t.Object({
