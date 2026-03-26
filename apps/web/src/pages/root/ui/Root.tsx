@@ -1,144 +1,16 @@
-import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Link, FileText, File as FileIcon, Upload, Youtube, BookOpen } from "lucide-react";
+import { useState } from "react";
+import { Link, FileText, File as FileIcon, Youtube, BookOpen } from "lucide-react";
 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/shared/ui";
-import { api } from "~/shared/lib/treaty";
-import { useSession } from "~/shared/lib";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/shared/ui";
 
-import { SendContent } from "~/features/sendContent";
-
-type KindleEmail = {
-  id: string;
-  email: string;
-  label: string | null;
-  isDefault: boolean;
-};
-
-const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
-const ACCEPTED_FILE_EXTENSIONS = [
-  "pdf",
-  "doc",
-  "docx",
-  "txt",
-  "rtf",
-  "htm",
-  "html",
-  "png",
-  "gif",
-  "jpg",
-  "jpeg",
-  "bmp",
-  "epub",
-];
-const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",");
+import { SendUrlWidget } from "~/widgets/sendUrlWidget";
+import { SendTextWidget } from "~/widgets/sendTextWidget";
+import { SendYoutubeWidget } from "~/widgets/sendYoutubeWidget";
+import { SendTopicWidget } from "~/widgets/sendTopicWidget";
+import { SendFileWidget } from "~/widgets/sendFileWidget";
 
 export const Root = () => {
-  const { data: session } = useSession();
-
-  const [activeTab, setActiveTab] = useState<"url" | "text" | "file" | "youtube" | "topic">("url");
-  const [url, setUrl] = useState("");
-  const [text, setText] = useState("");
-  const [topic, setTopic] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
-  const [isDraggingFile, setIsDraggingFile] = useState(false);
-  const [youtubeUrl, setYoutubeUrl] = useState("");
-  const [youtubeError, setYoutubeError] = useState<string | null>(null);
-  const [selectedKindleId, setSelectedKindleId] = useState<string | undefined>(undefined);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|live\/)|youtu\.be\/)/;
-
-  const handleYoutubeUrlChange = (value: string) => {
-    setYoutubeUrl(value);
-    if (value.trim() && !YOUTUBE_URL_REGEX.test(value)) {
-      setYoutubeError("Please enter a valid YouTube URL");
-    } else {
-      setYoutubeError(null);
-    }
-  };
-
-  const validateFile = (nextFile: File): string | null => {
-    if (nextFile.size > MAX_FILE_SIZE_BYTES) {
-      return "File size exceeds 200 MB limit.";
-    }
-
-    const extension = nextFile.name.split(".").pop()?.toLowerCase();
-    if (!extension || !ACCEPTED_FILE_EXTENSIONS.includes(extension)) {
-      return "Unsupported file type.";
-    }
-
-    return null;
-  };
-
-  const applyFile = (nextFile: File | null) => {
-    if (!nextFile) return;
-    const validationError = validateFile(nextFile);
-    if (validationError) {
-      setFile(null);
-      setFileError(validationError);
-      return;
-    }
-    setFile(nextFile);
-    setFileError(null);
-  };
-
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const nextFile = event.target.files?.[0] ?? null;
-    applyFile(nextFile);
-    event.target.value = "";
-  };
-
-  const handleFileDrop = (event: DragEvent<HTMLLabelElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDraggingFile(false);
-    const nextFile = event.dataTransfer.files?.[0] ?? null;
-    applyFile(nextFile);
-  };
-
-  // Fetch kindle emails for the selector
-  const { data: kindleEmails } = useQuery({
-    queryKey: ["kindleEmails"],
-    queryFn: async () => {
-      const response = await api.kindle.get();
-      if (response.error) return [];
-      return (response.data?.data ?? []) as KindleEmail[];
-    },
-    enabled: !!session,
-  });
-
-  // Set default kindle on initial load
-  const defaultKindle = kindleEmails?.find((k) => k.isDefault);
-  const effectiveKindleId = selectedKindleId ?? defaultKindle?.id;
-
-  const handleSuccess = () => {
-    if (activeTab === "url") {
-      setUrl("");
-    } else if (activeTab === "text") {
-      setText("");
-    } else if (activeTab === "youtube") {
-      setYoutubeUrl("");
-      setYoutubeError(null);
-    } else if (activeTab === "topic") {
-      setTopic("");
-    } else {
-      setFile(null);
-      setFileError(null);
-    }
-  };
+  const [activeTab, setActiveTab] = useState("url");
 
   return (
     <div className="flex items-center justify-center" style={{ minHeight: "calc(100vh - 7rem)" }}>
@@ -148,8 +20,8 @@ export const Root = () => {
           <p className="text-muted-foreground">Send articles and text to your Kindle device</p>
         </div>
 
-        <div className="border border-border rounded-xl p-6 space-y-5">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "url" | "text" | "file" | "youtube" | "topic")}>
+        <div className="border border-border rounded-xl p-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full grid grid-cols-5 bg-muted">
               <TabsTrigger value="url" className="gap-2 data-[state=active]:bg-background">
                 <Link className="size-4" />
@@ -173,129 +45,12 @@ export const Root = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="url" className="mt-4">
-              <Input
-                type="url"
-                placeholder="https://example.com/article"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-            </TabsContent>
-
-            <TabsContent value="text" className="mt-4">
-              <textarea
-                placeholder="Paste your text content here..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                rows={8}
-                className="w-full border border-border rounded-md px-3 py-2 text-foreground placeholder:text-muted-foreground bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-            </TabsContent>
-
-            <TabsContent value="youtube" className="mt-4 space-y-3">
-              <Input
-                type="url"
-                placeholder="https://youtube.com/watch?v=..."
-                value={youtubeUrl}
-                onChange={(e) => handleYoutubeUrlChange(e.target.value)}
-              />
-              {youtubeError && (
-                <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
-                  {youtubeError}
-                </p>
-              )}
-            </TabsContent>
-
-            <TabsContent value="topic" className="mt-4">
-              <textarea
-                placeholder="Enter a topic or question, e.g. 'How stablecoins work and why USDT is priced at exactly 1 USD'"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                rows={4}
-                className="w-full border border-border rounded-md px-3 py-2 text-foreground placeholder:text-muted-foreground bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-            </TabsContent>
-
-            <TabsContent value="file" className="mt-4 space-y-3">
-              <label
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  setIsDraggingFile(true);
-                }}
-                onDragLeave={(event) => {
-                  event.preventDefault();
-                  setIsDraggingFile(false);
-                }}
-                onDrop={handleFileDrop}
-                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center transition-colors ${
-                  isDraggingFile
-                    ? "border-foreground bg-muted"
-                    : "border-border hover:border-foreground/30 hover:bg-accent"
-                }`}
-              >
-                <Upload className="size-5 text-muted-foreground" />
-                <p className="text-sm text-foreground">Drop a file here or click to choose</p>
-                <p className="text-xs text-muted-foreground">
-                  PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB up to 200 MB
-                </p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept={FILE_INPUT_ACCEPT}
-                  onChange={handleFileInputChange}
-                  className="hidden"
-                />
-              </label>
-
-              {file && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: <span className="text-foreground">{file.name}</span>
-                </p>
-              )}
-
-              {fileError && (
-                <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
-                  {fileError}
-                </p>
-              )}
-            </TabsContent>
+            <TabsContent value="url"><SendUrlWidget /></TabsContent>
+            <TabsContent value="text"><SendTextWidget /></TabsContent>
+            <TabsContent value="youtube"><SendYoutubeWidget /></TabsContent>
+            <TabsContent value="topic"><SendTopicWidget /></TabsContent>
+            <TabsContent value="file"><SendFileWidget /></TabsContent>
           </Tabs>
-
-          {/* Kindle selector */}
-          {kindleEmails && kindleEmails.length > 0 && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Send to</label>
-              <Select
-                value={effectiveKindleId ?? ""}
-                onValueChange={(value) => setSelectedKindleId(value || undefined)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a Kindle device" />
-                </SelectTrigger>
-                <SelectContent>
-                  {kindleEmails.map((kindle) => (
-                    <SelectItem key={kindle.id} value={kindle.id}>
-                      {kindle.label || kindle.email}
-                      {kindle.isDefault ? " (default)" : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {kindleEmails && kindleEmails.length === 0 && (
-            <p className="text-sm text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950 px-3 py-2 rounded-lg">
-              Please add a Kindle email address in Settings before sending content.
-            </p>
-          )}
-
-          <SendContent
-            type={activeTab}
-            content={activeTab === "url" ? url : activeTab === "text" ? text : activeTab === "youtube" ? youtubeUrl : activeTab === "topic" ? topic : file}
-            kindleEmailId={effectiveKindleId}
-            onSuccess={handleSuccess}
-          />
         </div>
       </div>
     </div>
