@@ -2,6 +2,11 @@
 .ralphy
 .turbo
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # LLM
 context
 .claude/worktrees
