@@ -4,5 +4,6 @@
 
 # LLM
 context
-.claude
+.claude/worktrees
+.claude/settings.local.json
 skills-lock.json
