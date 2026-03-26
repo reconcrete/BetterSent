@@ -5,3 +5,8 @@ export * from "./Input/Input";
 export * from "./Select/Select";
 export * from "./Table/Table";
 export * from "./Dialog/Dialog";
+export * from "./Card/Card";
+export * from "./Badge/Badge";
+export * from "./Separator/Separator";
+export * from "./DropdownMenu/DropdownMenu";
+export * from "./Avatar/Avatar";
