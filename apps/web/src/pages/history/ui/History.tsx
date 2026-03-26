@@ -1,7 +1,6 @@
 import type { FC } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Link, FileText, File, Loader2, CheckCircle2, XCircle, Clock, Youtube, BookOpen } from "lucide-react";
+import { Link, FileText, File, Loader2, CheckCircle2, XCircle, Clock, Youtube, BookOpen } from "lucide-react";
 
 import {
   Table,
@@ -10,7 +9,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
 } from "~/shared/ui";
 import { api } from "~/shared/lib/treaty";
 import { useSession } from "~/shared/lib";
@@ -103,8 +101,7 @@ const truncateContent = (content: string, maxLength = 50): string => {
 };
 
 export const History: FC = () => {
-  const navigate = useNavigate();
-  const { data: session, isPending: isSessionPending } = useSession();
+  const { data: session } = useSession();
 
   const { data: historyItems, isLoading } = useQuery({
     queryKey: ["sendHistory"],
@@ -114,120 +111,86 @@ export const History: FC = () => {
       return (response.data?.data ?? []) as HistoryItem[];
     },
     enabled: !!session,
-    refetchInterval: 5000, // Poll every 5s to catch status updates
+    refetchInterval: 5000,
   });
 
-  if (isSessionPending) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">Please sign in</h1>
-          <p className="text-muted-foreground">You need to be signed in to view your history.</p>
-          <Button onClick={() => navigate("/")}>Go to Home</Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/")}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" />
-            Back
-          </Button>
-        </div>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Send History</h1>
+        <p className="text-muted-foreground">
+          Track what you've sent to your Kindle device
+        </p>
+      </div>
 
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Send History</h1>
-          <p className="text-muted-foreground">
-            Track what you've sent to your Kindle device
-          </p>
-        </div>
-
-        <div className="border border-border rounded-xl overflow-hidden">
-          {isLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="size-6 animate-spin mx-auto text-muted-foreground" />
-              <p className="mt-2 text-muted-foreground">Loading history...</p>
-            </div>
-          ) : historyItems && historyItems.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted">
-                  <TableHead className="w-[200px]">Title</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Kindle</TableHead>
-                  <TableHead className="text-right">Date</TableHead>
-                  <TableHead className="w-[70px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {historyItems.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">
-                      <div className="max-w-[200px]">
-                        <div className="truncate" title={item.title || item.content}>
-                          {item.title || truncateContent(item.content)}
-                        </div>
-                        {item.author && (
-                          <div className="text-xs text-muted-foreground truncate">
-                            by {item.author}
-                          </div>
-                        )}
+      <div className="border border-border rounded-xl overflow-hidden">
+        {isLoading ? (
+          <div className="p-8 text-center">
+            <Loader2 className="size-6 animate-spin mx-auto text-muted-foreground" />
+            <p className="mt-2 text-muted-foreground">Loading history...</p>
+          </div>
+        ) : historyItems && historyItems.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead className="w-[200px]">Title</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Kindle</TableHead>
+                <TableHead className="text-right">Date</TableHead>
+                <TableHead className="w-[70px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {historyItems.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">
+                    <div className="max-w-[200px]">
+                      <div className="truncate" title={item.title || item.content}>
+                        {item.title || truncateContent(item.content)}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <TypeBadge type={item.type} />
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={item.status} errorMessage={item.errorMessage} />
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {item.kindleEmail ? (
-                        <span className="text-sm truncate max-w-[150px] block">
-                          {item.kindleEmail}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
+                      {item.author && (
+                        <div className="text-xs text-muted-foreground truncate">
+                          by {item.author}
+                        </div>
                       )}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {formatDate(item.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      {item.hasPreview && (
-                        <PreviewExtraction historyId={item.id} />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="p-8 text-center">
-              <p className="text-muted-foreground">No history yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Content you send to your Kindle will appear here.
-              </p>
-            </div>
-          )}
-        </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <TypeBadge type={item.type} />
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={item.status} errorMessage={item.errorMessage} />
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {item.kindleEmail ? (
+                      <span className="text-sm truncate max-w-[150px] block">
+                        {item.kindleEmail}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right text-muted-foreground">
+                    {formatDate(item.createdAt)}
+                  </TableCell>
+                  <TableCell>
+                    {item.hasPreview && (
+                      <PreviewExtraction historyId={item.id} />
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="p-8 text-center">
+            <p className="text-muted-foreground">No history yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Content you send to your Kindle will appear here.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

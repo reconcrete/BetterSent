@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, FileText, File as FileIcon, Upload, LogOut, Youtube, BookOpen } from "lucide-react";
+import { Link, FileText, File as FileIcon, Upload, Youtube, BookOpen } from "lucide-react";
 
 import {
   Tabs,
@@ -8,7 +8,6 @@ import {
   TabsTrigger,
   TabsContent,
   Input,
-  Button,
   Select,
   SelectContent,
   SelectItem,
@@ -16,16 +15,9 @@ import {
   SelectValue,
 } from "~/shared/ui";
 import { api } from "~/shared/lib/treaty";
-import { signOut, useSession, useAnalytics } from "~/shared/lib";
+import { useSession } from "~/shared/lib";
 
 import { SendContent } from "~/features/sendContent";
-import { KindleSettings } from "~/features/openKindleSettings";
-import { OpenHistory } from "~/features/openHistory";
-import { ThemeToggle } from "~/features/toggleTheme";
-
-import { SignInCard } from "~/widgets/signInCard";
-
-import { useOnboardingGuard } from "../hooks";
 
 type KindleEmail = {
   id: string;
@@ -53,10 +45,7 @@ const ACCEPTED_FILE_EXTENSIONS = [
 const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",");
 
 export const Root = () => {
-  const { data: session, isPending } = useSession();
-  const analytics = useAnalytics();
-  
-  useOnboardingGuard();
+  const { data: session } = useSession();
 
   const [activeTab, setActiveTab] = useState<"url" | "text" | "file" | "youtube" | "topic">("url");
   const [url, setUrl] = useState("");
@@ -151,37 +140,12 @@ export const Root = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    analytics.reset();
-    await signOut();
-  };
-
-  if (isPending) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
-  // Show auth widget if not logged in
-  if (!session) {
-    return <SignInCard />;
-  }
-
-  // Show main app if logged in
   return (
-    <div className="relative min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
+    <div className="flex items-center justify-center" style={{ minHeight: "calc(100vh - 7rem)" }}>
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Bettersent</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Send to Kindle</h1>
           <p className="text-muted-foreground">Send articles and text to your Kindle device</p>
-          <p className="text-sm text-muted-foreground">
-            Signed in as <span className="text-foreground">{session.user.email}</span>
-          </p>
         </div>
 
         <div className="border border-border rounded-xl p-6 space-y-5">
@@ -332,15 +296,6 @@ export const Root = () => {
             kindleEmailId={effectiveKindleId}
             onSuccess={handleSuccess}
           />
-        </div>
-
-        <div className="flex items-center justify-center gap-2">
-          <KindleSettings />
-          <OpenHistory />
-          <Button variant="ghost" onClick={handleSignOut} className="text-muted-foreground hover:text-foreground">
-            <LogOut className="size-4" />
-            Sign Out
-          </Button>
         </div>
       </div>
     </div>
