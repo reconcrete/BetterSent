@@ -120,7 +120,7 @@ export const updateKindleEmail = async (
       ...(data.label !== undefined && { label: data.label }),
       updatedAt: new Date(),
     })
-    .where(eq(kindleEmailAddress.id, emailId))
+    .where(and(eq(kindleEmailAddress.id, emailId), eq(kindleEmailAddress.userId, userId)))
     .returning();
 
   log.debug({ emailId }, "Kindle email updated");
@@ -148,7 +148,7 @@ export const deleteKindleEmail = async (
 
   const wasDefault = existing.isDefault;
 
-  await db.delete(kindleEmailAddress).where(eq(kindleEmailAddress.id, emailId));
+  await db.delete(kindleEmailAddress).where(and(eq(kindleEmailAddress.id, emailId), eq(kindleEmailAddress.userId, userId)));
 
   // If the deleted email was the default, set another one as default
   if (wasDefault) {
