@@ -12,7 +12,7 @@ const app = new Elysia()
     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization", "X-Internal-Api-Key", "X-User-Id"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }))
   .use(authMiddleware)
   .get("/health", () => ({ status: "ok" }))
