@@ -5,6 +5,7 @@ import { $ } from "bun";
 import type { EpubMetadata } from "../types";
 import { INLINE_IMAGE_RE } from "../constants";
 import { DEFAULT_USER_AGENT } from "../../scraper/constants";
+import { isPrivateHost } from "../../scraper/lib";
 
 export function getExtensionFromUrl(url: string): string {
   try {
@@ -32,14 +33,67 @@ export async function localizeMarkdownImages(markdown: string, runFolderPath: st
 
   for (const imageUrl of imageUrls) {
     try {
+      // Block fetches to private/internal IPs
+      try {
+        const parsedUrl = new URL(imageUrl);
+        if (isPrivateHost(parsedUrl.hostname)) continue;
+      } catch {
+        continue;
+      }
+
       const res = await fetch(imageUrl, {
-        redirect: "follow",
+        redirect: "manual",
         headers: {
           "User-Agent": DEFAULT_USER_AGENT,
           Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
           Referer: imageUrl,
         },
       });
+
+      // Reject redirects to private IPs
+      if ([301, 302, 303, 307, 308].includes(res.status)) {
+        const location = res.headers.get("location");
+        if (location) {
+          try {
+            const redirectUrl = new URL(location, imageUrl);
+            if (isPrivateHost(redirectUrl.hostname)) continue;
+            // Follow safe redirect manually
+            const redirectRes = await fetch(redirectUrl.toString(), {
+              redirect: "manual",
+              headers: {
+                "User-Agent": DEFAULT_USER_AGENT,
+                Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+              },
+            });
+            if (!redirectRes.ok) continue;
+            const contentType = redirectRes.headers.get("content-type") ?? "";
+            if (!contentType.startsWith("image/")) continue;
+            const ext =
+              contentType.includes("jpeg") || contentType.includes("jpg")
+                ? "jpg"
+                : contentType.includes("png")
+                  ? "png"
+                  : contentType.includes("gif")
+                    ? "gif"
+                    : contentType.includes("webp")
+                      ? "webp"
+                      : contentType.includes("svg")
+                        ? "svg"
+                        : getExtensionFromUrl(imageUrl);
+            const basename = `${index}.${ext}`;
+            const filepath = join(imagesDir, basename);
+            const buffer = Buffer.from(await redirectRes.arrayBuffer());
+            await writeFile(filepath, buffer);
+            urlToLocal.set(imageUrl, join("images", basename));
+            index += 1;
+            continue;
+          } catch {
+            continue;
+          }
+        }
+        continue;
+      }
+
       if (!res.ok) continue;
       const contentType = res.headers.get("content-type") ?? "";
       if (!contentType.startsWith("image/")) continue;
