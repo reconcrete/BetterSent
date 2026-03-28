@@ -1,10 +1,8 @@
 import type { FC } from "react";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 import { useSession } from "~/shared/lib";
-
-import { SignInCard } from "~/widgets/signInCard";
 
 import { useOnboardingGuard } from "../../hooks/useOnboardingGuard";
 
@@ -24,7 +22,7 @@ export const AppLayout: FC = () => {
   }
 
   if (!session) {
-    return <SignInCard />;
+    return <Navigate to="/sign-in" replace />;
   }
 
   return (

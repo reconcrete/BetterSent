@@ -10,3 +10,4 @@ export * from "./Badge/Badge";
 export * from "./Separator/Separator";
 export * from "./DropdownMenu/DropdownMenu";
 export * from "./Avatar/Avatar";
+export * from "./Logo/Logo";
