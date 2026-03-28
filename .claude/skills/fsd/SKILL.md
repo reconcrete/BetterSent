@@ -226,6 +226,7 @@ features/featureName/
     └── index.ts
 ```
 - Feature names follow `verbNoun` pattern: `sendContent`, `toggleTheme`
+- The main component name matches the feature name in PascalCase and represents the **action**, not the UI element type. For example: `GoogleSignIn` (not `GoogleSignInButton`), `MagicLinkSignIn` (not `MagicLinkSignInForm`), `SendContent` (not `SendContentButton`).
 - Small features: just `ui/`
 - Medium features: `ui/` + `lib/`
 - Features handle their own mutations and analytics events

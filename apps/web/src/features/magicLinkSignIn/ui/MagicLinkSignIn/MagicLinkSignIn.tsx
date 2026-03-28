@@ -1,15 +1,15 @@
 import type { FC } from "react";
 import { useState } from "react";
-import { Mail, CheckCircle } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { Button, Input } from "~/shared/ui";
 import { signIn, useAnalytics } from "~/shared/lib";
 
-type SignInMagicLinkFormProps = {
+type MagicLinkSignInProps = {
   callbackURL?: string;
 };
 
-export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
+export const MagicLinkSignIn: FC<MagicLinkSignInProps> = ({
   callbackURL,
 }) => {
   const [email, setEmail] = useState("");
@@ -23,7 +23,6 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
     setError("");
     setIsLoading(true);
 
-    // Use absolute URL for callback (frontend origin)
     const absoluteCallbackURL = callbackURL
       ? new URL(callbackURL, window.location.origin).toString()
       : window.location.origin;
@@ -49,33 +48,28 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
 
   if (isSent) {
     return (
-      <div className="text-center py-4 space-y-3">
-        <CheckCircle className="size-12 text-green-500 mx-auto" />
-        <h3 className="text-lg font-medium text-foreground">Check your email</h3>
-        <p className="text-sm text-muted-foreground">
-          We sent a magic link to <span className="font-medium text-foreground">{email}</span>
+      <div className="text-center space-y-2 py-2">
+        <p className="text-sm text-foreground">
+          Magic link sent to <span className="font-medium">{email}</span>
         </p>
-        <p className="text-xs text-muted-foreground">
-          Click the link in the email to sign in. The link expires in 5 minutes.
-        </p>
-        <Button
-          variant="ghost"
+        <button
+          type="button"
           onClick={() => {
             setIsSent(false);
             setEmail("");
           }}
-          className="mt-4"
+          className="text-xs text-primary hover:underline"
         >
           Use a different email
-        </Button>
+        </button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <label htmlFor="magic-link-email" className="text-sm font-medium text-foreground">
+        <label htmlFor="magic-link-email" className="text-sm font-semibold text-foreground">
           Email
         </label>
         <Input
@@ -85,18 +79,15 @@ export const SignInMagicLinkForm: FC<SignInMagicLinkFormProps> = ({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="h-[46px] rounded-xl px-4"
         />
       </div>
-
-      <p className="text-xs text-muted-foreground">
-        We'll send you a magic link to sign in without a password.
-      </p>
 
       {error && (
         <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">{error}</p>
       )}
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" disabled={isLoading} className="w-full h-[48px] rounded-xl">
         {isLoading ? (
           "Sending..."
         ) : (
