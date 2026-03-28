@@ -1,10 +1,17 @@
 import { type FC, useState, useCallback } from "react";
 
 import { SendContent } from "~/features/sendContent";
+import { useSubscriptionStatus } from "~/entities/billing";
 
 import { KindleEmailSelector } from "~/widgets/kindleEmailSelector";
+import { UpgradePrompt } from "~/widgets/upgradePrompt";
 
 export const SendTopicWidget: FC = () => {
+  const { data: status } = useSubscriptionStatus();
+
+  if (status?.plan === "free") {
+    return <UpgradePrompt feature="Topic generation" />;
+  }
   const [topic, setTopic] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
 

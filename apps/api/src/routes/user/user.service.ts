@@ -1,5 +1,5 @@
 import { db } from "../../db";
-import { user } from "@bettersent/db/schema";
+import { user, subscription } from "@bettersent/db/schema";
 import { eq } from "drizzle-orm";
 import { log } from "../../lib/logger";
 
@@ -12,6 +12,8 @@ export const getProfile = async (userId: string) => {
     throw new Error("User not found");
   }
 
+  const plan = await getUserPlan(userId);
+
   log.debug({ userId }, "User profile retrieved");
 
   return {
@@ -20,7 +22,19 @@ export const getProfile = async (userId: string) => {
     name: userData.name,
     createdAt: userData.createdAt.toISOString(),
     onboarded: userData.onboarded,
+    plan,
   };
+};
+
+const getUserPlan = async (userId: string): Promise<"free" | "pro"> => {
+  const sub = await db
+    .select()
+    .from(subscription)
+    .where(eq(subscription.userId, userId))
+    .limit(1)
+    .then((rows) => rows[0] ?? null);
+
+  return sub?.status === "active" ? "pro" : "free";
 };
 
 export const updateProfile = async (userId: string, data: { name?: string }) => {
@@ -36,6 +50,8 @@ export const updateProfile = async (userId: string, data: { name?: string }) => 
     throw new Error("User not found");
   }
 
+  const plan = await getUserPlan(userId);
+
   log.debug({ userId }, "User profile updated");
 
   return {
@@ -44,6 +60,7 @@ export const updateProfile = async (userId: string, data: { name?: string }) => 
     name: updatedUser.name,
     createdAt: updatedUser.createdAt.toISOString(),
     onboarded: updatedUser.onboarded,
+    plan,
   };
 };
 
@@ -60,6 +77,8 @@ export const markOnboarded = async (userId: string) => {
     throw new Error("User not found");
   }
 
+  const plan = await getUserPlan(userId);
+
   log.debug({ userId }, "User marked as onboarded");
 
   return {
@@ -68,5 +87,6 @@ export const markOnboarded = async (userId: string) => {
     name: updatedUser.name,
     createdAt: updatedUser.createdAt.toISOString(),
     onboarded: updatedUser.onboarded,
+    plan,
   };
 };

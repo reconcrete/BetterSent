@@ -3,12 +3,19 @@ import { type FC, useState, useCallback } from "react";
 import { Input } from "~/shared/ui";
 
 import { SendContent } from "~/features/sendContent";
+import { useSubscriptionStatus } from "~/entities/billing";
 
 import { KindleEmailSelector } from "~/widgets/kindleEmailSelector";
+import { UpgradePrompt } from "~/widgets/upgradePrompt";
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|live\/)|youtu\.be\/)/;
 
 export const SendYoutubeWidget: FC = () => {
+  const { data: status } = useSubscriptionStatus();
+
+  if (status?.plan === "free") {
+    return <UpgradePrompt feature="YouTube extraction" />;
+  }
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);

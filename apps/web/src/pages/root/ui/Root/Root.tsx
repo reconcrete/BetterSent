@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, FileText, File as FileIcon, Youtube, BookOpen } from "lucide-react";
+import { Link, FileText, File as FileIcon, Youtube, BookOpen, Lock } from "lucide-react";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/shared/ui";
+import { useSubscriptionStatus } from "~/entities/billing";
 
 import { SendUrlWidget } from "~/widgets/sendUrlWidget";
 import { SendTextWidget } from "~/widgets/sendTextWidget";
@@ -11,6 +12,9 @@ import { SendFileWidget } from "~/widgets/sendFileWidget";
 
 export const Root = () => {
   const [activeTab, setActiveTab] = useState("url");
+  const { data: status } = useSubscriptionStatus();
+
+  const isFree = !status || status.plan === "free";
 
   return (
     <div className="flex items-center justify-center" style={{ minHeight: "calc(100vh - 7rem)" }}>
@@ -32,11 +36,11 @@ export const Root = () => {
                 Plain Text
               </TabsTrigger>
               <TabsTrigger value="youtube" className="gap-2 data-[state=active]:bg-background">
-                <Youtube className="size-4" />
+                {isFree ? <Lock className="size-3.5" /> : <Youtube className="size-4" />}
                 YouTube
               </TabsTrigger>
               <TabsTrigger value="topic" className="gap-2 data-[state=active]:bg-background">
-                <BookOpen className="size-4" />
+                {isFree ? <Lock className="size-3.5" /> : <BookOpen className="size-4" />}
                 Topic
               </TabsTrigger>
               <TabsTrigger value="file" className="gap-2 data-[state=active]:bg-background">

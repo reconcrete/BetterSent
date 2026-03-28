@@ -1,10 +1,11 @@
 import type { FC } from "react";
-import { Tablet, User, CreditCard } from "lucide-react";
+import { Tablet, User } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Badge } from "~/shared/ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/shared/ui";
 import { useSession } from "~/shared/lib";
 
 import { KindleDeviceManager } from "~/widgets/kindleDeviceManager";
+import { SubscriptionManager } from "~/widgets/subscriptionManager";
 
 export const Settings: FC = () => {
   const { data: session } = useSession();
@@ -52,23 +53,7 @@ export const Settings: FC = () => {
       </Card>
 
       {/* Subscription */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <CreditCard className="size-5 text-muted-foreground" />
-            <CardTitle>Subscription</CardTitle>
-            <Badge variant="secondary">Coming soon</Badge>
-          </div>
-          <CardDescription>
-            Manage your subscription plan and billing
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Subscription management will be available soon.
-          </p>
-        </CardContent>
-      </Card>
+      <SubscriptionManager />
     </div>
   );
 };

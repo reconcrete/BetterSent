@@ -1,10 +1,11 @@
-import type { FC } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { type FC, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 as Loader, Send } from "lucide-react";
 
 import { Button } from "~/shared/ui";
 import { useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
+import { BILLING_STATUS_KEY } from "~/entities/billing";
 
 type SendContentProps = {
   type: "url" | "text" | "file" | "youtube" | "topic";
@@ -15,31 +16,47 @@ type SendContentProps = {
 
 export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess }) => {
   const analytics = useAnalytics();
+  const queryClient = useQueryClient();
+  const [error, setError] = useState<string | null>(null);
+
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
+      setError(null);
+
+      let response;
       if (type === "file") {
         if (!(content instanceof File)) {
           throw new Error("No file selected.");
         }
-        return api.extract.file.post({ file: content, kindleEmailId });
+        response = await api.extract.file.post({ file: content, kindleEmailId });
+      } else if (type === "youtube") {
+        response = await api.extract.youtube.post({ url: content as string, kindleEmailId });
+      } else if (type === "topic") {
+        response = await api.extract.topic.post({ topic: content as string, kindleEmailId });
+      } else if (type === "url") {
+        response = await api.extract.url.post({ url: content as string, kindleEmailId });
+      } else {
+        response = await api.extract.text.post({ textContent: content as string, kindleEmailId });
       }
 
-      if (type === "youtube") {
-        return api.extract.youtube.post({ url: content as string, kindleEmailId });
+      if (response.error) {
+        const errorValue = response.error.value;
+        const errorMessage =
+          typeof errorValue === "object" && errorValue && "error" in errorValue
+            ? (errorValue as { error: string }).error
+            : "Failed to send content";
+        throw new Error(errorMessage);
       }
 
-      if (type === "topic") {
-        return api.extract.topic.post({ topic: content as string, kindleEmailId });
-      }
-
-      if (type === "url") {
-        return api.extract.url.post({ url: content as string, kindleEmailId });
-      }
-      return api.extract.text.post({ textContent: content as string, kindleEmailId });
+      return response.data;
     },
     onSuccess: () => {
       analytics.capture("extraction_sent", { type });
+      queryClient.invalidateQueries({ queryKey: BILLING_STATUS_KEY });
       onSuccess?.();
+    },
+    onError: (err: Error) => {
+      setError(err.message);
     },
   });
 
@@ -54,23 +71,30 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
   };
 
   return (
-    <Button
-      onClick={handleSend}
-      disabled={isPending || !canSend}
-      size="lg"
-      className="w-full"
-    >
-      {isPending ? (
-        <>
-          <Loader className="animate-spin" />
-          Sending to Kindle...
-        </>
-      ) : (
-        <>
-          <Send />
-          Send to Kindle
-        </>
+    <div className="space-y-2">
+      <Button
+        onClick={handleSend}
+        disabled={isPending || !canSend}
+        size="lg"
+        className="w-full"
+      >
+        {isPending ? (
+          <>
+            <Loader className="animate-spin" />
+            Sending to Kindle...
+          </>
+        ) : (
+          <>
+            <Send />
+            Send to Kindle
+          </>
+        )}
+      </Button>
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+          {error}
+        </p>
       )}
-    </Button>
+    </div>
   );
 };

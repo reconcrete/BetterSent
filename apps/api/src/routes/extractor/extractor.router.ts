@@ -12,6 +12,8 @@ import {
 import { extractText, extractUrl, extractYoutube, extractTopic, extractFile } from "./extractor.service";
 import { authMiddleware } from "../../lib/auth";
 import { log } from "../../lib/logger";
+import { checkAndIncrementUsage } from "../billing/billing.service";
+import { UsageLimitError, FeatureLockedError } from "../billing/billing.errors";
 
 export const extractorRouter = new Elysia({ prefix: "/extract" })
   .use(authMiddleware)
@@ -19,9 +21,14 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     "/text",
     async ({ body, set, user }) => {
       try {
+        await checkAndIncrementUsage(user.id, "text");
         const data = await extractText(body.textContent, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof UsageLimitError) {
+          set.status = 429;
+          return { success: false, error: error.message };
+        }
         log.error({ error }, "Extraction error");
         set.status = 500;
         return {
@@ -36,9 +43,14 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     "/url",
     async ({ body, set, user }) => {
       try {
+        await checkAndIncrementUsage(user.id, "url");
         const data = await extractUrl(body.url, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof UsageLimitError) {
+          set.status = 429;
+          return { success: false, error: error.message };
+        }
         log.error({ error }, "Extraction error");
         set.status = 500;
         return {
@@ -53,9 +65,18 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     "/youtube",
     async ({ body, set, user }) => {
       try {
+        await checkAndIncrementUsage(user.id, "youtube");
         const data = await extractYoutube(body.url, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof FeatureLockedError) {
+          set.status = 403;
+          return { success: false, error: error.message };
+        }
+        if (error instanceof UsageLimitError) {
+          set.status = 429;
+          return { success: false, error: error.message };
+        }
         log.error({ error }, "YouTube extraction error");
         set.status = 500;
         return {
@@ -70,9 +91,18 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     "/topic",
     async ({ body, set, user }) => {
       try {
+        await checkAndIncrementUsage(user.id, "topic");
         const data = await extractTopic(body.topic, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof FeatureLockedError) {
+          set.status = 403;
+          return { success: false, error: error.message };
+        }
+        if (error instanceof UsageLimitError) {
+          set.status = 429;
+          return { success: false, error: error.message };
+        }
         log.error({ error }, "Topic generation error");
         set.status = 500;
         return {
@@ -87,9 +117,14 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     "/file",
     async ({ body, set, user }) => {
       try {
+        await checkAndIncrementUsage(user.id, "file");
         const data = await extractFile(body.file, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof UsageLimitError) {
+          set.status = 429;
+          return { success: false, error: error.message };
+        }
         log.error({ error }, "File send error");
         set.status = 500;
         return {

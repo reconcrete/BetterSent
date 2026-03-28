@@ -7,6 +7,7 @@ export const userProfileSchema = t.Object({
   name: t.String(),
   createdAt: t.String(),
   onboarded: t.Boolean(),
+  plan: t.Union([t.Literal("free"), t.Literal("pro")]),
 });
 
 export const updateProfileInputSchema = t.Object({

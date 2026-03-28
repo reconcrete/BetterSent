@@ -5,6 +5,14 @@ export const baseResponseSchema = <T extends TSchema>(dataSchema: T) => ({
     success: t.Literal(true),
     data: dataSchema,
   }),
+  403: t.Object({
+    success: t.Literal(false),
+    error: t.String(),
+  }),
+  429: t.Object({
+    success: t.Literal(false),
+    error: t.String(),
+  }),
   500: t.Object({
     success: t.Literal(false),
     error: t.String(),

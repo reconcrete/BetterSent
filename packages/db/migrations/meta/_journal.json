@@ -43,6 +43,13 @@
       "when": 1773525266611,
       "tag": "0005_add-onboarded-to-user",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774729024032,
+      "tag": "0006_adorable_blackheart",
+      "breakpoints": true
     }
   ]
 }
