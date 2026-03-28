@@ -26,9 +26,9 @@ export const AppLayout: FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-svh flex-col bg-background">
       <NavBar email={session.user.email} />
-      <main className="p-4">
+      <main className="flex-1 p-4">
         <Outlet />
       </main>
     </div>

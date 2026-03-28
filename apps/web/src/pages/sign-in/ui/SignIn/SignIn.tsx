@@ -24,7 +24,7 @@ export const SignIn: FC = () => {
   }
 
   return (
-    <div className="relative flex min-h-screen">
+    <div className="relative flex h-dvh overflow-hidden">
       {/* Theme toggle */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
@@ -34,14 +34,10 @@ export const SignIn: FC = () => {
       <div className="flex-1 lg:basis-[55%] flex flex-col items-center justify-center bg-background p-6 md:p-8">
         <div className="w-full max-w-[414px] space-y-8">
           <div className="space-y-2">
-            <h1 className="flex items-end justify-center gap-2.5 text-[32px] font-bold text-foreground leading-[1.2]">
-              Welcome to
+            <h1 className="flex flex-col sm:flex-row items-center sm:items-end justify-center gap-1 sm:gap-2.5 text-[32px] font-bold text-foreground leading-[1.2]">
+              <span className="whitespace-nowrap">Welcome to</span>
               <Logo className="text-[32px]" />
             </h1>
-            <p className="text-sm text-muted-foreground text-center">
-              First time here?{" "}
-              <span className="text-secondary dark:text-primary cursor-pointer">Create account</span>
-            </p>
           </div>
 
           <SignInForm />
