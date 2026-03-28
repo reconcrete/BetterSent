@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/shared/lib/treaty";
 
 export const BILLING_STATUS_KEY = ["billingStatus"];

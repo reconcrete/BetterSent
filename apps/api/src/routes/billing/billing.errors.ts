@@ -1,11 +1,12 @@
 export class UsageLimitError extends Error {
-  constructor(
-    message: string,
-    public readonly limit: number,
-    public readonly used: number,
-  ) {
+  readonly limit: number;
+  readonly used: number;
+
+  constructor(message: string, limit: number, used: number) {
     super(message);
     this.name = "UsageLimitError";
+    this.limit = limit;
+    this.used = used;
   }
 }
 
