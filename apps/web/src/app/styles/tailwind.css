@@ -6,6 +6,7 @@
 
 @theme {
   --font-sans: "Geist", sans-serif;
+  --font-display: "DM Serif Display", serif;
 }
 
 @utility scrollbar-hidden {
