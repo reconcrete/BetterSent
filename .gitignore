@@ -14,3 +14,4 @@ context
 .claude/worktrees
 .claude/settings.local.json
 skills-lock.json
+.vercel
