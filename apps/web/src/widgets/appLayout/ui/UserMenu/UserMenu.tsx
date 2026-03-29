@@ -36,7 +36,7 @@ export const UserMenu: FC<UserMenuProps> = ({ email }) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar className="size-8">
-            <AvatarFallback className="bg-primary/8 text-xs font-bold text-primary">
+            <AvatarFallback className="bg-primary/8 text-xs font-bold text-secondary">
               {getInitials(email)}
             </AvatarFallback>
           </Avatar>
