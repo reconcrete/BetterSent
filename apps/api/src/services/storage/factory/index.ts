@@ -1,6 +1,7 @@
 import type { IStorageService } from "../interface";
 import { FileSystemStorageService } from "../implementation/filesystem.storage.service";
 import { S3StorageService } from "../implementation/s3.storage.service";
+import { isProduction } from "../../../shared/env";
 
 interface S3EnvironmentConfig {
   endpoint: string;
@@ -42,8 +43,7 @@ function readS3Environment(): { config: S3EnvironmentConfig | null; missing: str
 }
 
 export function createStorageService(): IStorageService {
-  const nodeEnv = process.env.NODE_ENV ?? "development";
-  if (nodeEnv !== "production") {
+  if (!isProduction) {
     return new FileSystemStorageService();
   }
 
