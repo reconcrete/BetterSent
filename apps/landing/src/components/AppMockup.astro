@@ -1,0 +1,176 @@
+---
+const recentItems = [
+  {
+    title: "Why AI Will Transform Reading",
+    source: "paulgraham.com",
+    gradient: "from-[#4f39f6] to-[#7f22fe]",
+  },
+  {
+    title: "The Future of Digital Publishing",
+    source: "stratechery.com",
+    gradient: "from-[#009966] to-[#00d492]",
+  },
+  {
+    title: "Building Better Reading Habits",
+    source: "jamesclear.com",
+    gradient: "from-[#e7000b] to-[#fe9a00]",
+  },
+];
+
+const sidebarItems = [
+  { label: "Dashboard", active: true },
+  { label: "Send to Kindle", active: false },
+  { label: "History", active: false },
+  { label: "Settings", active: false },
+];
+
+const stats = [
+  { value: "142", label: "Articles sent" },
+  { value: "23", label: "Books delivered" },
+  { value: "4.2h", label: "Avg. reading time" },
+];
+---
+
+<div
+  class="mx-auto max-w-[1000px] overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#111314]"
+>
+  <!-- Window chrome -->
+  <div
+    class="flex h-11 items-center gap-2 border-b border-border bg-[#111314] px-4"
+  >
+    <span class="size-2.5 rounded-full bg-[#ff5f57]"></span>
+    <span class="size-2.5 rounded-full bg-[#febc2e]"></span>
+    <span class="size-2.5 rounded-full bg-[#28c840]"></span>
+  </div>
+
+  <!-- App content -->
+  <div class="flex gap-8 px-10 pt-10 pb-0">
+    <!-- Sidebar (hidden on mobile) -->
+    <div class="hidden w-[220px] shrink-0 flex-col gap-2 lg:flex">
+      <p
+        class="px-3.5 text-[11px] font-semibold uppercase tracking-[1px] text-[#555]"
+      >
+        Your Library
+      </p>
+      {
+        sidebarItems.map((item) => (
+          <div
+            class:list={[
+              "flex h-10 items-center gap-3 rounded-lg px-3.5",
+              item.active ? "bg-accent" : "",
+            ]}
+          >
+            <span
+              class:list={[
+                "size-4 rounded",
+                item.active
+                  ? "bg-[rgba(255,242,124,0.2)]"
+                  : "bg-[rgba(255,255,255,0.06)]",
+              ]}
+            />
+            <span
+              class:list={[
+                "text-[13px] font-medium",
+                item.active ? "text-primary" : "text-muted-foreground",
+              ]}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Main content -->
+    <div class="flex min-w-0 flex-1 flex-col gap-6">
+      <!-- Header -->
+      <div class="text-center">
+        <h3 class="text-lg font-bold text-white">Send to Kindle</h3>
+        <p class="text-[13px] text-muted-foreground">
+          Paste a URL or upload a file
+        </p>
+      </div>
+
+      <!-- Input form -->
+      <div
+        class="rounded-xl border border-border bg-[rgba(255,255,255,0.03)] p-5"
+      >
+        <div class="flex gap-3">
+          <div
+            class="flex h-[45px] flex-1 items-center rounded-lg border border-border bg-[rgba(255,255,255,0.04)] px-4"
+          >
+            <span class="text-sm text-[#555]"
+              >https://example.com/article...</span
+            >
+          </div>
+          <button
+            class="h-[45px] rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground"
+          >
+            Send
+          </button>
+        </div>
+        <div class="mt-4 flex items-center gap-4">
+          <span class="text-xs text-[#555]">or</span>
+          <span
+            class="rounded-md border border-[rgba(255,255,255,0.1)] px-3 py-1.5 text-xs text-muted-foreground"
+            >Upload PDF</span
+          >
+          <span
+            class="rounded-md border border-[rgba(255,255,255,0.1)] px-3 py-1.5 text-xs text-muted-foreground"
+            >Upload EPUB</span
+          >
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="grid grid-cols-3 gap-5">
+        {
+          stats.map((stat) => (
+            <div class="rounded-xl border border-border bg-[rgba(255,255,255,0.03)] px-5 py-5">
+              <p class="text-[32px] font-extrabold tracking-[-1px] text-primary">
+                {stat.value}
+              </p>
+              <p class="text-xs font-medium text-muted-foreground">
+                {stat.label}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+
+      <!-- Recent items -->
+      <div>
+        <p class="text-[13px] font-semibold text-[#a3a3a6]">Recently Sent</p>
+        <div class="mt-3 flex flex-col">
+          {
+            recentItems.map((item, i) => (
+              <div
+                class:list={[
+                  "flex items-center gap-3 py-4",
+                  i < recentItems.length - 1
+                    ? "border-b border-[rgba(255,255,255,0.04)]"
+                    : "",
+                ]}
+              >
+                <div
+                  class={`h-[50px] w-9 shrink-0 rounded bg-gradient-to-br ${item.gradient}`}
+                />
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-[13px] font-semibold text-secondary-foreground">
+                    {item.title}
+                  </p>
+                  <p class="text-[11.5px] text-muted-foreground">
+                    {item.source}
+                  </p>
+                </div>
+                <span class="shrink-0 text-[11px] font-semibold text-primary">
+                  Delivered
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

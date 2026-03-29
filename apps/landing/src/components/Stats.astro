@@ -1,0 +1,26 @@
+---
+const stats = [
+  { value: "850K+", label: "Articles delivered" },
+  { value: "12K", label: "Active readers" },
+  { value: "3.2M", label: "Pages formatted" },
+  { value: "4.9", label: "Average rating" },
+];
+---
+
+<section class="px-6 py-10 lg:px-[60px]">
+  <div
+    data-animate
+    class="mx-auto flex max-w-[1352px] flex-wrap items-center justify-around gap-8 rounded-[20px] border border-[rgba(255,242,124,0.15)] bg-accent px-12 py-16 md:py-[60px]"
+  >
+    {
+      stats.map((stat) => (
+        <div class="text-center">
+          <p class="font-display text-4xl leading-[56px] tracking-[-1px] text-primary md:text-[56px]">
+            {stat.value}
+          </p>
+          <p class="text-sm font-medium text-muted-foreground">{stat.label}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>

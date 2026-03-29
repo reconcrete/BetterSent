@@ -1,0 +1,89 @@
+---
+const faqs = [
+  {
+    question: "How does BetterSent deliver content to my Kindle?",
+    answer:
+      "We convert your content into a beautifully formatted EPUB file and send it directly to your Kindle's email address. Amazon's Whispersync delivers it to your device within seconds.",
+  },
+  {
+    question: "What types of content can I send?",
+    answer:
+      "You can send URLs (articles, blog posts, research papers), plain text, uploaded files (PDF, DOCX, EPUB, and more), YouTube video transcripts, and AI-generated mini-books on any topic.",
+  },
+  {
+    question: "Do I need to install anything?",
+    answer:
+      "No. BetterSent is entirely web-based. Just sign in, paste a URL or upload a file, and hit send. We also have a Telegram bot if you prefer messaging apps.",
+  },
+  {
+    question: "Is there a free plan?",
+    answer:
+      "Yes. The free plan includes 5 extractions per month — enough to try out the service. You can send URLs, text, and files without paying anything.",
+  },
+  {
+    question: "What makes Pro worth it?",
+    answer:
+      "Pro gives you 500 extractions per month, YouTube transcript extraction, AI topic generation (50 mini-books per month), multiple Kindle devices, and Telegram bot access.",
+  },
+  {
+    question: "How do I set up my Kindle to receive content?",
+    answer:
+      'Add our sending email to your Amazon approved senders list, then enter your Kindle\'s email address in BetterSent settings. We guide you through the process — it takes under a minute.',
+  },
+];
+---
+
+<section
+  id="faq"
+  class="border-t border-[rgba(255,255,255,0.04)] px-6 py-[120px] lg:px-[60px]"
+>
+  <div class="mx-auto max-w-[720px]">
+    <!-- Section header -->
+    <div class="mb-16 text-center">
+      <p
+        data-animate
+        class="text-[13px] font-semibold uppercase tracking-[2px] text-primary"
+      >
+        FAQ
+      </p>
+      <h2
+        data-animate
+        data-delay="1"
+        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-white md:text-[48px] md:leading-[55.2px]"
+      >
+        Common questions
+      </h2>
+    </div>
+
+    <!-- FAQ items -->
+    <div class="space-y-0">
+      {
+        faqs.map((faq, i) => (
+          <details
+            data-animate
+            data-delay={String(Math.min(i + 1, 5))}
+            class="group border-b border-border"
+          >
+            <summary class="flex cursor-pointer items-center justify-between py-6 text-[15px] font-semibold text-white transition-colors hover:text-secondary-foreground [&::-webkit-details-marker]:hidden">
+              {faq.question}
+              <svg
+                class="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-45"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              >
+                <line x1="10" y1="4" x2="10" y2="16" />
+                <line x1="4" y1="10" x2="16" y2="10" />
+              </svg>
+            </summary>
+            <p class="pb-6 text-sm leading-[23px] text-muted-foreground">
+              {faq.answer}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>

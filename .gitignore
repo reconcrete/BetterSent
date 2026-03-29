@@ -1,6 +1,8 @@
-/node_modules
+node_modules
 .ralphy
 .turbo
+.astro
+dist
 
 # Environment variables
 .env

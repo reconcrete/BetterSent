@@ -1,0 +1,78 @@
+---
+import AppMockup from "./AppMockup.astro";
+---
+
+<section class="overflow-hidden px-6 pb-24 pt-24 lg:px-[60px] lg:pb-0 lg:pt-[100px]">
+  <div class="mx-auto max-w-[1352px]">
+    <!-- Text content -->
+    <div class="flex flex-col items-center gap-10">
+      <div class="flex flex-col items-center gap-5">
+        <!-- Badge -->
+        <div
+          data-animate
+          class="flex items-center gap-2.5 rounded-full border border-[rgba(255,242,124,0.15)] bg-accent px-[17px] py-1.5"
+        >
+          <span class="size-1.5 rounded-full bg-primary"></span>
+          <span class="text-[13px] font-medium text-primary"
+            >Send anything to your Kindle, instantly</span
+          >
+        </div>
+
+        <!-- Headline -->
+        <h1
+          data-animate
+          data-delay="1"
+          class="max-w-[800px] text-center font-display text-5xl leading-[1.05] tracking-[-2px] text-white md:text-[80px] md:leading-[84px]"
+        >
+          Read everything on<br />
+          your <em class="italic text-primary">Kindle</em>, effortlessly
+        </h1>
+
+        <!-- Subheadline -->
+        <p
+          data-animate
+          data-delay="2"
+          class="max-w-[506px] text-center text-base leading-relaxed text-muted-foreground md:text-lg md:leading-[30.6px]"
+        >
+          Send articles, documents, YouTube transcripts, and AI-generated
+          mini-books directly to your Kindle. One click — it's on your device,
+          ready to read.
+        </p>
+      </div>
+
+      <!-- CTA buttons -->
+      <div data-animate data-delay="3" class="flex items-center gap-3">
+        <a
+          href="https://app.bettersent.com/sign-in"
+          class="group flex items-center gap-2.5 rounded-[10px] bg-primary px-8 py-[14px] text-[15px] font-semibold text-primary-foreground transition-all hover:brightness-110"
+        >
+          <svg
+            class="size-4 transition-transform group-hover:translate-x-0.5"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M14 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3"></path>
+            <polyline points="5 6 8 3 11 6"></polyline>
+            <line x1="8" y1="3" x2="8" y2="11"></line>
+          </svg>
+          Send to Kindle
+        </a>
+        <a
+          href="#how-it-works"
+          class="rounded-[10px] border border-[rgba(255,255,255,0.1)] bg-muted px-8 py-[14px] text-[15px] font-medium text-secondary-foreground transition-colors hover:bg-[rgba(255,255,255,0.1)]"
+        >
+          See how it works
+        </a>
+      </div>
+    </div>
+
+    <!-- App Mockup -->
+    <div data-animate data-delay="4" class="mt-20">
+      <AppMockup />
+    </div>
+  </div>
+</section>

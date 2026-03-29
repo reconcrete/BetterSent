@@ -1,0 +1,79 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "BetterSent — Read everything on your Kindle, effortlessly",
+  description = "Send articles, documents, YouTube transcripts, and AI-generated mini-books to your Kindle. One click — beautifully formatted, ready to read.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Geist:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+  </head>
+  <body class="overflow-x-hidden">
+    <slot />
+
+    <style is:global>
+      @import "../styles/global.css";
+    </style>
+
+    <script>
+      // Scroll-triggered reveal animations
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("animate-in");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+      );
+      document
+        .querySelectorAll("[data-animate]")
+        .forEach((el) => observer.observe(el));
+    </script>
+
+    <style is:global>
+      [data-animate] {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      [data-animate].animate-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      [data-animate][data-delay="1"] { transition-delay: 0.1s; }
+      [data-animate][data-delay="2"] { transition-delay: 0.2s; }
+      [data-animate][data-delay="3"] { transition-delay: 0.3s; }
+      [data-animate][data-delay="4"] { transition-delay: 0.4s; }
+      [data-animate][data-delay="5"] { transition-delay: 0.5s; }
+    </style>
+  </body>
+</html>

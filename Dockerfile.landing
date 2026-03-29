@@ -1,0 +1,23 @@
+FROM oven/bun:1 AS build
+
+WORKDIR /app
+
+# Copy workspace files needed for install
+COPY package.json bun.lock ./
+COPY apps/landing/package.json ./apps/landing/
+
+# Install dependencies
+RUN bun install --filter @bettersent/landing
+
+# Copy landing source
+COPY apps/landing ./apps/landing
+
+# Build static site
+RUN cd apps/landing && bun run build
+
+# Serve with Caddy (tiny, production-grade static server)
+FROM caddy:2-alpine
+
+COPY --from=build /app/apps/landing/dist /usr/share/caddy
+
+EXPOSE 80
