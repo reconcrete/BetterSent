@@ -7,12 +7,11 @@ import { user as userTable } from "@bettersent/db/schema";
 import { eq } from "drizzle-orm";
 import Elysia from "elysia";
 import { createEmailService } from "../services/email";
+import { isProduction } from "../shared/env";
 
 const trustedOrigins = process.env.TRUSTED_ORIGINS
   ? process.env.TRUSTED_ORIGINS.split(",")
   : ["http://localhost:5173"];
-
-const isProduction = process.env.NODE_ENV === "production";
 
 export const auth = betterAuth({
   basePath: "/api/auth",
@@ -27,17 +26,21 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    magicLink({
-      sendMagicLink: async ({ email, url }) => {
-        const emailService = createEmailService();
-        await emailService.sendEmail(
-          email,
-          "Sign in to Bettersent",
-          `Click here to sign in: ${url}`,
-          []
-        );
-      },
-    }),
+    ...(!isProduction
+      ? [
+          magicLink({
+            sendMagicLink: async ({ email, url }) => {
+              const emailService = createEmailService();
+              await emailService.sendEmail(
+                email,
+                "Sign in to Bettersent",
+                `Click here to sign in: ${url}`,
+                []
+              );
+            },
+          }),
+        ]
+      : []),
   ],
   advanced: {
     crossSubDomainCookies: {

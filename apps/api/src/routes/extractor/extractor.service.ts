@@ -11,6 +11,7 @@ import {
   createSendHistoryEntry,
   updateSendHistoryEntry,
 } from "../history/history.service";
+import { isProduction } from "../../shared/env";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
 const SUPPORTED_FILE_EXTENSIONS = new Set([
@@ -29,10 +30,8 @@ const SUPPORTED_FILE_EXTENSIONS = new Set([
   "epub",
 ]);
 
-const isProductionEnv = process.env.NODE_ENV === "production";
-
 const getSentFilename = (filename: string): string => {
-  if (isProductionEnv) {
+  if (isProduction) {
     return filename;
   }
 
@@ -105,7 +104,7 @@ export const extractText = async (textContent: string, userId: string, kindleEma
   log.debug({ contentLength: textContent.length }, "Received text content");
 
   // In production, resolve kindle email first to fail fast if not configured
-  const toEmail = isProductionEnv ? await getKindleEmail(userId, kindleEmailId) : null;
+  const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
   if (toEmail) log.debug({ toEmail }, "Will send to");
 
   // Create history entry with processing status
@@ -140,7 +139,7 @@ export const extractText = async (textContent: string, userId: string, kindleEma
     await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
     // Send email only in production
-    if (isProductionEnv && toEmail) {
+    if (isProduction && toEmail) {
       log.debug("Sending email");
       const emailService = createEmailService();
       const attachmentContent = (await storageService.getFile(path)).toString("base64");
@@ -171,7 +170,7 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
   log.debug({ url }, "Received URL");
 
   // In production, resolve kindle email first to fail fast if not configured
-  const toEmail = isProductionEnv ? await getKindleEmail(userId, kindleEmailId) : null;
+  const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
   if (toEmail) log.debug({ toEmail }, "Will send to");
 
   // Create history entry with processing status
@@ -223,7 +222,7 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
     await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
     // Send email only in production
-    if (isProductionEnv && toEmail) {
+    if (isProduction && toEmail) {
       const emailService = createEmailService();
       const attachmentContent = (await storageService.getFile(path)).toString("base64");
       const emailFilename = getSentFilename(`${metadata.title}.epub`);
@@ -260,7 +259,7 @@ export const extractYoutube = async (url: string, userId: string, kindleEmailId?
 
   log.debug({ url }, "Received YouTube URL");
 
-  const toEmail = isProductionEnv ? await getKindleEmail(userId, kindleEmailId) : null;
+  const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
   if (toEmail) log.debug({ toEmail }, "Will send to");
 
   const historyId = await createSendHistoryEntry(userId, {
@@ -296,7 +295,7 @@ export const extractYoutube = async (url: string, userId: string, kindleEmailId?
 
     await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
-    if (isProductionEnv && toEmail) {
+    if (isProduction && toEmail) {
       const emailService = createEmailService();
       const attachmentContent = (await storageService.getFile(path)).toString("base64");
       const emailFilename = getSentFilename(`${metadata.title}.epub`);
@@ -325,7 +324,7 @@ export const extractYoutube = async (url: string, userId: string, kindleEmailId?
 export const extractTopic = async (topic: string, userId: string, kindleEmailId?: string) => {
   log.debug({ topicLength: topic.length }, "Received topic for generation");
 
-  const toEmail = isProductionEnv ? await getKindleEmail(userId, kindleEmailId) : null;
+  const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
   if (toEmail) log.debug({ toEmail }, "Will send to");
 
   const historyId = await createSendHistoryEntry(userId, {
@@ -356,7 +355,7 @@ export const extractTopic = async (topic: string, userId: string, kindleEmailId?
 
     await updateSendHistoryEntry(historyId, { markdownPath, epubPath: path });
 
-    if (isProductionEnv && toEmail) {
+    if (isProduction && toEmail) {
       log.debug("Sending email");
       const emailService = createEmailService();
       const attachmentContent = (await storageService.getFile(path)).toString("base64");

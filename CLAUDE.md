@@ -47,7 +47,7 @@ bun run api:start          # Start API server
 
 ### API (`apps/api`)
 - **Framework**: Elysia with type-safe routes
-- **Auth**: Better Auth with Google OAuth and Magic Link (no password auth)
+- **Auth**: Better Auth with Google OAuth (Magic Link available in dev only for testing)
 - **Auth middleware**: Custom Elysia macro + internal API key support for Telegram bot
 - **Services use factory pattern**: Extractor (content extraction) and Storage (S3 vs filesystem) have interface/implementation/factory structure
 - **Content pipeline**: URL → scrape → OpenAI extraction → Pandoc conversion (HTML→Markdown/EPUB) → S3 storage → Resend email to Kindle

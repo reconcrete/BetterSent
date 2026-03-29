@@ -1,16 +1,16 @@
 import { createAuthClient } from "better-auth/react";
 import { magicLinkClient } from "better-auth/client/plugins";
+import { isProduction } from "../env";
 
 const getBaseURL = () => {
   const url = import.meta.env.VITE_API_URL;
-  const mode = import.meta.env.MODE;
 
   if (!url) return "http://localhost:8080";
 
   // Strip protocol if present to normalize
   const urlWithoutProtocol = url.replace(/^https?:\/\//, "");
 
-  if (mode === "development") {
+  if (!isProduction) {
     return `http://${urlWithoutProtocol}`;
   }
 
@@ -23,7 +23,9 @@ const getBaseURL = () => {
 
 export const authClient = createAuthClient({
   baseURL: getBaseURL(),
-  plugins: [magicLinkClient()],
+  plugins: [
+    ...(!isProduction ? [magicLinkClient()] : []),
+  ],
 });
 
 export const { signIn, signOut, useSession } = authClient;
