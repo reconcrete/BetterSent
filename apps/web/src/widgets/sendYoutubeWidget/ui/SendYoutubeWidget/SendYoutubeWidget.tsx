@@ -1,4 +1,4 @@
-import { type FC, useState, useCallback } from "react";
+import { type FC, useState, useCallback, useRef } from "react";
 import { Info, Link } from "lucide-react";
 
 import { Input } from "~/shared/ui";
@@ -16,6 +16,7 @@ export const SendYoutubeWidget: FC = () => {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
+  const submitRef = useRef<(() => void) | null>(null);
 
   const handleUrlChange = (value: string) => {
     setYoutubeUrl(value);
@@ -57,6 +58,7 @@ export const SendYoutubeWidget: FC = () => {
           placeholder="youtube.com/watch?v=..."
           value={youtubeUrl}
           onChange={(e) => handleUrlChange(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submitRef.current?.()}
           icon={<Link />}
         />
         {youtubeError && (
@@ -68,7 +70,7 @@ export const SendYoutubeWidget: FC = () => {
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="youtube" content={youtubeUrl} kindleEmailId={kindleId} onSuccess={handleSuccess} />
+      <SendContent type="youtube" content={youtubeUrl} kindleEmailId={kindleId} onSuccess={handleSuccess} submitRef={submitRef} />
     </div>
   );
 };

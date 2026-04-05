@@ -12,3 +12,4 @@ export * from "./DropdownMenu/DropdownMenu";
 export * from "./Avatar/Avatar";
 export * from "./Logo/Logo";
 export * from "./FileDropZone/FileDropZone";
+export * from "./Skeleton/Skeleton";

@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 import { cn } from "~/shared/lib";
 import { useSession } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
+import { ChooseDeviceSkeleton } from "../ChooseDeviceSkeleton/ChooseDeviceSkeleton";
 
 type KindleEmail = {
   id: string;
@@ -39,7 +40,7 @@ export const ChooseDevice: FC<ChooseDeviceProps> = ({ value, onChange }) => {
     }
   }, [value, defaultDevice, onChange]);
 
-  if (!devices) return null;
+  if (!devices) return <ChooseDeviceSkeleton />;
 
   if (devices.length === 0) {
     return (

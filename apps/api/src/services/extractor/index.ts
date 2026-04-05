@@ -1,3 +1,3 @@
-export type { ContentMetadata, ExtractedContent } from "./types";
-export { ExtractorService } from "./implementation";
-export { createExtractorService } from "./factory";
+export type { ContentMetadata, ExtractedContent, ExtractedUrlContent, ContentExtractor } from "./types";
+export { ExtractorService, DefuddleExtractor, FirecrawlExtractor } from "./implementation";
+export { createExtractorService, createContentExtractor, createFirecrawlExtractor } from "./factory";

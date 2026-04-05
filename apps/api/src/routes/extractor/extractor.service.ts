@@ -1,7 +1,6 @@
 import { eq, and } from "drizzle-orm";
 
-import { createExtractorService } from "../../services/extractor";
-import { createScraperService } from "../../services/scraper";
+import { createExtractorService, createContentExtractor } from "../../services/extractor";
 import { createStorageService } from "../../services/storage";
 import { createEmailService } from "../../services/email";
 import { db } from "../../db";
@@ -181,27 +180,27 @@ export const extractUrl = async (url: string, userId: string, kindleEmailId?: st
   });
 
   try {
-    log.debug("Scraping URL");
-    const scraperService = createScraperService();
-    const scrapeResult = await scraperService.scrapeUrl(url);
-    log.debug({ contentLength: scrapeResult.markdown.length, needsLlmProcessing: scrapeResult.needsLlmProcessing }, "URL scraped");
+    log.debug("Extracting URL content");
+    const contentExtractor = createContentExtractor();
+    const extractResult = await contentExtractor.extractUrl(url);
+    log.debug({ contentLength: extractResult.markdown.length, needsLlmProcessing: extractResult.needsLlmProcessing }, "URL content extracted");
 
     let markdown: string;
     let metadata: { title: string; author: string };
 
-    if (scrapeResult.needsLlmProcessing) {
-      log.debug("LLM process starting (fallback scraper used)");
+    if (extractResult.needsLlmProcessing) {
+      log.debug("LLM process starting (content needs processing)");
       const extractorService = createExtractorService();
       const startTime = Date.now();
-      const extracted = await extractorService.extractContent(scrapeResult.markdown);
+      const extracted = await extractorService.extractContent(extractResult.markdown);
       const llmDuration = Date.now() - startTime;
       log.debug({ duration: llmDuration }, "LLM process finished");
       markdown = extracted.markdown;
       metadata = extracted.metadata;
     } else {
-      log.debug("Using Firecrawl markdown directly (skipping LLM)");
-      markdown = scrapeResult.markdown;
-      metadata = scrapeResult.metadata;
+      log.debug("Using extracted markdown directly (skipping LLM)");
+      markdown = extractResult.markdown;
+      metadata = extractResult.metadata;
     }
 
     log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");
@@ -269,15 +268,15 @@ export const extractYoutube = async (url: string, userId: string, kindleEmailId?
   });
 
   try {
-    log.debug("Scraping YouTube URL");
-    const scraperService = createScraperService();
-    const scrapeResult = await scraperService.scrapeUrl(url);
-    log.debug({ contentLength: scrapeResult.markdown.length }, "YouTube page scraped");
+    log.debug("Extracting YouTube URL content");
+    const contentExtractor = createContentExtractor();
+    const extractResult = await contentExtractor.extractUrl(url);
+    log.debug({ contentLength: extractResult.markdown.length }, "YouTube page extracted");
 
     log.debug("LLM process starting (YouTube content)");
     const extractorService = createExtractorService();
     const startTime = Date.now();
-    const { markdown, metadata } = await extractorService.extractYoutubeContent(scrapeResult.markdown);
+    const { markdown, metadata } = await extractorService.extractYoutubeContent(extractResult.markdown);
     const llmDuration = Date.now() - startTime;
     log.debug({ duration: llmDuration }, "LLM process finished");
     log.debug({ title: metadata.title, author: metadata.author }, "Extracted metadata");

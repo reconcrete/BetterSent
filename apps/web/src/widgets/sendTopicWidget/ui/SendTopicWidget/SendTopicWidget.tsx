@@ -1,4 +1,4 @@
-import { type FC, useState, useCallback } from "react";
+import { type FC, useState, useCallback, useRef } from "react";
 import { Info } from "lucide-react";
 
 import { Textarea } from "~/shared/ui";
@@ -13,6 +13,7 @@ export const SendTopicWidget: FC = () => {
   const { data: status } = useSubscriptionStatus();
   const [topic, setTopic] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
+  const submitRef = useRef<(() => void) | null>(null);
 
   const handleSuccess = () => setTopic("");
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
@@ -40,12 +41,15 @@ export const SendTopicWidget: FC = () => {
           placeholder="Enter a topic or question, e.g. 'How stablecoins work and why USDT is priced at exactly 1 USD'"
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submitRef.current?.();
+          }}
         />
 
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="topic" content={topic} kindleEmailId={kindleId} onSuccess={handleSuccess} />
+      <SendContent type="topic" content={topic} kindleEmailId={kindleId} onSuccess={handleSuccess} submitRef={submitRef} />
     </div>
   );
 };

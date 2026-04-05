@@ -1,4 +1,4 @@
-import { type FC, useState, useCallback } from "react";
+import { type FC, useState, useCallback, useRef } from "react";
 import { Info, Link } from "lucide-react";
 
 import { Input } from "~/shared/ui";
@@ -9,6 +9,7 @@ import { ChooseDevice } from "~/features/chooseDevice";
 export const SendUrlWidget: FC = () => {
   const [url, setUrl] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
+  const submitRef = useRef<(() => void) | null>(null);
 
   const handleSuccess = () => setUrl("");
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
@@ -28,13 +29,14 @@ export const SendUrlWidget: FC = () => {
           placeholder="example.com/article"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submitRef.current?.()}
           icon={<Link />}
         />
 
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="url" content={url} kindleEmailId={kindleId} onSuccess={handleSuccess} />
+      <SendContent type="url" content={url} kindleEmailId={kindleId} onSuccess={handleSuccess} submitRef={submitRef} />
     </div>
   );
 };

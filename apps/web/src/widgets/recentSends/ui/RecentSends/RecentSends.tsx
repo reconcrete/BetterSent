@@ -8,11 +8,12 @@ import { useSession } from "~/shared/lib";
 import type { HistoryItem } from "~/widgets/historyCard";
 
 import { RecentSendRow } from "../RecentSendRow/RecentSendRow";
+import { RecentSendsSkeleton } from "../RecentSendsSkeleton/RecentSendsSkeleton";
 
 export const RecentSends: FC = () => {
   const { data: session } = useSession();
 
-  const { data: historyItems } = useQuery({
+  const { data: historyItems, isLoading } = useQuery({
     queryKey: ["sendHistory"],
     queryFn: async () => {
       const response = await api.history.get();
@@ -25,6 +26,7 @@ export const RecentSends: FC = () => {
 
   const recentItems = historyItems?.slice(0, 3);
 
+  if (isLoading) return <RecentSendsSkeleton />;
   if (!recentItems || recentItems.length === 0) return null;
 
   return (

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, LetterText, File as FileIcon, Youtube, BookOpen, Plus } from "lucide-react";
 
 import {
@@ -20,8 +19,10 @@ import { SendTopicWidget } from "~/widgets/sendTopicWidget";
 import { SendFileWidget } from "~/widgets/sendFileWidget";
 import { RecentSends } from "~/widgets/recentSends";
 
+import { usePersistedTab } from "../../hooks";
+
 export const Root = () => {
-  const [activeTab, setActiveTab] = useState("file");
+  const [activeTab, setActiveTab] = usePersistedTab();
 
   const isOverflowActive = activeTab === "youtube" || activeTab === "topic";
 
