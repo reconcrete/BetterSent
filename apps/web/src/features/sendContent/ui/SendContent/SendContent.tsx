@@ -76,23 +76,22 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       <Button
         onClick={handleSend}
         disabled={isPending || !canSend}
-        size="lg"
-        className="w-full"
+        className="w-full rounded-xl py-3 h-auto font-semibold"
       >
         {isPending ? (
           <>
-            <Loader className="animate-spin" />
+            <Loader className="size-3.5 animate-spin" />
             Sending to Kindle...
           </>
         ) : (
           <>
-            <Send />
+            <Send className="size-3.5" />
             Send to Kindle
           </>
         )}
       </Button>
       {error && (
-        <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+        <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-xl">
           {error}
         </p>
       )}

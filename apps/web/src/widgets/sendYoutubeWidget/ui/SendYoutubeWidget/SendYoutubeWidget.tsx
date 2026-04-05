@@ -1,21 +1,18 @@
 import { type FC, useState, useCallback } from "react";
+import { Info, Link } from "lucide-react";
 
 import { Input } from "~/shared/ui";
 
 import { SendContent } from "~/features/sendContent";
+import { ChooseDevice } from "~/features/chooseDevice";
 import { useSubscriptionStatus } from "~/entities/billing";
 
-import { KindleEmailSelector } from "~/widgets/kindleEmailSelector";
 import { UpgradePrompt } from "~/widgets/upgradePrompt";
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|live\/)|youtu\.be\/)/;
 
 export const SendYoutubeWidget: FC = () => {
   const { data: status } = useSubscriptionStatus();
-
-  if (status?.plan === "free") {
-    return <UpgradePrompt feature="YouTube extraction" />;
-  }
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
@@ -36,22 +33,41 @@ export const SendYoutubeWidget: FC = () => {
 
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
 
+  if (status?.plan === "free") {
+    return (
+      <UpgradePrompt
+        title="Unlock YouTube to Kindle"
+        description="Convert YouTube video transcripts into readable documents and send them straight to your Kindle."
+      />
+    );
+  }
+
   return (
-    <div className="mt-4 space-y-5">
-      <div className="space-y-3">
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-1.5 justify-center">
+        <Info className="size-[15px] shrink-0 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
+          Paste a YouTube video link to convert its transcript to a Kindle document
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3">
         <Input
           type="url"
-          placeholder="https://youtube.com/watch?v=..."
+          placeholder="youtube.com/watch?v=..."
           value={youtubeUrl}
           onChange={(e) => handleUrlChange(e.target.value)}
+          icon={<Link />}
         />
         {youtubeError && (
-          <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+          <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-xl">
             {youtubeError}
           </p>
         )}
+
+        <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
-      <KindleEmailSelector value={kindleId} onChange={handleKindleChange} />
+
       <SendContent type="youtube" content={youtubeUrl} kindleEmailId={kindleId} onSuccess={handleSuccess} />
     </div>
   );

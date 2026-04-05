@@ -1,38 +1,41 @@
 import type { FC } from "react";
-import { Lock, Zap, Loader2 } from "lucide-react";
+import { Lock, Star, Loader2 } from "lucide-react";
 
 import { Button } from "~/shared/ui";
 import { useCreateCheckout } from "~/entities/billing";
 
 type UpgradePromptProps = {
-  feature: string;
+  title: string;
+  description: string;
 };
 
-export const UpgradePrompt: FC<UpgradePromptProps> = ({ feature }) => {
+export const UpgradePrompt: FC<UpgradePromptProps> = ({ title, description }) => {
   const checkout = useCreateCheckout();
 
   return (
-    <div className="mt-4 flex flex-col items-center gap-4 py-8 text-center">
-      <div className="rounded-full bg-muted p-3">
-        <Lock className="size-5 text-muted-foreground" />
-      </div>
-      <div className="space-y-1">
-        <p className="text-sm font-medium text-foreground">
-          {feature} requires Pro
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Upgrade to unlock {feature.toLowerCase()}, plus 500 extractions/month.
-        </p>
+    <div className="flex flex-col items-center gap-5 px-24 py-8">
+      <div className="flex flex-col items-center gap-4">
+        <div className="rounded-2xl border border-primary/15 bg-primary/[0.08] p-[15px] dark:border-primary/15 dark:bg-primary/[0.08]">
+          <Lock className="size-6 text-primary" />
+        </div>
+        <div className="flex flex-col gap-2 items-center text-center">
+          <p className="text-base font-semibold text-foreground">
+            {title}
+          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {description}
+          </p>
+        </div>
       </div>
       <Button
         onClick={() => checkout.mutate()}
         disabled={checkout.isPending}
-        size="lg"
+        className="rounded-xl px-7 py-3 h-auto"
       >
         {checkout.isPending ? (
-          <Loader2 className="size-4 animate-spin" />
+          <Loader2 className="size-3.5 animate-spin" />
         ) : (
-          <Zap className="size-4" />
+          <Star className="size-3.5" />
         )}
         Upgrade to Pro
       </Button>

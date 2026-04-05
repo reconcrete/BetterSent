@@ -11,3 +11,4 @@ export * from "./Separator/Separator";
 export * from "./DropdownMenu/DropdownMenu";
 export * from "./Avatar/Avatar";
 export * from "./Logo/Logo";
+export * from "./FileDropZone/FileDropZone";

@@ -1,9 +1,10 @@
 import { type FC, useState, useRef, useCallback, type ChangeEvent, type DragEvent } from "react";
-import { Upload } from "lucide-react";
+import { Info } from "lucide-react";
+
+import { FileDropZone } from "~/shared/ui";
 
 import { SendContent } from "~/features/sendContent";
-
-import { KindleEmailSelector } from "~/widgets/kindleEmailSelector";
+import { ChooseDevice } from "~/features/chooseDevice";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
 const ACCEPTED_FILE_EXTENSIONS = [
@@ -64,9 +65,17 @@ export const SendFileWidget: FC = () => {
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
 
   return (
-    <div className="mt-4 space-y-5">
-      <div className="space-y-3">
-        <label
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-1.5 justify-center">
+        <Info className="size-[15px] shrink-0 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
+          Files are automatically formatted for the best Kindle reading experience
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <FileDropZone
+          isDragging={isDragging}
           onDragOver={(event) => {
             event.preventDefault();
             setIsDragging(true);
@@ -76,17 +85,7 @@ export const SendFileWidget: FC = () => {
             setIsDragging(false);
           }}
           onDrop={handleFileDrop}
-          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center transition-colors ${
-            isDragging
-              ? "border-foreground bg-muted"
-              : "border-border hover:border-foreground/30 hover:bg-accent"
-          }`}
         >
-          <Upload className="size-5 text-muted-foreground" />
-          <p className="text-sm text-foreground">Drop a file here or click to choose</p>
-          <p className="text-xs text-muted-foreground">
-            PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB up to 200 MB
-          </p>
           <input
             ref={fileInputRef}
             type="file"
@@ -94,7 +93,7 @@ export const SendFileWidget: FC = () => {
             onChange={handleFileInputChange}
             className="hidden"
           />
-        </label>
+        </FileDropZone>
 
         {file && (
           <p className="text-sm text-muted-foreground">
@@ -103,12 +102,14 @@ export const SendFileWidget: FC = () => {
         )}
 
         {fileError && (
-          <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+          <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-xl">
             {fileError}
           </p>
         )}
+
+        <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
-      <KindleEmailSelector value={kindleId} onChange={handleKindleChange} />
+
       <SendContent type="file" content={file} kindleEmailId={kindleId} onSuccess={handleSuccess} />
     </div>
   );

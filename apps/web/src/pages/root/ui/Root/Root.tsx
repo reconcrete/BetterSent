@@ -21,7 +21,7 @@ import { SendFileWidget } from "~/widgets/sendFileWidget";
 import { RecentSends } from "~/widgets/recentSends";
 
 export const Root = () => {
-  const [activeTab, setActiveTab] = useState("url");
+  const [activeTab, setActiveTab] = useState("file");
 
   const isOverflowActive = activeTab === "youtube" || activeTab === "topic";
 
@@ -29,7 +29,11 @@ export const Root = () => {
     <div className="pt-6 md:pt-10 mx-auto w-full max-w-[600px] flex flex-col gap-6 md:gap-10">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="w-full">
-          <TabsTrigger value="url" className="data-[state=active]:[&_svg]:text-primary">
+          <TabsTrigger value="file" className="data-[state=active]:[&_svg]:text-primary">
+            <FileIcon className="size-3.5" />
+            File
+          </TabsTrigger>
+          <TabsTrigger value="url" className="data-[state=active]:[&_svg]:text-[#3F88FE]">
             <Link className="size-3.5" />
             Link
           </TabsTrigger>
@@ -37,15 +41,11 @@ export const Root = () => {
             <LetterText className="size-3.5" />
             Plain Text
           </TabsTrigger>
-          <TabsTrigger value="file" className="data-[state=active]:[&_svg]:text-[#22C55E]">
-            <FileIcon className="size-3.5" />
-            File
-          </TabsTrigger>
           <TabsTrigger value="youtube" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#EF4444]">
             <Youtube className="size-3.5" />
             YouTube
           </TabsTrigger>
-          <TabsTrigger value="topic" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#3F88FE]">
+          <TabsTrigger value="topic" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#22C55E]">
             <BookOpen className="size-3.5" />
             Topic
           </TabsTrigger>
@@ -68,21 +68,21 @@ export const Root = () => {
                 YouTube
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setActiveTab("topic")}>
-                <BookOpen className="size-3.5 text-[#3F88FE]" />
+                <BookOpen className="size-3.5 text-[#22C55E]" />
                 Topic
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </TabsList>
 
-        <TabsContent value="url" className="rounded-tr-[16px]">
+        <TabsContent value="file" className="rounded-tr-[16px]">
+          <SendFileWidget />
+        </TabsContent>
+        <TabsContent value="url" className="rounded-t-[16px]">
           <SendUrlWidget />
         </TabsContent>
         <TabsContent value="text" className="rounded-t-[16px]">
           <SendTextWidget />
-        </TabsContent>
-        <TabsContent value="file" className="rounded-t-[16px]">
-          <SendFileWidget />
         </TabsContent>
         <TabsContent value="youtube" className="rounded-tl-[16px] md:rounded-t-[16px]">
           <SendYoutubeWidget />

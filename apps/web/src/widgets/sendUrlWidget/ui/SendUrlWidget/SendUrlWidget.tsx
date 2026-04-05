@@ -1,10 +1,10 @@
 import { type FC, useState, useCallback } from "react";
+import { Info, Link } from "lucide-react";
 
 import { Input } from "~/shared/ui";
 
 import { SendContent } from "~/features/sendContent";
-
-import { KindleEmailSelector } from "~/widgets/kindleEmailSelector";
+import { ChooseDevice } from "~/features/chooseDevice";
 
 export const SendUrlWidget: FC = () => {
   const [url, setUrl] = useState("");
@@ -14,14 +14,26 @@ export const SendUrlWidget: FC = () => {
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
 
   return (
-    <div className="mt-4 space-y-5">
-      <Input
-        type="url"
-        placeholder="https://example.com/article"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-      />
-      <KindleEmailSelector value={kindleId} onChange={handleKindleChange} />
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-1.5 justify-center">
+        <Info className="size-[15px] shrink-0 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
+          Copy the link to the article you like and paste it below
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <Input
+          type="url"
+          placeholder="example.com/article"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          icon={<Link />}
+        />
+
+        <ChooseDevice value={kindleId} onChange={handleKindleChange} />
+      </div>
+
       <SendContent type="url" content={url} kindleEmailId={kindleId} onSuccess={handleSuccess} />
     </div>
   );
