@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
 
 import type { HistoryItem } from "~/widgets/historyCard";
 
@@ -10,12 +10,16 @@ import { getSubtitle } from "../../lib/getSubtitle";
 interface RecentSendRowProps {
   item: HistoryItem;
   isFirst: boolean;
+  action?: ReactNode;
 }
 
-export const RecentSendRow: FC<RecentSendRowProps> = ({ item, isFirst }) => {
+export const RecentSendRow: FC<RecentSendRowProps> = ({ item, isFirst, action }) => {
   const TypeIcon = typeIcons[item.type];
   const status = statusConfig[item.status];
   const StatusIcon = status.icon;
+
+  const title = item.title || item.content;
+  const titleWithAuthor = item.author ? `${title} by ${item.author}` : title;
 
   return (
     <div
@@ -28,10 +32,13 @@ export const RecentSendRow: FC<RecentSendRowProps> = ({ item, isFirst }) => {
           <TypeIcon className="size-3.5 text-muted-foreground" />
         </div>
         <div className="flex flex-col gap-1 min-w-0">
-          <p className="text-[13px] font-medium text-foreground truncate">
-            {item.title || item.content}
-          </p>
-          <p className="text-[11px] text-[#747474] dark:text-[#555]">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <p className="text-[13px] font-medium text-foreground truncate">
+              {titleWithAuthor}
+            </p>
+            {action}
+          </div>
+          <p className="text-[11px] text-[#747474] dark:text-[#555] truncate">
             {getSubtitle(item)}
           </p>
         </div>

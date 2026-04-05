@@ -3,36 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 
-import { Button, Card } from "~/shared/ui";
+import { Button } from "~/shared/ui";
 import { api } from "~/shared/lib/treaty";
 import { useSession } from "~/shared/lib";
 
-import { HistoryCard, type HistoryItem } from "~/widgets/historyCard";
-
-const HistoryCardSkeleton: FC = () => (
-  <div className="space-y-3">
-    {Array.from({ length: 3 }).map((_, i) => (
-      <Card key={i}>
-        <div className="p-4 space-y-3 animate-pulse">
-          <div className="flex items-center justify-between">
-            <div className="h-5 w-16 rounded-full bg-muted" />
-            <div className="h-5 w-20 rounded-full bg-muted" />
-          </div>
-          <div className="space-y-2">
-            <div className="h-4 w-3/4 rounded bg-muted" />
-            <div className="flex justify-between">
-              <div className="h-3 w-24 rounded bg-muted" />
-              <div className="h-3 w-20 rounded bg-muted" />
-            </div>
-          </div>
-          <div className="pt-1 border-t border-border">
-            <div className="h-3 w-32 rounded bg-muted" />
-          </div>
-        </div>
-      </Card>
-    ))}
-  </div>
-);
+import { PreviewExtraction } from "~/features/previewExtraction";
+import type { HistoryItem } from "~/widgets/historyCard";
+import { RecentSendRow, RecentSendsSkeleton } from "~/widgets/recentSends";
 
 const EmptyHistoryState: FC = () => (
   <div className="text-center py-16 space-y-4">
@@ -70,14 +47,19 @@ export const History: FC = () => {
         <p className="text-muted-foreground">Track what you've sent to your Kindle device</p>
       </div>
 
-      {isLoading && <HistoryCardSkeleton />}
+      {isLoading && <RecentSendsSkeleton />}
 
       {!isLoading && historyItems?.length === 0 && <EmptyHistoryState />}
 
       {!isLoading && historyItems && historyItems.length > 0 && (
-        <div className="space-y-3">
-          {historyItems.map((item) => (
-            <HistoryCard key={item.id} item={item} />
+        <div>
+          {historyItems.map((item, i) => (
+            <RecentSendRow
+              key={item.id}
+              item={item}
+              isFirst={i === 0}
+              action={item.hasPreview ? <PreviewExtraction historyId={item.id} /> : undefined}
+            />
           ))}
         </div>
       )}

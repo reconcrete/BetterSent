@@ -13,7 +13,7 @@ export const historyItemSchema = t.Object({
     t.Literal("error"),
   ]),
   errorMessage: t.Nullable(t.String()),
-  kindleEmail: t.Nullable(t.String()),
+  kindleLabel: t.Nullable(t.String()),
   hasPreview: t.Boolean(),
   createdAt: t.String(),
   updatedAt: t.String(),

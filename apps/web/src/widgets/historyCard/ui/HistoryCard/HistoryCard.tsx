@@ -15,7 +15,7 @@ export type HistoryItem = {
   author: string | null;
   status: "pending" | "processing" | "completed" | "error";
   errorMessage: string | null;
-  kindleEmail: string | null;
+  kindleLabel: string | null;
   hasPreview: boolean;
   createdAt: string;
   updatedAt: string;
@@ -60,12 +60,12 @@ export const HistoryCard: FC<HistoryCardProps> = ({ item }) => {
           </div>
         </div>
 
-        {/* Bottom row: kindle email + actions */}
+        {/* Bottom row: kindle label + actions */}
         <div className="flex items-center justify-between pt-1 border-t border-border">
-          {item.kindleEmail ? (
+          {item.kindleLabel ? (
             <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground truncate max-w-[200px]">
               <Mail className="size-3 shrink-0" />
-              {item.kindleEmail}
+              {item.kindleLabel}
             </span>
           ) : (
             <span />

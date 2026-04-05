@@ -25,8 +25,9 @@ export const PreviewExtraction = memo<PreviewExtractionProps>(({ historyId }) =>
       onClick={handleClick}
       title="Preview markdown"
       aria-label="Preview markdown"
+      className="size-6 [&_svg]:size-3"
     >
-      <Eye className="size-4" />
+      <Eye />
     </Button>
   );
 });

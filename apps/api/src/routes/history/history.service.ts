@@ -13,13 +13,16 @@ export type SendHistoryData = {
   author: string | null;
   status: SendHistoryStatus;
   errorMessage: string | null;
-  kindleEmail: string | null;
+  kindleLabel: string | null;
   hasPreview: boolean;
   createdAt: string;
   updatedAt: string;
 };
 
-const toSendHistoryData = (row: typeof sendHistory.$inferSelect): SendHistoryData => ({
+const toSendHistoryData = (
+  row: typeof sendHistory.$inferSelect,
+  kindleLabel: string | null,
+): SendHistoryData => ({
   id: row.id,
   type: row.type as "url" | "text" | "file" | "youtube" | "topic",
   content: row.content,
@@ -27,7 +30,7 @@ const toSendHistoryData = (row: typeof sendHistory.$inferSelect): SendHistoryDat
   author: row.author,
   status: row.status as SendHistoryStatus,
   errorMessage: row.errorMessage,
-  kindleEmail: row.kindleEmail,
+  kindleLabel,
   hasPreview: !!row.markdownPath,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
@@ -40,14 +43,18 @@ export const getSendHistory = async (userId: string): Promise<SendHistoryData[]>
   log.debug({ userId }, "Fetching send history");
 
   const history = await db
-    .select()
+    .select({
+      history: sendHistory,
+      kindleLabel: kindleEmailAddress.label,
+    })
     .from(sendHistory)
+    .leftJoin(kindleEmailAddress, eq(sendHistory.kindleEmailId, kindleEmailAddress.id))
     .where(eq(sendHistory.userId, userId))
     .orderBy(desc(sendHistory.createdAt));
 
   log.debug({ userId, count: history.length }, "Found send history items");
 
-  return history.map(toSendHistoryData);
+  return history.map((row) => toSendHistoryData(row.history, row.kindleLabel));
 };
 
 /**
