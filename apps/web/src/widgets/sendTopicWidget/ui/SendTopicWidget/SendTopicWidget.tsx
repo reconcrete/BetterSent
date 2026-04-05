@@ -38,7 +38,7 @@ export const SendTopicWidget: FC = () => {
 
       <div className="flex flex-col gap-3">
         <Textarea
-          placeholder="Enter a topic or question, e.g. 'How stablecoins work and why USDT is priced at exactly 1 USD'"
+          placeholder="How does AI work?"
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           onKeyDown={(e) => {
