@@ -33,11 +33,8 @@ export const Root = () => {
     activeTab === "youtube" || activeTab === "topic";
 
   return (
-    <div
-      className="flex items-center justify-center px-4 md:px-0"
-      style={{ minHeight: "calc(100vh - 7rem)" }}
-    >
-      <div className="w-full max-w-[598px]">
+    <div className="pt-2 md:pt-6">
+      <div className="w-full max-w-[600px] mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full">
             <TabsTrigger value="url" className="data-[state=active]:[&_svg]:text-primary">
