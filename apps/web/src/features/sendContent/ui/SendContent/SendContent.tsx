@@ -1,4 +1,4 @@
-import { type FC, type MutableRefObject, useState, useEffect } from "react";
+import { type FC, type RefObject, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 as Loader, Send } from "lucide-react";
 
@@ -12,7 +12,7 @@ type SendContentProps = {
   content: string | File | null;
   kindleEmailId?: string;
   onSuccess?: () => void;
-  submitRef?: MutableRefObject<(() => void) | null>;
+  submitRef?: RefObject<(() => void) | null>;
 };
 
 export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess, submitRef }) => {
