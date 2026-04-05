@@ -25,6 +25,7 @@ import { SendTextWidget } from "~/widgets/sendTextWidget";
 import { SendYoutubeWidget } from "~/widgets/sendYoutubeWidget";
 import { SendTopicWidget } from "~/widgets/sendTopicWidget";
 import { SendFileWidget } from "~/widgets/sendFileWidget";
+import { RecentSends } from "~/widgets/recentSends";
 
 export const Root = () => {
   const [activeTab, setActiveTab] = useState("url");
@@ -102,6 +103,8 @@ export const Root = () => {
             <SendTopicWidget />
           </TabsContent>
         </Tabs>
+
+        <RecentSends />
       </div>
     </div>
   );

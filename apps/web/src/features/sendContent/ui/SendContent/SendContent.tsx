@@ -53,6 +53,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
     onSuccess: () => {
       analytics.capture("extraction_sent", { type });
       queryClient.invalidateQueries({ queryKey: BILLING_STATUS_KEY });
+      queryClient.invalidateQueries({ queryKey: ["sendHistory"] });
       onSuccess?.();
     },
     onError: (err: Error) => {
