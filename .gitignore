@@ -15,3 +15,4 @@ context
 .claude/settings.local.json
 skills-lock.json
 .vercel
+.mcp

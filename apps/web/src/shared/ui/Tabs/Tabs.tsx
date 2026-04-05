@@ -10,7 +10,7 @@ function Tabs({
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn("flex flex-col", className)}
       {...props}
     />
   )
@@ -24,7 +24,7 @@ function TabsList({
     <TabsPrimitive.List
       data-slot="tabs-list"
       className={cn(
-        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+        "flex items-center relative z-10",
         className
       )}
       {...props}
@@ -40,7 +40,14 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "inline-flex flex-1 items-center justify-center gap-1.5 rounded-t-[10px] px-5 py-4 text-[13px] font-medium whitespace-nowrap transition-colors",
+        "text-[#747474]",
+        "md:data-[state=active]:px-6",
+        "data-[state=active]:border-l data-[state=active]:border-r data-[state=active]:border-t",
+        "data-[state=active]:bg-white data-[state=active]:border-black/[0.06] data-[state=active]:text-foreground",
+        "dark:data-[state=active]:bg-white/[0.02] dark:data-[state=active]:border-white/[0.06]",
+        "focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
       {...props}
@@ -55,7 +62,13 @@ function TabsContent({
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      className={cn(
+        "flex-1 border rounded-b-[16px] outline-none",
+        "px-3.5 pt-3 pb-3.5 md:px-[30px] md:pt-5 md:pb-[30px]",
+        "bg-white border-black/[0.06]",
+        "dark:bg-white/[0.02] dark:border-white/[0.06]",
+        className
+      )}
       {...props}
     />
   )
