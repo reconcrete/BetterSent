@@ -28,7 +28,7 @@ export const AppLayout: FC = () => {
   return (
     <div className="flex min-h-svh flex-col bg-background">
       <NavBar email={session.user.email} />
-      <main className="flex-1 p-4">
+      <main className="flex-1 px-4 pb-8">
         <Outlet />
       </main>
     </div>

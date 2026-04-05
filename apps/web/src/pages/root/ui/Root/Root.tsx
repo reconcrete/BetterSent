@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Link,
-  LetterText,
-  File as FileIcon,
-  Youtube,
-  BookOpen,
-  Plus,
-} from "lucide-react";
+import { Link, LetterText, File as FileIcon, Youtube, BookOpen, Plus } from "lucide-react";
 
 import {
   Tabs,
@@ -30,82 +23,76 @@ import { RecentSends } from "~/widgets/recentSends";
 export const Root = () => {
   const [activeTab, setActiveTab] = useState("url");
 
-  const isOverflowActive =
-    activeTab === "youtube" || activeTab === "topic";
+  const isOverflowActive = activeTab === "youtube" || activeTab === "topic";
 
   return (
-    <div className="pt-2 md:pt-6">
-      <div className="w-full max-w-[600px] mx-auto">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full">
-            <TabsTrigger value="url" className="data-[state=active]:[&_svg]:text-primary">
-              <Link className="size-3.5" />
-              Link
-            </TabsTrigger>
-            <TabsTrigger value="text" className="data-[state=active]:[&_svg]:text-[#B05EFF]">
-              <LetterText className="size-3.5" />
-              Plain Text
-            </TabsTrigger>
-            <TabsTrigger value="file" className="data-[state=active]:[&_svg]:text-[#22C55E]">
-              <FileIcon className="size-3.5" />
-              File
-            </TabsTrigger>
-            <TabsTrigger value="youtube" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#EF4444]">
-              <Youtube className="size-3.5" />
-              YouTube
-            </TabsTrigger>
-            <TabsTrigger value="topic" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#3F88FE]">
-              <BookOpen className="size-3.5" />
-              Topic
-            </TabsTrigger>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={cn(
-                    "md:hidden inline-flex items-center rounded-t-[10px] p-4 transition-colors focus-visible:outline-none",
-                    isOverflowActive
-                      ? "border-l border-r border-t bg-white border-black/[0.06] text-foreground dark:bg-white/[0.02] dark:border-white/[0.06]"
-                      : "text-[#747474]"
-                  )}
-                >
-                  <Plus className="size-[15px]" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => setActiveTab("youtube")}>
-                  <Youtube className="size-3.5 text-[#EF4444]" />
-                  YouTube
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setActiveTab("topic")}>
-                  <BookOpen className="size-3.5 text-[#3F88FE]" />
-                  Topic
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </TabsList>
+    <div className="pt-6 md:pt-10 mx-auto w-full max-w-[600px] flex flex-col gap-6 md:gap-10">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="w-full">
+          <TabsTrigger value="url" className="data-[state=active]:[&_svg]:text-primary">
+            <Link className="size-3.5" />
+            Link
+          </TabsTrigger>
+          <TabsTrigger value="text" className="data-[state=active]:[&_svg]:text-[#B05EFF]">
+            <LetterText className="size-3.5" />
+            Plain Text
+          </TabsTrigger>
+          <TabsTrigger value="file" className="data-[state=active]:[&_svg]:text-[#22C55E]">
+            <FileIcon className="size-3.5" />
+            File
+          </TabsTrigger>
+          <TabsTrigger value="youtube" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#EF4444]">
+            <Youtube className="size-3.5" />
+            YouTube
+          </TabsTrigger>
+          <TabsTrigger value="topic" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#3F88FE]">
+            <BookOpen className="size-3.5" />
+            Topic
+          </TabsTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={cn(
+                  "md:hidden inline-flex items-center rounded-t-[10px] p-4 transition-colors focus-visible:outline-none",
+                  isOverflowActive
+                    ? "border-l border-r border-t bg-white border-black/[0.06] text-foreground dark:bg-white/[0.02] dark:border-white/[0.06]"
+                    : "text-[#747474]",
+                )}
+              >
+                <Plus className="size-[15px]" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setActiveTab("youtube")}>
+                <Youtube className="size-3.5 text-[#EF4444]" />
+                YouTube
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setActiveTab("topic")}>
+                <BookOpen className="size-3.5 text-[#3F88FE]" />
+                Topic
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TabsList>
 
-          <TabsContent value="url" className="rounded-tr-[16px]">
-            <SendUrlWidget />
-          </TabsContent>
-          <TabsContent value="text" className="rounded-t-[16px]">
-            <SendTextWidget />
-          </TabsContent>
-          <TabsContent value="file" className="rounded-t-[16px]">
-            <SendFileWidget />
-          </TabsContent>
-          <TabsContent
-            value="youtube"
-            className="rounded-tl-[16px] md:rounded-t-[16px]"
-          >
-            <SendYoutubeWidget />
-          </TabsContent>
-          <TabsContent value="topic" className="rounded-tl-[16px]">
-            <SendTopicWidget />
-          </TabsContent>
-        </Tabs>
+        <TabsContent value="url" className="rounded-tr-[16px]">
+          <SendUrlWidget />
+        </TabsContent>
+        <TabsContent value="text" className="rounded-t-[16px]">
+          <SendTextWidget />
+        </TabsContent>
+        <TabsContent value="file" className="rounded-t-[16px]">
+          <SendFileWidget />
+        </TabsContent>
+        <TabsContent value="youtube" className="rounded-tl-[16px] md:rounded-t-[16px]">
+          <SendYoutubeWidget />
+        </TabsContent>
+        <TabsContent value="topic" className="rounded-tl-[16px]">
+          <SendTopicWidget />
+        </TabsContent>
+      </Tabs>
 
-        <RecentSends />
-      </div>
+      <RecentSends />
     </div>
   );
 };
