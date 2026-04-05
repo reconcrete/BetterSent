@@ -16,7 +16,11 @@ export const GoogleSignIn: FC<GoogleSignInProps> = ({ className }) => {
       variant="outline"
       onClick={() => {
         analytics.capture("sign_in_google");
-        signIn.social({ provider: "google", callbackURL: window.location.origin });
+        signIn.social({
+          provider: "google",
+          callbackURL: window.location.origin,
+          newUserCallbackURL: `${window.location.origin}/onboarding`,
+        });
       }}
       className={cn("w-full h-[46px] rounded-xl", className)}
     >

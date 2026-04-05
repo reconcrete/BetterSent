@@ -8,7 +8,6 @@
  */
 export type ModalPropsMap = {
   MarkdownPreviewModal: MarkdownPreviewModalProps;
-  OnboardingModal: OnboardingModalProps;
 };
 
 // ============================================
@@ -18,8 +17,6 @@ export type ModalPropsMap = {
 export type MarkdownPreviewModalProps = ModalPropsBase & {
   historyId: string;
 };
-
-export type OnboardingModalProps = ModalPropsBase;
 
 /**
  * Union of all modal names derived from ModalPropsMap.

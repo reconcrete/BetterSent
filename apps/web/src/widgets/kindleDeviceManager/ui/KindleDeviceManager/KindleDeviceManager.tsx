@@ -294,10 +294,15 @@ export const KindleDeviceManager: FC = () => {
         <Info className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
         <p className="text-[13px] leading-relaxed text-muted-foreground">
           Find your Kindle email in{" "}
-          <span className="font-medium text-secondary dark:text-primary">
+          <a
+            href="https://www.amazon.com/hz/mycd/preferences/myx#/home/settings/payment"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-secondary dark:text-primary hover:underline"
+          >
             Amazon &rarr; Manage Content and Devices &rarr; Preferences &rarr;
             Personal Document Settings
-          </span>
+          </a>
         </p>
       </div>
     </div>

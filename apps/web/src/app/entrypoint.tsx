@@ -6,6 +6,7 @@ import { Root } from "~/pages/root";
 import { History } from "~/pages/history";
 import { Settings } from "~/pages/settings";
 import { SignIn } from "~/pages/sign-in";
+import { Onboarding } from "~/pages/onboarding";
 
 import { AppLayout } from "~/widgets/appLayout";
 
@@ -21,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
           <AppModals />
           <Routes>
             <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route element={<AppLayout />}>
               <Route path="/" element={<Root />} />
               <Route path="/history" element={<History />} />
