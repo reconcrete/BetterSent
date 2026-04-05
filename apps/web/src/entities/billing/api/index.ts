@@ -4,7 +4,7 @@ import { api } from "~/shared/lib/treaty";
 export const BILLING_STATUS_KEY = ["billingStatus"];
 
 export const useSubscriptionStatus = () => {
-  return useQuery({
+  const query = useQuery({
     queryKey: BILLING_STATUS_KEY,
     queryFn: async () => {
       const response = await api.billing.status.get();
@@ -15,6 +15,8 @@ export const useSubscriptionStatus = () => {
     },
     staleTime: 30_000,
   });
+
+  return { ...query, isPro: query.data?.plan === "pro" };
 };
 
 export const useCreateCheckout = () => {

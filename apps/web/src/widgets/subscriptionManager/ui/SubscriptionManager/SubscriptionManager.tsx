@@ -34,7 +34,7 @@ const UsageBar: FC<{ used: number; limit: number; label: string }> = ({ used, li
 export const SubscriptionManager: FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  const { data: status, isLoading } = useSubscriptionStatus();
+  const { data: status, isLoading, isPro } = useSubscriptionStatus();
   const checkout = useCreateCheckout();
   const portal = useCreatePortal();
 
@@ -56,8 +56,6 @@ export const SubscriptionManager: FC = () => {
       </Card>
     );
   }
-
-  const isPro = status?.plan === "pro";
 
   return (
     <Card>

@@ -1,6 +1,5 @@
 import type { FC } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 
 import { useSession } from "~/shared/lib";
 
@@ -14,11 +13,7 @@ export const AppLayout: FC = () => {
   useOnboardingGuard();
 
   if (isPending) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <div className="min-h-screen bg-background flex items-center justify-center" />;
   }
 
   if (!session) {

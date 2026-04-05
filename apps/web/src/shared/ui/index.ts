@@ -13,3 +13,4 @@ export * from "./Avatar/Avatar";
 export * from "./Logo/Logo";
 export * from "./FileDropZone/FileDropZone";
 export * from "./Skeleton/Skeleton";
+export * from "./ProBadge/ProBadge";
