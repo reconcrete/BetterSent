@@ -50,6 +50,14 @@ export const ChooseDevice: FC<ChooseDeviceProps> = ({ value, onChange }) => {
     );
   }
 
+  if (devices.length === 1) {
+    return (
+      <p className="text-xs font-semibold uppercase tracking-[0.5px] text-muted-foreground">
+        Sending to {devices[0].label || "Kindle"}
+      </p>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center w-full">

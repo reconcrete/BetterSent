@@ -43,6 +43,11 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     "/url",
     async ({ body, set, user }) => {
       try {
+        const normalized = body.url.trim().toLowerCase();
+        if (normalized.includes("youtube.com/") || normalized.includes("youtu.be/")) {
+          set.status = 400;
+          return { success: false, error: "YouTube links should be sent through the YouTube tab." };
+        }
         await checkAndIncrementUsage(user.id, "url");
         const data = await extractUrl(body.url, user.id, body.kindleEmailId);
         return { success: true, data };

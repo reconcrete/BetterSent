@@ -24,6 +24,16 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
     mutationFn: async () => {
       setError(null);
 
+      if (type === "url" && typeof content === "string") {
+        const normalized = content.trim().toLowerCase();
+        if (
+          normalized.includes("youtube.com/") ||
+          normalized.includes("youtu.be/")
+        ) {
+          throw new Error("YouTube links should be sent through the YouTube tab.");
+        }
+      }
+
       let response;
       if (type === "file") {
         if (!(content instanceof File)) {

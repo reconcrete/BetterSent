@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Eye } from "lucide-react";
 
-import { Button } from "~/shared/ui";
+import { Button, Tooltip, TooltipTrigger, TooltipContent } from "~/shared/ui";
 import { useAnalytics } from "~/shared/lib";
 import { useOpenModal } from "~/entities/modals";
 
@@ -19,15 +19,19 @@ export const PreviewExtraction = memo<PreviewExtractionProps>(({ historyId }) =>
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      onClick={handleClick}
-      title="Preview markdown"
-      aria-label="Preview markdown"
-      className="size-6 [&_svg]:size-3"
-    >
-      <Eye />
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={handleClick}
+          aria-label="Preview extraction"
+          className="size-6 [&_svg]:size-3"
+        >
+          <Eye />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Preview extraction</TooltipContent>
+    </Tooltip>
   );
 });
