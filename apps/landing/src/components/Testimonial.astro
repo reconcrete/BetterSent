@@ -1,35 +1,134 @@
 ---
-
+const useCases = [
+  {
+    title: "Long reads on your commute",
+    description:
+      "Save articles from the web and read them on your Kindle without distractions, ads, or eye strain.",
+    icon: "book",
+  },
+  {
+    title: "Turn videos into reading",
+    description:
+      "Extract YouTube video transcripts and read them at your own pace — great for lectures, talks, and tutorials.",
+    icon: "video",
+  },
+  {
+    title: "Learn about anything",
+    description:
+      "Enter a topic and get an AI-generated mini-book delivered to your Kindle — structured, researched, and ready to read.",
+    icon: "lightbulb",
+  },
+  {
+    title: "Send from anywhere",
+    description:
+      "Use the web app, or forward links and text to our Telegram bot. Your content lands on your Kindle either way.",
+    icon: "send",
+  },
+];
 ---
 
-<section class="px-6 py-[120px] lg:px-11">
-  <div
-    data-animate
-    class="mx-auto flex max-w-[760px] flex-col items-center gap-10"
-  >
-    <!-- Quote -->
-    <blockquote
-      class="text-center font-display text-2xl italic leading-[46.4px] tracking-[-0.3px] text-secondary-foreground md:text-[32px]"
-    >
-      "Bettersent completely changed how I consume articles. I used to have <span
-        class="text-primary">50 open tabs</span
-      > — now everything goes straight to my Kindle. I actually finish reading
-      things now."
-    </blockquote>
-
-    <!-- Author -->
-    <div class="flex items-center gap-3">
-      <div
-        class="flex size-10 items-center justify-center rounded-full bg-[rgba(255,242,124,0.15)]"
+<section class="px-6 py-[120px] lg:px-[60px]">
+  <div class="mx-auto max-w-[1352px]">
+    <!-- Section header -->
+    <div class="mb-16 text-center">
+      <p
+        data-animate
+        class="text-[13px] font-semibold uppercase tracking-[2px] text-primary"
       >
-        <span class="text-sm font-bold text-primary">MK</span>
-      </div>
-      <div>
-        <p class="text-sm font-semibold text-white">Maria Kowalski</p>
-        <p class="text-[13px] text-muted-foreground">
-          Software Engineer, reads 40+ articles/week
-        </p>
-      </div>
+        Use cases
+      </p>
+      <h2
+        data-animate
+        data-delay="1"
+        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-white md:text-[48px] md:leading-[55.2px]"
+      >
+        Built for how you actually read
+      </h2>
+      <p
+        data-animate
+        data-delay="2"
+        class="mx-auto mt-4 max-w-[460px] text-base leading-[27.2px] text-muted-foreground"
+      >
+        Whether it's a blog post, a video transcript, or a topic you're curious about — get it on your Kindle.
+      </p>
+    </div>
+
+    <!-- Use case grid -->
+    <div class="mx-auto grid max-w-[900px] gap-6 md:grid-cols-2">
+      {
+        useCases.map((uc, i) => (
+          <div
+            data-animate
+            data-delay={String(Math.min(i + 1, 4))}
+            class="flex gap-5 rounded-2xl border border-border bg-[rgba(255,255,255,0.02)] p-7"
+          >
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent">
+              {uc.icon === "book" && (
+                <svg
+                  class="size-5 text-primary"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M2 4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14l-1-1-3 2-3-2-1 1V4z" />
+                  <path d="M10 4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14l-1-1-3 2-3-2-1 1V4z" />
+                </svg>
+              )}
+              {uc.icon === "video" && (
+                <svg
+                  class="size-5 text-primary"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="10" cy="10" r="8" />
+                  <polygon points="8 6.5 14 10 8 13.5" fill="currentColor" />
+                </svg>
+              )}
+              {uc.icon === "lightbulb" && (
+                <svg
+                  class="size-5 text-primary"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M10 2a5.5 5.5 0 0 0-2 10.65V14h4v-1.35A5.5 5.5 0 0 0 10 2z" />
+                  <line x1="8" y1="17" x2="12" y2="17" />
+                </svg>
+              )}
+              {uc.icon === "send" && (
+                <svg
+                  class="size-5 text-primary"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="2" x2="9" y2="11" />
+                  <polygon points="18 2 12 18 9 11 2 8 18 2" />
+                </svg>
+              )}
+            </div>
+            <div>
+              <h3 class="text-[15px] font-bold text-white">{uc.title}</h3>
+              <p class="mt-2 text-sm leading-[22px] text-muted-foreground">
+                {uc.description}
+              </p>
+            </div>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

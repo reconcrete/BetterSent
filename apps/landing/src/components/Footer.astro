@@ -5,31 +5,16 @@ const columns = [
     links: [
       { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
-      { label: "Telegram Bot", href: "#" },
-      { label: "API", href: "#" },
+      { label: "FAQ", href: "#faq" },
     ],
   },
   {
-    title: "Resources",
+    title: "Legal",
     links: [
-      { label: "Help Center", href: "#" },
-      { label: "Changelog", href: "#" },
-      { label: "Status", href: "#" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "About", href: "#" },
       { label: "Privacy", href: "#" },
       { label: "Terms", href: "#" },
     ],
   },
-];
-
-const socials = [
-  { label: "Twitter", href: "#" },
-  { label: "GitHub", href: "#" },
 ];
 ---
 
@@ -85,23 +70,11 @@ const socials = [
 
     <!-- Bottom bar -->
     <div
-      class="flex flex-col items-center justify-between gap-4 border-t border-[rgba(255,255,255,0.04)] py-5 md:flex-row"
+      class="flex items-center justify-center border-t border-[rgba(255,255,255,0.04)] py-5"
     >
       <p class="text-xs text-[#555]">
         &copy; {new Date().getFullYear()} Bettersent. All rights reserved.
       </p>
-      <div class="flex gap-4">
-        {
-          socials.map((s) => (
-            <a
-              href={s.href}
-              class="text-[13px] text-[#555] transition-colors hover:text-muted-foreground"
-            >
-              {s.label}
-            </a>
-          ))
-        }
-      </div>
     </div>
   </div>
 </footer>

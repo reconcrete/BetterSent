@@ -37,6 +37,7 @@ const features = [
     description:
       "Send content from Telegram. Forward a link or text to our bot and it lands on your Kindle without opening a browser.",
     icon: "telegram",
+    free: true,
   },
 ];
 ---
@@ -169,6 +170,11 @@ const features = [
               {feature.pro && (
                 <span class="rounded-md bg-[rgba(255,242,124,0.15)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.5px] text-primary">
                   Pro
+                </span>
+              )}
+              {feature.free && (
+                <span class="rounded-md bg-[rgba(255,255,255,0.08)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
+                  Free
                 </span>
               )}
             </div>

@@ -17,17 +17,12 @@ const recentItems = [
   },
 ];
 
-const sidebarItems = [
-  { label: "Dashboard", active: true },
-  { label: "Send to Kindle", active: false },
-  { label: "History", active: false },
-  { label: "Settings", active: false },
-];
-
-const stats = [
-  { value: "142", label: "Articles sent" },
-  { value: "23", label: "Books delivered" },
-  { value: "4.2h", label: "Avg. reading time" },
+const tabs = [
+  { label: "File", active: false },
+  { label: "Link", active: true },
+  { label: "Plain Text", active: false },
+  { label: "YouTube", active: false, pro: true },
+  { label: "Topic", active: false, pro: true },
 ];
 ---
 
@@ -44,51 +39,38 @@ const stats = [
   </div>
 
   <!-- App content -->
-  <div class="flex gap-8 px-10 pt-10 pb-0">
-    <!-- Sidebar (hidden on mobile) -->
-    <div class="hidden w-[220px] shrink-0 flex-col gap-2 lg:flex">
-      <p
-        class="px-3.5 text-[11px] font-semibold uppercase tracking-[1px] text-[#555]"
-      >
-        Your Library
-      </p>
-      {
-        sidebarItems.map((item) => (
-          <div
-            class:list={[
-              "flex h-10 items-center gap-3 rounded-lg px-3.5",
-              item.active ? "bg-accent" : "",
-            ]}
-          >
-            <span
-              class:list={[
-                "size-4 rounded",
-                item.active
-                  ? "bg-[rgba(255,242,124,0.2)]"
-                  : "bg-[rgba(255,255,255,0.06)]",
-              ]}
-            />
-            <span
-              class:list={[
-                "text-[13px] font-medium",
-                item.active ? "text-primary" : "text-muted-foreground",
-              ]}
-            >
-              {item.label}
-            </span>
-          </div>
-        ))
-      }
-    </div>
-
+  <div class="px-6 pt-8 pb-0 md:px-10">
     <!-- Main content -->
-    <div class="flex min-w-0 flex-1 flex-col gap-6">
+    <div class="flex flex-col gap-6">
       <!-- Header -->
       <div class="text-center">
         <h3 class="text-lg font-bold text-white">Send to Kindle</h3>
         <p class="text-[13px] text-muted-foreground">
-          Paste a URL or upload a file
+          Choose a source and send it to your device
         </p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex items-center gap-1 overflow-x-auto rounded-xl border border-border bg-[rgba(255,255,255,0.02)] p-1.5">
+        {
+          tabs.map((tab) => (
+            <div
+              class:list={[
+                "flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-medium",
+                tab.active
+                  ? "bg-accent text-primary"
+                  : "text-muted-foreground",
+              ]}
+            >
+              {tab.label}
+              {tab.pro && (
+                <span class="rounded bg-[rgba(255,242,124,0.15)] px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary">
+                  Pro
+                </span>
+              )}
+            </div>
+          ))
+        }
       </div>
 
       <!-- Input form -->
@@ -109,38 +91,23 @@ const stats = [
             Send
           </button>
         </div>
-        <div class="mt-4 flex items-center gap-4">
-          <span class="text-xs text-[#555]">or</span>
+        <!-- Device selector -->
+        <div class="mt-4 flex items-center gap-3">
+          <span class="text-xs text-[#555]">Device:</span>
           <span
-            class="rounded-md border border-[rgba(255,255,255,0.1)] px-3 py-1.5 text-xs text-muted-foreground"
-            >Upload PDF</span
+            class="flex items-center gap-1.5 rounded-lg border border-primary/30 bg-accent px-3 py-1.5 text-xs font-medium text-primary"
           >
-          <span
-            class="rounded-md border border-[rgba(255,255,255,0.1)] px-3 py-1.5 text-xs text-muted-foreground"
-            >Upload EPUB</span
-          >
+            <span class="size-3 rounded border border-primary/40 bg-primary/20 flex items-center justify-center">
+              <span class="text-[8px] text-primary">✓</span>
+            </span>
+            My Kindle Paperwhite
+          </span>
         </div>
-      </div>
-
-      <!-- Stats row -->
-      <div class="grid grid-cols-3 gap-5">
-        {
-          stats.map((stat) => (
-            <div class="rounded-xl border border-border bg-[rgba(255,255,255,0.03)] px-5 py-5">
-              <p class="text-[32px] font-extrabold tracking-[-1px] text-primary">
-                {stat.value}
-              </p>
-              <p class="text-xs font-medium text-muted-foreground">
-                {stat.label}
-              </p>
-            </div>
-          ))
-        }
       </div>
 
       <!-- Recent items -->
       <div>
-        <p class="text-[13px] font-semibold text-[#a3a3a6]">Recently Sent</p>
+        <p class="text-[13px] font-semibold text-[#a3a3a6]">Recent sends</p>
         <div class="mt-3 flex flex-col">
           {
             recentItems.map((item, i) => (
