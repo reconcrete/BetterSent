@@ -40,11 +40,8 @@ export const History: FC = () => {
   });
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Send History</h1>
-        <p className="text-muted-foreground">Track what you've sent to your Kindle device</p>
-      </div>
+    <div className="max-w-2xl mx-auto pt-6 space-y-6">
+      <h1 className="text-[22px] font-bold leading-snug text-foreground md:hidden">Send History</h1>
 
       {isLoading && <RecentSendsSkeleton />}
 
