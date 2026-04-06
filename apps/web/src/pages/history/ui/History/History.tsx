@@ -37,7 +37,6 @@ export const History: FC = () => {
       return (response.data?.data ?? []) as HistoryItem[];
     },
     enabled: !!session,
-    refetchInterval: 5000,
   });
 
   return (

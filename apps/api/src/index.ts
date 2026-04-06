@@ -4,6 +4,7 @@ import { cors } from "@elysiajs/cors";
 
 import { extractorRouter, userRouter, kindleRouter, historyRouter, billingRouter, billingWebhookRouter } from "./routes";
 import { authMiddleware } from "./lib/auth";
+import { wsRouter } from "./lib/ws";
 import { log } from "./lib/logger";
 
 const app = new Elysia()
@@ -16,6 +17,7 @@ const app = new Elysia()
   }))
   .use(authMiddleware)
   .get("/health", () => ({ status: "ok" }))
+  .use(wsRouter)
   .use(billingWebhookRouter)
   .use(extractorRouter)
   .use(userRouter)

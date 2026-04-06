@@ -2,6 +2,7 @@ import { db } from "../../db";
 import { sendHistory, kindleEmailAddress } from "@bettersent/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { log } from "../../lib/logger";
+import { sendToUser } from "../../lib/ws";
 
 export type SendHistoryStatus = "pending" | "processing" | "completed" | "error";
 
@@ -19,7 +20,7 @@ export type SendHistoryData = {
   updatedAt: string;
 };
 
-const toSendHistoryData = (
+export const toSendHistoryData = (
   row: typeof sendHistory.$inferSelect,
   kindleLabel: string | null,
 ): SendHistoryData => ({
@@ -167,4 +168,39 @@ export const getHistoryEntry = async (
     .limit(1);
 
   return entry ?? null;
+};
+
+/**
+ * Get a single send history entry with kindle label (for WebSocket notifications)
+ */
+export const getHistoryEntryWithLabel = async (
+  historyId: string,
+  userId: string
+): Promise<SendHistoryData | null> => {
+  const [row] = await db
+    .select({
+      history: sendHistory,
+      kindleLabel: kindleEmailAddress.label,
+    })
+    .from(sendHistory)
+    .leftJoin(kindleEmailAddress, eq(sendHistory.kindleEmailId, kindleEmailAddress.id))
+    .where(and(eq(sendHistory.id, historyId), eq(sendHistory.userId, userId)))
+    .limit(1);
+
+  return row ? toSendHistoryData(row.history, row.kindleLabel) : null;
+};
+
+/**
+ * Update a history entry and push a WebSocket notification to the user
+ */
+export const updateAndNotifyHistory = async (
+  historyId: string,
+  userId: string,
+  data: Parameters<typeof updateSendHistoryEntry>[1]
+) => {
+  await updateSendHistoryEntry(historyId, data);
+  const entry = await getHistoryEntryWithLabel(historyId, userId);
+  if (entry) {
+    sendToUser(userId, { type: "history:updated", data: entry });
+  }
 };

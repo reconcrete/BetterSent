@@ -96,7 +96,7 @@ export const NavBar: FC<NavBarProps> = ({ email }) => {
               <button type="button" aria-label="Settings menu">
                 <Settings2 className="size-[22px] text-foreground sm:hidden" />
                 <Avatar className="size-8 hidden sm:flex">
-                  <AvatarFallback className="bg-primary/8 text-xs font-bold text-secondary">
+                  <AvatarFallback className="bg-primary/8 text-xs font-bold text-secondary dark:text-primary">
                     {email.split("@")[0].slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>

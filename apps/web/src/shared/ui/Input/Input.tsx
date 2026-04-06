@@ -14,10 +14,10 @@ function Input({
     <div
       className={cn(
         "flex h-[50px] w-full items-center gap-2 rounded-xl border px-4 py-3.5 transition-[color,box-shadow]",
-        "bg-black/[0.03] border-black/6",
-        "dark:bg-white/[0.04] dark:border-white/6",
-        "has-[:focus-visible]:border-ring has-[:focus-visible]:ring-ring/50 has-[:focus-visible]:ring-[3px]",
-        "has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50",
+        "bg-black/3 border-black/6",
+        "dark:bg-white/4 dark:border-white/6",
+        "has-focus-visible:border-ring has-focus-visible:ring-ring/50 has-focus-visible:ring-[3px]",
+        "has-disabled:pointer-events-none has-disabled:opacity-50",
         "has-[:aria-invalid]:ring-destructive/20 dark:has-[:aria-invalid]:ring-destructive/40 has-[:aria-invalid]:border-destructive",
         className
       )}

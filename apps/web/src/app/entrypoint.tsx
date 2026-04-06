@@ -10,10 +10,10 @@ import { Onboarding } from "~/pages/onboarding";
 
 import { AppLayout } from "~/widgets/appLayout";
 import { TooltipProvider } from "~/shared/ui";
-
 import { AnalyticsProvider } from "./providers/AnalyticsProvider";
 import { AppModals } from "./providers/AppModals";
 import { QueryProvider } from "./providers/QueryProvider";
+import { WebSocketProvider } from "./providers/WebSocketProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -21,16 +21,18 @@ createRoot(document.getElementById("root")!).render(
       <QueryProvider>
         <TooltipProvider>
           <BrowserRouter>
-            <AppModals />
-            <Routes>
-              <Route path="/sign-in" element={<SignIn />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route element={<AppLayout />}>
-                <Route path="/" element={<Root />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/settings" element={<Settings />} />
-              </Route>
-            </Routes>
+            <WebSocketProvider>
+              <AppModals />
+              <Routes>
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route element={<AppLayout />}>
+                  <Route path="/" element={<Root />} />
+                  <Route path="/history" element={<History />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Route>
+              </Routes>
+            </WebSocketProvider>
           </BrowserRouter>
         </TooltipProvider>
       </QueryProvider>

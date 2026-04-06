@@ -22,7 +22,6 @@ export const RecentSends: FC = () => {
       return (response.data?.data ?? []) as HistoryItem[];
     },
     enabled: !!session,
-    refetchInterval: 5000,
   });
 
   const recentItems = historyItems?.slice(0, 3);

@@ -1,11 +1,12 @@
 import { type FC, type RefObject, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2 as Loader, Send } from "lucide-react";
+import { Send } from "lucide-react";
 
 import { Button } from "~/shared/ui";
 import { useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 import { BILLING_STATUS_KEY } from "~/entities/billing";
+import type { HistoryItem } from "~/widgets/historyCard";
 
 type SendContentProps = {
   type: "url" | "text" | "file" | "youtube" | "topic";
@@ -15,17 +16,23 @@ type SendContentProps = {
   submitRef?: RefObject<(() => void) | null>;
 };
 
+type MutationVars = {
+  type: "url" | "text" | "file" | "youtube" | "topic";
+  content: string | File | null;
+  kindleEmailId?: string;
+};
+
 export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess, submitRef }) => {
   const analytics = useAnalytics();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (vars: MutationVars) => {
       setError(null);
 
-      if (type === "url" && typeof content === "string") {
-        const normalized = content.trim().toLowerCase();
+      if (vars.type === "url" && typeof vars.content === "string") {
+        const normalized = vars.content.trim().toLowerCase();
         if (
           normalized.includes("youtube.com/") ||
           normalized.includes("youtu.be/")
@@ -35,19 +42,19 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       }
 
       let response;
-      if (type === "file") {
-        if (!(content instanceof File)) {
+      if (vars.type === "file") {
+        if (!(vars.content instanceof File)) {
           throw new Error("No file selected.");
         }
-        response = await api.extract.file.post({ file: content, kindleEmailId });
-      } else if (type === "youtube") {
-        response = await api.extract.youtube.post({ url: content as string, kindleEmailId });
-      } else if (type === "topic") {
-        response = await api.extract.topic.post({ topic: content as string, kindleEmailId });
-      } else if (type === "url") {
-        response = await api.extract.url.post({ url: content as string, kindleEmailId });
+        response = await api.extract.file.post({ file: vars.content, kindleEmailId: vars.kindleEmailId });
+      } else if (vars.type === "youtube") {
+        response = await api.extract.youtube.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
+      } else if (vars.type === "topic") {
+        response = await api.extract.topic.post({ topic: vars.content as string, kindleEmailId: vars.kindleEmailId });
+      } else if (vars.type === "url") {
+        response = await api.extract.url.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
       } else {
-        response = await api.extract.text.post({ textContent: content as string, kindleEmailId });
+        response = await api.extract.text.post({ textContent: vars.content as string, kindleEmailId: vars.kindleEmailId });
       }
 
       if (response.error) {
@@ -61,13 +68,46 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
 
       return response.data;
     },
-    onSuccess: () => {
-      analytics.capture("extraction_sent", { type });
-      queryClient.invalidateQueries({ queryKey: BILLING_STATUS_KEY });
-      queryClient.invalidateQueries({ queryKey: ["sendHistory"] });
+    onMutate: async (vars: MutationVars) => {
+      await queryClient.cancelQueries({ queryKey: ["sendHistory"] });
+      const previous = queryClient.getQueryData<HistoryItem[]>(["sendHistory"]);
+
+      const tempId = crypto.randomUUID();
+      const optimisticItem: HistoryItem = {
+        id: tempId,
+        type: vars.type,
+        content: typeof vars.content === "string" ? vars.content : vars.content?.name ?? "",
+        title: null,
+        author: null,
+        status: "processing",
+        errorMessage: null,
+        kindleLabel: null,
+        hasPreview: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) => [optimisticItem, ...old]);
       onSuccess?.();
+
+      return { previous, tempId };
     },
-    onError: (err: Error) => {
+    onSuccess: (data, vars, context) => {
+      if (context?.tempId && data) {
+        const historyId = data.data?.historyId;
+        if (historyId) {
+          queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) =>
+            old.map((item) => (item.id === context.tempId ? { ...item, id: historyId } : item))
+          );
+        }
+      }
+      analytics.capture("extraction_sent", { type: vars.type });
+      queryClient.invalidateQueries({ queryKey: BILLING_STATUS_KEY });
+    },
+    onError: (err: Error, _, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["sendHistory"], context.previous);
+      }
       setError(err.message);
     },
   });
@@ -79,7 +119,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
 
   const handleSend = () => {
     if (!canSend) return;
-    mutate();
+    mutate({ type, content, kindleEmailId });
   };
 
   useEffect(() => {
@@ -93,17 +133,8 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         disabled={isPending || !canSend}
         className="w-full rounded-xl py-3 h-auto font-semibold"
       >
-        {isPending ? (
-          <>
-            <Loader className="size-3.5 animate-spin" />
-            Sending to Kindle...
-          </>
-        ) : (
-          <>
-            <Send className="size-3.5" />
-            Send to Kindle
-          </>
-        )}
+        <Send className="size-3.5" />
+        Send to Kindle
       </Button>
       {error && (
         <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-xl">

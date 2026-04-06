@@ -77,13 +77,12 @@ export async function extractConversation(
       url = result.data;
     }
 
-    await ctx.reply("⏳ Extracting content from URL...");
     const result = await conversation.external(() =>
       apiClient.extractUrl(url!, userId, deviceId)
     );
 
     if (result.success) {
-      await ctx.reply(`✅ Sent to your Kindle!\n📄 ${result.data?.filename || "Document"}`);
+      await ctx.reply("✅ Content is being sent to your Kindle!");
     } else {
       await ctx.reply(`❌ Failed: ${result.error || "Unknown error"}`);
     }
@@ -96,13 +95,12 @@ export async function extractConversation(
       await conversation.halt({ next: true });
     }
 
-    await ctx.reply("⏳ Processing text...");
     const result = await conversation.external(() =>
       apiClient.extractText(text, userId, deviceId)
     );
 
     if (result.success) {
-      await ctx.reply(`✅ Sent to your Kindle!\n📄 ${result.data?.filename || "Document"}`);
+      await ctx.reply("✅ Content is being sent to your Kindle!");
     } else {
       await ctx.reply(`❌ Failed: ${result.error || "Unknown error"}`);
     }
@@ -115,13 +113,12 @@ export async function extractConversation(
     const arrayBuffer = await fileResponse.arrayBuffer();
     const fileName = response.message.document?.file_name || "document";
 
-    await ctx.reply("⏳ Processing file...");
     const result = await conversation.external(() =>
       apiClient.extractFile(arrayBuffer, fileName, userId, deviceId)
     );
 
     if (result.success) {
-      await ctx.reply(`✅ Sent to your Kindle!\n📄 ${result.data?.filename || fileName}`);
+      await ctx.reply("✅ File is being sent to your Kindle!");
     } else {
       await ctx.reply(`❌ Failed: ${result.error || "Unknown error"}`);
     }

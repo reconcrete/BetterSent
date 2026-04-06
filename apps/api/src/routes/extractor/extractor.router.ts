@@ -6,8 +6,7 @@ import {
   extractYoutubeInputSchema,
   extractTopicInputSchema,
   extractFileInputSchema,
-  extractOutputSchema,
-  extractFileOutputSchema,
+  extractAcceptedSchema,
 } from "./extractor.schema";
 import { extractText, extractUrl, extractYoutube, extractTopic, extractFile } from "./extractor.service";
 import { authMiddleware } from "../../lib/auth";
@@ -37,7 +36,7 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         };
       }
     },
-    { auth: true, body: extractTextInputSchema, response: extractOutputSchema }
+    { auth: true, body: extractTextInputSchema, response: extractAcceptedSchema }
   )
   .post(
     "/url",
@@ -64,7 +63,7 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         };
       }
     },
-    { auth: true, body: extractUrlInputSchema, response: extractOutputSchema }
+    { auth: true, body: extractUrlInputSchema, response: extractAcceptedSchema }
   )
   .post(
     "/youtube",
@@ -90,7 +89,7 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         };
       }
     },
-    { auth: true, body: extractYoutubeInputSchema, response: extractOutputSchema }
+    { auth: true, body: extractYoutubeInputSchema, response: extractAcceptedSchema }
   )
   .post(
     "/topic",
@@ -116,7 +115,7 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         };
       }
     },
-    { auth: true, body: extractTopicInputSchema, response: extractOutputSchema }
+    { auth: true, body: extractTopicInputSchema, response: extractAcceptedSchema }
   )
   .post(
     "/file",
@@ -138,5 +137,5 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         };
       }
     },
-    { auth: true, body: extractFileInputSchema, response: extractFileOutputSchema }
+    { auth: true, body: extractFileInputSchema, response: extractAcceptedSchema }
   );

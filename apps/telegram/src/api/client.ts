@@ -6,19 +6,8 @@ interface ApiResponse<T> {
   error?: string;
 }
 
-interface ExtractResult {
-  markdown: string;
-  filename: string;
-  savedAt: string;
-  metadata?: {
-    title: string;
-    author?: string;
-  };
-}
-
-interface ExtractFileResult {
-  filename: string;
-  sentAt: string;
+interface ExtractAcceptedResult {
+  historyId: string;
 }
 
 function getHeaders(userId: string): Record<string, string> {
@@ -46,7 +35,7 @@ export async function extractUrl(
   url: string,
   userId: string,
   kindleEmailId?: string
-): Promise<ApiResponse<ExtractResult>> {
+): Promise<ApiResponse<ExtractAcceptedResult>> {
   const res = await fetch(`${API_URL}/extract/url`, {
     method: "POST",
     headers: getHeaders(userId),
@@ -59,7 +48,7 @@ export async function extractText(
   textContent: string,
   userId: string,
   kindleEmailId?: string
-): Promise<ApiResponse<ExtractResult>> {
+): Promise<ApiResponse<ExtractAcceptedResult>> {
   const res = await fetch(`${API_URL}/extract/text`, {
     method: "POST",
     headers: getHeaders(userId),
@@ -73,7 +62,7 @@ export async function extractFile(
   fileName: string,
   userId: string,
   kindleEmailId?: string
-): Promise<ApiResponse<ExtractFileResult>> {
+): Promise<ApiResponse<ExtractAcceptedResult>> {
   const formData = new FormData();
   formData.append("file", new Blob([new Uint8Array(fileData)]), fileName);
   if (kindleEmailId) formData.append("kindleEmailId", kindleEmailId);
