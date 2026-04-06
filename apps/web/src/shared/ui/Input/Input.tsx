@@ -30,7 +30,7 @@ function Input({
       <input
         type={type}
         data-slot="input"
-        className="w-full min-w-0 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:cursor-not-allowed"
+        className="w-full min-w-0 bg-transparent text-base sm:text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:cursor-not-allowed"
         {...props}
       />
     </div>

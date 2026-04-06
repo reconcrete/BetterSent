@@ -9,7 +9,7 @@ export const ChooseDeviceSkeleton: FC = () => (
         Send to
       </span>
     </div>
-    <div className="flex w-full flex-wrap gap-2">
+    <div className="flex w-full flex-col sm:flex-row sm:flex-wrap gap-2">
       {[0, 1].map((i) => (
         <Skeleton key={i} className="flex-1 h-[50px] rounded-xl" />
       ))}

@@ -66,7 +66,7 @@ export const ChooseDevice: FC<ChooseDeviceProps> = ({ value, onChange }) => {
         </span>
       </div>
 
-      <div className="flex w-full flex-wrap gap-2">
+      <div className="flex w-full flex-col sm:flex-row sm:flex-wrap gap-2">
         {devices.map((device) => {
           const isSelected = device.id === value;
 
