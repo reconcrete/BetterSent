@@ -53,10 +53,12 @@ export const NavBar: FC<NavBarProps> = ({ email }) => {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-6">
-        <NavLink to="/">
-          <Logo className="text-xl" />
-        </NavLink>
+      <div className="mx-auto flex h-14 max-w-4xl items-center px-6">
+        <div className="flex-1">
+          <NavLink to="/" className="inline-flex">
+            <Logo className="text-xl" />
+          </NavLink>
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-3">
@@ -80,7 +82,7 @@ export const NavBar: FC<NavBarProps> = ({ email }) => {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3.5">
+        <div className="flex flex-1 items-center justify-end gap-3.5">
           <NavLink
             to="/history"
             aria-label="History"
