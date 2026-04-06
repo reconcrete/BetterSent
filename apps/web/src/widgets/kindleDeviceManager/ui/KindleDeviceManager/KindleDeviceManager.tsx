@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Star, Loader2, Mail, Info, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Star, Loader2, Mail, Info, Eye, EyeOff, ExternalLink } from "lucide-react";
 
 import { Button, Input } from "~/shared/ui";
 import { cn } from "~/shared/lib";
@@ -167,12 +167,12 @@ export const KindleDeviceManager: FC = () => {
                 className="flex items-center gap-3 rounded-xl border bg-white px-5 py-4 dark:bg-white/5"
               >
                 {kindle.isDefault ? (
-                  <Star className="size-3.5 shrink-0 fill-amber-500 text-amber-500" />
+                  <Star className="size-3.5 shrink-0 fill-secondary text-secondary dark:fill-primary dark:text-primary" />
                 ) : (
                   <button
                     onClick={() => setDefaultMutation.mutate(kindle.id)}
                     disabled={isPending}
-                    className="shrink-0 text-muted-foreground/30 transition-colors hover:text-amber-400 disabled:opacity-50"
+                    className="shrink-0 text-muted-foreground/30 transition-colors hover:text-secondary/60 dark:hover:text-primary/60 disabled:opacity-50"
                     title="Set as default"
                     aria-label="Set as default"
                   >
@@ -290,19 +290,21 @@ export const KindleDeviceManager: FC = () => {
       </div>
 
       {/* Info callout */}
-      <div className="flex gap-3 rounded-xl border border-primary/15 bg-primary/6 px-4 py-3.5">
-        <Info className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-        <p className="text-[13px] leading-relaxed text-muted-foreground">
-          Find your Kindle email in{" "}
+      <div className="flex items-center gap-3 rounded-xl border border-primary/15 bg-primary/6 px-4 py-3.5">
+        <Info className="size-3.5 shrink-0 text-muted-foreground" />
+        <p className="text-[13px] leading-relaxed">
           <a
             href="https://www.amazon.com/hz/mycd/preferences/myx#/home/settings/payment"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-secondary dark:text-primary hover:underline"
+            className="font-medium text-secondary dark:text-primary hover:opacity-80 transition-opacity"
           >
-            Amazon &rarr; Manage Content and Devices &rarr; Preferences &rarr;
-            Personal Document Settings
-          </a>
+            <ExternalLink className="size-3 inline-block align-[-1px] mr-0.5" />
+            Open Kindle Settings
+          </a>{" "}
+          <span className="text-muted-foreground">
+            and find "Personal Document Settings"
+          </span>
         </p>
       </div>
     </div>

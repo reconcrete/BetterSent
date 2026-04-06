@@ -98,10 +98,10 @@ export const Settings: FC = () => {
                 key={id}
                 onClick={() => selectSection(id)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg border-l-[1.5px] px-3 py-2.5 text-left text-sm transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
                   activeSection === id
-                    ? "border-secondary bg-primary/6 font-medium text-secondary dark:border-primary dark:text-primary"
-                    : "border-transparent text-muted-foreground hover:bg-muted",
+                    ? "bg-primary/8 font-medium text-secondary dark:text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 <Icon className="size-4" />

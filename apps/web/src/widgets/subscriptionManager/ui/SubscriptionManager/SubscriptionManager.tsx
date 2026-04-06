@@ -2,9 +2,9 @@ import type { FC } from "react";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { CreditCard, Loader2, ExternalLink, Zap, Crown } from "lucide-react";
+import { Loader2, ExternalLink, Zap, Check } from "lucide-react";
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge } from "~/shared/ui";
+import { Button } from "~/shared/ui";
 import { useSubscriptionStatus, useCreateCheckout, useCreatePortal, BILLING_STATUS_KEY } from "~/entities/billing";
 
 const UsageBar: FC<{ used: number; limit: number; label: string }> = ({ used, limit, label }) => {
@@ -49,36 +49,61 @@ export const SubscriptionManager: FC = () => {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="size-5 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <CreditCard className="size-5 text-muted-foreground" />
-          <CardTitle>Subscription</CardTitle>
-          {isPro ? (
-            <Badge>
-              <Crown className="size-3" />
-              Pro
-            </Badge>
-          ) : (
-            <Badge variant="secondary">Free</Badge>
+    <div className="space-y-6">
+      {/* Current Plan */}
+      <div className="space-y-2.5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Current Plan
+        </p>
+        <div className="rounded-xl border bg-white px-5 py-4 dark:bg-white/5 space-y-4">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-foreground">
+              {isPro ? "Pro" : "Free"}
+            </p>
+            {isPro ? (
+              <span className="shrink-0 rounded-full bg-primary/12 px-2 py-0.5 text-[11px] font-medium text-secondary dark:text-primary">
+                Active
+              </span>
+            ) : (
+              <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                Free tier
+              </span>
+            )}
+          </div>
+
+          {isPro && status?.cancelAtPeriodEnd && (
+            <p className="text-sm text-amber-500">
+              Ends on{" "}
+              {new Date(status.currentPeriodEnd!).toLocaleDateString(undefined, {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </p>
+          )}
+
+          {isPro && status?.status === "past_due" && (
+            <p className="text-sm text-destructive">
+              Payment failed. Update your payment method to keep Pro features.
+            </p>
           )}
         </div>
-        <CardDescription>
-          {isPro ? "Manage your Pro subscription" : "Upgrade to unlock all features"}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        {status && (
-          <div className="space-y-3">
+      </div>
+
+      {/* Usage */}
+      {status && (
+        <div className="space-y-2.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+            Usage
+          </p>
+          <div className="rounded-xl border bg-white px-5 py-4 dark:bg-white/5 space-y-3">
             <UsageBar
               used={status.usage.extractionCount}
               limit={status.usage.extractionLimit}
@@ -92,51 +117,47 @@ export const SubscriptionManager: FC = () => {
               />
             )}
           </div>
-        )}
+        </div>
+      )}
 
-        {isPro && status?.cancelAtPeriodEnd && (
-          <p className="text-sm text-amber-500">
-            Your subscription will end on{" "}
-            {new Date(status.currentPeriodEnd!).toLocaleDateString(undefined, {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}
+      {/* Manage / Upgrade */}
+      {isPro ? (
+        <Button
+          variant="outline"
+          onClick={() => portal.mutate()}
+          disabled={portal.isPending}
+        >
+          {portal.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <ExternalLink className="size-4" />
+          )}
+          Manage Subscription
+        </Button>
+      ) : (
+        <div className="space-y-2.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+            Upgrade
           </p>
-        )}
-
-        {isPro && status?.status === "past_due" && (
-          <p className="text-sm text-destructive">
-            Your payment failed. Please update your payment method to continue using Pro features.
-          </p>
-        )}
-
-        {isPro ? (
-          <Button
-            variant="outline"
-            onClick={() => portal.mutate()}
-            disabled={portal.isPending}
-          >
-            {portal.isPending ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <ExternalLink className="size-4" />
-            )}
-            Manage Subscription
-          </Button>
-        ) : (
-          <div className="space-y-4">
-            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <Zap className="size-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">Pro includes</span>
-              </div>
-              <ul className="text-sm text-muted-foreground space-y-1.5 ml-6">
-                <li>500 extractions per month</li>
-                <li>YouTube video extraction</li>
-                <li>AI topic generation (50/month)</li>
-              </ul>
+          <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-5 py-4 dark:bg-primary/[0.03] space-y-4">
+            <div className="flex items-center gap-2">
+              <Zap className="size-4 text-secondary dark:text-primary" />
+              <p className="text-sm font-medium text-foreground">Pro includes</p>
             </div>
+            <ul className="space-y-2 ml-6">
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Check className="size-3.5 text-secondary dark:text-primary shrink-0" />
+                500 extractions per month
+              </li>
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Check className="size-3.5 text-secondary dark:text-primary shrink-0" />
+                YouTube video extraction
+              </li>
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Check className="size-3.5 text-secondary dark:text-primary shrink-0" />
+                AI topic generation (50/month)
+              </li>
+            </ul>
             <Button
               onClick={() => checkout.mutate()}
               disabled={checkout.isPending}
@@ -150,8 +171,8 @@ export const SubscriptionManager: FC = () => {
               Upgrade to Pro
             </Button>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </div>
   );
 };
