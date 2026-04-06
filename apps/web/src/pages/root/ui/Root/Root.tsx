@@ -48,12 +48,12 @@ export const Root = () => {
           <TabsTrigger value="youtube" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#EF4444]">
             <Youtube className="size-3.5" />
             YouTube
-            {isPro && <ProBadge />}
+            {!isPro && <ProBadge />}
           </TabsTrigger>
           <TabsTrigger value="topic" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#22C55E]">
             <BookOpen className="size-3.5" />
             Topic
-            {isPro && <ProBadge />}
+            {!isPro && <ProBadge />}
           </TabsTrigger>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
