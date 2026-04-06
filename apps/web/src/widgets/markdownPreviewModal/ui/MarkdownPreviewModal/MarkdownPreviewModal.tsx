@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { FileText, TriangleAlert } from "lucide-react";
 
 import { api } from "~/shared/lib/treaty";
 import {
@@ -39,38 +40,58 @@ export const MarkdownPreviewModal: FC<MarkdownPreviewModalProps> = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && closeModal()}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto p-6">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
-            Markdown Preview
-          </DialogTitle>
-          <DialogDescription>
-            Preview of the extracted content in markdown format.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col gap-0 p-0">
+        <DialogHeader className="px-6 pt-5 pb-4 border-b border-border/60">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center size-9 rounded-xl bg-primary/[0.08] border border-primary/15">
+              <FileText className="size-4 text-secondary dark:text-primary" />
+            </div>
+            <div className="space-y-0.5">
+              <DialogTitle className="text-base font-semibold tracking-tight">
+                Content Preview
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Extracted markdown
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
+        <div className="flex-1 overflow-y-auto scrollbar-hidden px-6 py-5">
           {isLoading && (
-            <div className="space-y-3 animate-pulse">
-              <div className="h-4 bg-muted rounded w-3/4" />
-              <div className="h-4 bg-muted rounded w-full" />
-              <div className="h-4 bg-muted rounded w-5/6" />
-              <div className="h-4 bg-muted rounded w-2/3" />
-              <div className="h-4 bg-muted rounded w-full" />
-              <div className="h-4 bg-muted rounded w-4/5" />
+            <div className="space-y-4 animate-pulse">
+              <div className="h-5 bg-muted rounded-md w-2/3" />
+              <div className="space-y-2.5 pt-1">
+                <div className="h-3.5 bg-muted/70 rounded w-full" />
+                <div className="h-3.5 bg-muted/70 rounded w-[92%]" />
+                <div className="h-3.5 bg-muted/70 rounded w-4/5" />
+              </div>
+              <div className="space-y-2.5 pt-2">
+                <div className="h-3.5 bg-muted/70 rounded w-full" />
+                <div className="h-3.5 bg-muted/70 rounded w-[88%]" />
+                <div className="h-3.5 bg-muted/70 rounded w-3/4" />
+                <div className="h-3.5 bg-muted/70 rounded w-[95%]" />
+              </div>
+              <div className="space-y-2.5 pt-2">
+                <div className="h-3.5 bg-muted/70 rounded w-5/6" />
+                <div className="h-3.5 bg-muted/70 rounded w-2/3" />
+              </div>
             </div>
           )}
 
           {error && (
-            <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
-              {error instanceof Error ? error.message : "Failed to load preview"}
-            </p>
+            <div className="flex items-start gap-3 text-sm text-destructive bg-destructive/8 border border-destructive/15 px-4 py-3 rounded-xl">
+              <TriangleAlert className="size-4 mt-0.5 shrink-0" />
+              <p>{error instanceof Error ? error.message : "Failed to load preview"}</p>
+            </div>
           )}
 
           {content && (
-            <div className="prose prose-neutral dark:prose-invert prose-sm max-w-none">
+            <div className="prose prose-neutral dark:prose-invert prose-sm max-w-none prose-headings:tracking-tight prose-headings:font-semibold prose-p:leading-relaxed prose-a:text-secondary dark:prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border/60 prose-pre:rounded-xl dark:prose-pre:bg-white/[0.06] dark:prose-pre:border-white/10 dark:prose-pre:text-foreground/90 prose-code:text-secondary dark:prose-code:text-primary prose-code:font-medium prose-img:rounded-xl prose-blockquote:border-primary/30 prose-blockquote:not-italic prose-hr:border-border/60">
               <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
             </div>
           )}
+        </div>
       </DialogContent>
     </Dialog>
   );

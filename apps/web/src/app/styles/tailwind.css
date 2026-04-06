@@ -134,4 +134,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  .prose input[type="checkbox"] {
+    @apply accent-primary size-4 rounded align-middle;
+    border: 1.5px solid oklch(0.4 0 0);
+  }
+  .dark .prose input[type="checkbox"] {
+    border-color: oklch(0.6 0 0);
+  }
 }

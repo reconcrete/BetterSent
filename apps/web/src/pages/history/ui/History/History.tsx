@@ -16,9 +16,7 @@ const EmptyHistoryState: FC = () => (
     <BookOpen className="size-12 mx-auto text-muted-foreground/50" />
     <div className="space-y-2">
       <h2 className="text-lg font-medium text-foreground">No history yet</h2>
-      <p className="text-sm text-muted-foreground">
-        Content you send to your Kindle will appear here.
-      </p>
+      <p className="text-sm text-muted-foreground">Content you send to your Kindle will appear here.</p>
     </div>
     <Button asChild>
       <Link to="/">Send your first article</Link>
