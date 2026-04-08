@@ -16,7 +16,7 @@ export class EmailService {
       from: this.fromEmail,
       to,
       subject,
-      text,
+      text: text || "Sent via Bettersent",
       attachments,
     });
 
