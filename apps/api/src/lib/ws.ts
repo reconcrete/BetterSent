@@ -39,9 +39,18 @@ export const sendToUser = (userId: string, data: WsMessage) => {
   const userConnections = connections.get(userId);
   if (!userConnections || userConnections.size === 0) return;
   for (const ws of userConnections) {
-    ws.send(data);
+    try {
+      ws.send(data);
+    } catch (err) {
+      log.warn({ userId, error: err }, "Failed to send WebSocket message, removing connection");
+      userConnections.delete(ws);
+    }
   }
-  log.debug({ userId, type: data.type, connections: userConnections.size }, "WebSocket message sent");
+  if (userConnections.size === 0) {
+    connections.delete(userId);
+  } else {
+    log.debug({ userId, type: data.type, connections: userConnections.size }, "WebSocket message sent");
+  }
 };
 
 export const wsRouter = new Elysia()

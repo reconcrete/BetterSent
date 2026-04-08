@@ -12,12 +12,16 @@ export class EmailService {
   }
 
   async sendEmail(to: string | string[], subject: string, text: string, attachments: EmailAttachment[]): Promise<void> {
-    await this.client.emails.send({
+    const { error } = await this.client.emails.send({
       from: this.fromEmail,
       to,
       subject,
       text,
       attachments,
     });
+
+    if (error) {
+      throw new Error(`Email send failed: ${error.message}`);
+    }
   }
 }
