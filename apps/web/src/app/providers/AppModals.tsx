@@ -1,5 +1,6 @@
 import { useModalsStore, type ModalName, type ModalPropsMap } from "~/entities/modals";
 import { MarkdownPreviewModal } from "~/widgets/markdownPreviewModal";
+import { ReferencesModal } from "~/widgets/referencesModal";
 
 const renderModalByName = (
   modalName: ModalName,
@@ -11,6 +12,13 @@ const renderModalByName = (
       return (
         <MarkdownPreviewModal
           {...(props as ModalPropsMap["MarkdownPreviewModal"])}
+          closeModal={handlers.closeModal}
+        />
+      );
+    case "ReferencesModal":
+      return (
+        <ReferencesModal
+          {...(props as ModalPropsMap["ReferencesModal"])}
           closeModal={handlers.closeModal}
         />
       );

@@ -62,7 +62,7 @@ export const sendHistory = pgTable(
   ]
 );
 
-export const sendHistoryRelations = relations(sendHistory, ({ one }) => ({
+export const sendHistoryRelations = relations(sendHistory, ({ one, many }) => ({
   user: one(user, {
     fields: [sendHistory.userId],
     references: [user.id],
@@ -70,5 +70,28 @@ export const sendHistoryRelations = relations(sendHistory, ({ one }) => ({
   kindleEmailAddress: one(kindleEmailAddress, {
     fields: [sendHistory.kindleEmailId],
     references: [kindleEmailAddress.id],
+  }),
+  references: many(reference),
+}));
+
+// References extracted from markdown content (outgoing links)
+export const reference = pgTable(
+  "reference",
+  {
+    id: text("id").primaryKey(),
+    historyId: text("history_id")
+      .notNull()
+      .references(() => sendHistory.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    title: text("title"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("reference_historyId_idx").on(table.historyId)]
+);
+
+export const referenceRelations = relations(reference, ({ one }) => ({
+  sendHistory: one(sendHistory, {
+    fields: [reference.historyId],
+    references: [sendHistory.id],
   }),
 }));

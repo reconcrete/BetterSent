@@ -83,6 +83,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         errorMessage: null,
         kindleLabel: null,
         hasPreview: false,
+        references: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };

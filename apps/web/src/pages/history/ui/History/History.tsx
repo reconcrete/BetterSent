@@ -8,6 +8,7 @@ import { api } from "~/shared/lib/treaty";
 import { useSession } from "~/shared/lib";
 
 import { PreviewExtraction } from "~/features/previewExtraction";
+import { ViewReferences } from "~/features/viewReferences";
 import type { HistoryItem } from "~/widgets/historyCard";
 import { RecentSendRow, RecentSendsSkeleton } from "~/widgets/recentSends";
 
@@ -52,7 +53,14 @@ export const History: FC = () => {
               key={item.id}
               item={item}
               isFirst={i === 0}
-              action={item.hasPreview ? <PreviewExtraction historyId={item.id} /> : undefined}
+              action={
+                (item.hasPreview || item.references.length > 0) ? (
+                  <>
+                    {item.hasPreview && <PreviewExtraction historyId={item.id} />}
+                    {item.references.length > 0 && <ViewReferences references={item.references} />}
+                  </>
+                ) : undefined
+              }
             />
           ))}
         </div>

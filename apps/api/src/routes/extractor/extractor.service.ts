@@ -6,7 +6,8 @@ import { createEmailService } from "../../services/email";
 import { db } from "../../db";
 import { kindleEmailAddress } from "@bettersent/db/schema";
 import { log } from "../../lib/logger";
-import { createSendHistoryEntry, updateAndNotifyHistory } from "../history/history.service";
+import { createSendHistoryEntry, updateAndNotifyHistory, saveReferences } from "../history/history.service";
+import { createMarkdownParserService } from "../../services/markdown-parser";
 import { isProduction } from "../../shared/env";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
@@ -157,6 +158,17 @@ const processUrl = async (historyId: string, url: string, userId: string, toEmai
     ...(toEmail && { kindleEmail: toEmail }),
   });
 
+  // Extract and save references from markdown
+  const markdownParserService = createMarkdownParserService();
+  const links = markdownParserService.parseLinks(markdown);
+  if (links.length > 0) {
+    try {
+      await saveReferences(historyId, links);
+    } catch (e) {
+      log.warn({ error: e, historyId }, "Failed to save references");
+    }
+  }
+
   const storageService = createStorageService();
   const { filename, path, markdownPath } = await storageService.saveEpub(markdown, "url", metadata);
   log.debug({ filename }, "EPUB saved");
@@ -193,6 +205,17 @@ const processYoutube = async (historyId: string, url: string, userId: string, to
     author: metadata.author,
     ...(toEmail && { kindleEmail: toEmail }),
   });
+
+  // Extract and save references from markdown
+  const markdownParserService = createMarkdownParserService();
+  const links = markdownParserService.parseLinks(markdown);
+  if (links.length > 0) {
+    try {
+      await saveReferences(historyId, links);
+    } catch (e) {
+      log.warn({ error: e, historyId }, "Failed to save references");
+    }
+  }
 
   const storageService = createStorageService();
   const { filename, path, markdownPath } = await storageService.saveEpub(markdown, "youtube", metadata);

@@ -8,6 +8,7 @@
  */
 export type ModalPropsMap = {
   MarkdownPreviewModal: MarkdownPreviewModalProps;
+  ReferencesModal: ReferencesModalProps;
 };
 
 // ============================================
@@ -16,6 +17,10 @@ export type ModalPropsMap = {
 
 export type MarkdownPreviewModalProps = ModalPropsBase & {
   historyId: string;
+};
+
+export type ReferencesModalProps = ModalPropsBase & {
+  references: { url: string; title: string | null }[];
 };
 
 /**

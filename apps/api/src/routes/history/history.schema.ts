@@ -15,6 +15,7 @@ export const historyItemSchema = t.Object({
   errorMessage: t.Nullable(t.String()),
   kindleLabel: t.Nullable(t.String()),
   hasPreview: t.Boolean(),
+  references: t.Array(t.Object({ url: t.String(), title: t.Nullable(t.String()) })),
   createdAt: t.String(),
   updatedAt: t.String(),
 });

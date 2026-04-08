@@ -8,6 +8,7 @@ export type HistoryItem = {
   errorMessage: string | null;
   kindleLabel: string | null;
   hasPreview: boolean;
+  references: { url: string; title: string | null }[];
   createdAt: string;
   updatedAt: string;
 };

@@ -1,6 +1,6 @@
 import { db } from "../../db";
-import { sendHistory, kindleEmailAddress } from "@bettersent/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { sendHistory, kindleEmailAddress, reference } from "@bettersent/db/schema";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { log } from "../../lib/logger";
 import { sendToUser } from "../../lib/ws";
 
@@ -16,6 +16,7 @@ export type SendHistoryData = {
   errorMessage: string | null;
   kindleLabel: string | null;
   hasPreview: boolean;
+  references: { url: string; title: string | null }[];
   createdAt: string;
   updatedAt: string;
 };
@@ -23,6 +24,7 @@ export type SendHistoryData = {
 export const toSendHistoryData = (
   row: typeof sendHistory.$inferSelect,
   kindleLabel: string | null,
+  references: { url: string; title: string | null }[] = [],
 ): SendHistoryData => ({
   id: row.id,
   type: row.type as "url" | "text" | "file" | "youtube" | "topic",
@@ -33,6 +35,7 @@ export const toSendHistoryData = (
   errorMessage: row.errorMessage,
   kindleLabel,
   hasPreview: !!row.markdownPath,
+  references,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
 });
@@ -55,7 +58,11 @@ export const getSendHistory = async (userId: string): Promise<SendHistoryData[]>
 
   log.debug({ userId, count: history.length }, "Found send history items");
 
-  return history.map((row) => toSendHistoryData(row.history, row.kindleLabel));
+  // Fetch all references for these history items in one query
+  const historyIds = history.map((row) => row.history.id);
+  const refsMap = await getReferencesMap(historyIds);
+
+  return history.map((row) => toSendHistoryData(row.history, row.kindleLabel, refsMap.get(row.history.id) ?? []));
 };
 
 /**
@@ -187,7 +194,14 @@ export const getHistoryEntryWithLabel = async (
     .where(and(eq(sendHistory.id, historyId), eq(sendHistory.userId, userId)))
     .limit(1);
 
-  return row ? toSendHistoryData(row.history, row.kindleLabel) : null;
+  if (!row) return null;
+
+  const refs = await db
+    .select({ url: reference.url, title: reference.title })
+    .from(reference)
+    .where(eq(reference.historyId, historyId));
+
+  return toSendHistoryData(row.history, row.kindleLabel, refs);
 };
 
 /**
@@ -203,4 +217,55 @@ export const updateAndNotifyHistory = async (
   if (entry) {
     sendToUser(userId, { type: "history:updated", data: entry });
   }
+};
+
+/**
+ * Save extracted references (outgoing links) for a history entry
+ */
+export const saveReferences = async (
+  historyId: string,
+  links: { url: string; title: string }[]
+): Promise<void> => {
+  if (links.length === 0) return;
+
+  await db.insert(reference).values(
+    links.map((link) => ({
+      id: crypto.randomUUID(),
+      historyId,
+      url: link.url,
+      title: link.title,
+    }))
+  );
+
+  log.debug({ historyId, count: links.length }, "References saved");
+};
+
+/**
+ * Batch-fetch references for multiple history items, grouped by historyId
+ */
+const getReferencesMap = async (
+  historyIds: string[]
+): Promise<Map<string, { url: string; title: string | null }[]>> => {
+  const map = new Map<string, { url: string; title: string | null }[]>();
+  if (historyIds.length === 0) return map;
+
+  const rows = await db
+    .select({
+      historyId: reference.historyId,
+      url: reference.url,
+      title: reference.title,
+    })
+    .from(reference)
+    .where(inArray(reference.historyId, historyIds));
+
+  for (const row of rows) {
+    const list = map.get(row.historyId);
+    if (list) {
+      list.push({ url: row.url, title: row.title });
+    } else {
+      map.set(row.historyId, [{ url: row.url, title: row.title }]);
+    }
+  }
+
+  return map;
 };
