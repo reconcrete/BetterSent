@@ -16,7 +16,7 @@ export const useSubscriptionStatus = () => {
     staleTime: 30_000,
   });
 
-  return { ...query, isPro: query.data?.plan === "pro" };
+  return { ...query, isPro: query.data?.plan === "pro", isLoaded: query.isSuccess };
 };
 
 export const useCreateCheckout = () => {

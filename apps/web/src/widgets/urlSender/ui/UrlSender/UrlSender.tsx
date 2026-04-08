@@ -6,7 +6,7 @@ import { Input } from "~/shared/ui";
 import { SendContent } from "~/features/sendContent";
 import { ChooseDevice } from "~/features/chooseDevice";
 
-export const SendUrlWidget: FC = () => {
+export const UrlSender: FC = () => {
   const [url, setUrl] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
   const submitRef = useRef<(() => void) | null>(null);

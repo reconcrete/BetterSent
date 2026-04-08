@@ -14,18 +14,18 @@ import { cn } from "~/shared/lib";
 import { useSubscriptionStatus } from "~/entities/billing";
 import { ProBadge } from "~/shared/ui";
 
-import { SendUrlWidget } from "~/widgets/sendUrlWidget";
-import { SendTextWidget } from "~/widgets/sendTextWidget";
-import { SendYoutubeWidget } from "~/widgets/sendYoutubeWidget";
-import { SendTopicWidget } from "~/widgets/sendTopicWidget";
-import { SendFileWidget } from "~/widgets/sendFileWidget";
+import { UrlSender } from "~/widgets/urlSender";
+import { TextSender } from "~/widgets/textSender";
+import { YoutubeSender } from "~/widgets/youtubeSender";
+import { TopicSender } from "~/widgets/topicSender";
+import { FileSender } from "~/widgets/fileSender";
 import { RecentSends } from "~/widgets/recentSends";
 
 import { usePersistedTab } from "../../hooks";
 
 export const Root = () => {
   const [activeTab, setActiveTab] = usePersistedTab();
-  const { isPro } = useSubscriptionStatus();
+  const { isPro, isLoaded } = useSubscriptionStatus();
 
   const isOverflowActive = activeTab === "youtube" || activeTab === "topic";
 
@@ -48,12 +48,12 @@ export const Root = () => {
           <TabsTrigger value="youtube" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#EF4444]">
             <Youtube className="size-3.5" />
             YouTube
-            {!isPro && <ProBadge />}
+            {isLoaded && !isPro && <ProBadge />}
           </TabsTrigger>
           <TabsTrigger value="topic" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#22C55E]">
             <BookOpen className="size-3.5" />
             Topic
-            {!isPro && <ProBadge />}
+            {isLoaded && !isPro && <ProBadge />}
           </TabsTrigger>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -72,31 +72,31 @@ export const Root = () => {
               <DropdownMenuItem onSelect={() => setActiveTab("youtube")}>
                 <Youtube className="size-3.5 text-[#EF4444]" />
                 YouTube
-                {!isPro && <ProBadge />}
+                {isLoaded && !isPro && <ProBadge />}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setActiveTab("topic")}>
                 <BookOpen className="size-3.5 text-[#22C55E]" />
                 Topic
-                {!isPro && <ProBadge />}
+                {isLoaded && !isPro && <ProBadge />}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </TabsList>
 
         <TabsContent value="file" className="rounded-tr-[16px]">
-          <SendFileWidget />
+          <FileSender />
         </TabsContent>
         <TabsContent value="url" className="rounded-t-[16px]">
-          <SendUrlWidget />
+          <UrlSender />
         </TabsContent>
         <TabsContent value="text" className="rounded-t-[16px]">
-          <SendTextWidget />
+          <TextSender />
         </TabsContent>
         <TabsContent value="youtube" className="rounded-tl-[16px] md:rounded-t-[16px]">
-          <SendYoutubeWidget />
+          <YoutubeSender />
         </TabsContent>
         <TabsContent value="topic" className="rounded-tl-[16px]">
-          <SendTopicWidget />
+          <TopicSender />
         </TabsContent>
       </Tabs>
 

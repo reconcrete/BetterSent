@@ -13,7 +13,7 @@ const ACCEPTED_FILE_EXTENSIONS = [
 ];
 const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",");
 
-export const SendFileWidget: FC = () => {
+export const FileSender: FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);

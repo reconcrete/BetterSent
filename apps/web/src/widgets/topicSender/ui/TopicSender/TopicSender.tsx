@@ -9,7 +9,7 @@ import { useSubscriptionStatus } from "~/entities/billing";
 
 import { UpgradePrompt } from "~/widgets/upgradePrompt";
 
-export const SendTopicWidget: FC = () => {
+export const TopicSender: FC = () => {
   const { data: status } = useSubscriptionStatus();
   const [topic, setTopic] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);

@@ -11,7 +11,7 @@ import { UpgradePrompt } from "~/widgets/upgradePrompt";
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|live\/)|youtu\.be\/)/;
 
-export const SendYoutubeWidget: FC = () => {
+export const YoutubeSender: FC = () => {
   const { data: status } = useSubscriptionStatus();
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeError, setYoutubeError] = useState<string | null>(null);

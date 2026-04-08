@@ -6,7 +6,7 @@ import { Textarea } from "~/shared/ui";
 import { SendContent } from "~/features/sendContent";
 import { ChooseDevice } from "~/features/chooseDevice";
 
-export const SendTextWidget: FC = () => {
+export const TextSender: FC = () => {
   const [text, setText] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
 
