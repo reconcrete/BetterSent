@@ -196,9 +196,16 @@ const processYoutube = async (historyId: string, url: string, userId: string, to
   const extractResult = await contentExtractor.extractUrl(url);
   log.debug({ contentLength: extractResult.markdown.length }, "YouTube page extracted");
 
+  // Truncate to avoid OpenAI JSON payload size issues
+  const MAX_CONTENT_LENGTH = 500_000;
+  const truncatedContent =
+    extractResult.markdown.length > MAX_CONTENT_LENGTH
+      ? extractResult.markdown.slice(0, MAX_CONTENT_LENGTH)
+      : extractResult.markdown;
+
   log.debug("LLM process starting (YouTube content)");
   const extractorService = createExtractorService();
-  const { markdown, metadata } = await extractorService.extractYoutubeContent(extractResult.markdown);
+  const { markdown, metadata } = await extractorService.extractYoutubeContent(truncatedContent);
 
   await updateAndNotifyHistory(historyId, userId, {
     title: metadata.title,
