@@ -327,6 +327,39 @@ export const extractTopic = async (topic: string, userId: string, kindleEmailId?
   return { historyId };
 };
 
+export const sendTestEpub = async (userId: string, kindleEmailId?: string) => {
+  log.debug("Sending test EPUB");
+  const toEmail = await getKindleEmail(userId, kindleEmailId);
+  const historyId = await createSendHistoryEntry(userId, { type: "text", content: "Test EPUB", kindleEmailId });
+
+  runInBackground(async () => {
+    const now = new Date();
+    const time = now.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+    const title = `Bettersent Test — ${time}`;
+    const author = "Bettersent";
+    const markdown = `# Welcome to Bettersent\n\nThis is a test document to verify your Kindle delivery is working correctly.\n\nIf you can read this on your Kindle, everything is set up properly!`;
+
+    await updateAndNotifyHistory(historyId, userId, { title, author, kindleEmail: toEmail });
+
+    const storageService = createStorageService();
+    const { path, markdownPath } = await storageService.saveEpub(markdown, "test", { title, author });
+    log.debug("Test EPUB saved");
+
+    await updateAndNotifyHistory(historyId, userId, { markdownPath, epubPath: path });
+
+    const emailService = createEmailService();
+    const attachmentContent = (await storageService.getFile(path)).toString("base64");
+    await emailService.sendEmail(toEmail, title, "", [
+      { filename: getSentFilename(`${title}.epub`), content: attachmentContent },
+    ]);
+    log.info({ to: toEmail }, "Test EPUB sent successfully");
+
+    await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+  }, historyId, userId);
+
+  return { historyId };
+};
+
 export const extractFile = async (file: File, userId: string, kindleEmailId?: string) => {
   validateDirectFile(file);
   log.debug({ filename: file.name, size: file.size }, "Received file for direct send");

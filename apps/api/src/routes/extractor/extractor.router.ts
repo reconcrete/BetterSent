@@ -6,9 +6,10 @@ import {
   extractYoutubeInputSchema,
   extractTopicInputSchema,
   extractFileInputSchema,
+  extractTestInputSchema,
   extractAcceptedSchema,
 } from "./extractor.schema";
-import { extractText, extractUrl, extractYoutube, extractTopic, extractFile } from "./extractor.service";
+import { extractText, extractUrl, extractYoutube, extractTopic, extractFile, sendTestEpub } from "./extractor.service";
 import { authMiddleware } from "../../lib/auth";
 import { log } from "../../lib/logger";
 import { checkAndIncrementUsage } from "../billing/billing.service";
@@ -138,4 +139,21 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
       }
     },
     { auth: true, body: extractFileInputSchema, response: extractAcceptedSchema }
+  )
+  .post(
+    "/test",
+    async ({ body, set, user }) => {
+      try {
+        const data = await sendTestEpub(user.id, body.kindleEmailId);
+        return { success: true, data };
+      } catch (error) {
+        log.error({ error }, "Test send error");
+        set.status = 500;
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error occurred",
+        };
+      }
+    },
+    { auth: true, body: extractTestInputSchema, response: extractAcceptedSchema }
   );

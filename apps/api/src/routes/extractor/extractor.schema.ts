@@ -26,6 +26,10 @@ export const extractFileInputSchema = t.Object({
   kindleEmailId: t.Optional(t.String()),
 });
 
+export const extractTestInputSchema = t.Object({
+  kindleEmailId: t.Optional(t.String({ maxLength: 256 })),
+});
+
 export const extractAcceptedSchema = baseResponseSchema(
   t.Object({
     historyId: t.String(),

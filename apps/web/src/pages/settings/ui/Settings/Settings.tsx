@@ -1,19 +1,21 @@
 import { useEffect, useState, type FC } from "react";
-import { Tablet, User, CreditCard, LogOut, Eye, EyeOff, Sun, Moon, Palette } from "lucide-react";
+import { Tablet, User, CreditCard, LogOut, Eye, EyeOff, Sun, Moon, Palette, FlaskConical } from "lucide-react";
 
 import { cn, signOut, useSession, useAnalytics } from "~/shared/lib";
 import { type Theme, getStoredTheme, applyTheme } from "~/features/toggleTheme";
 
 import { KindleDeviceManager } from "~/widgets/kindleDeviceManager";
 import { SubscriptionManager } from "~/widgets/subscriptionManager";
+import { TestSend } from "~/widgets/testSend";
 
-type Section = "kindle" | "account" | "subscription" | "appearance";
+type Section = "kindle" | "account" | "subscription" | "appearance" | "test";
 
 const sidebarLinks = [
   { id: "kindle" as const, label: "Kindle Devices", icon: Tablet },
   { id: "account" as const, label: "Account", icon: User },
   { id: "subscription" as const, label: "Subscription", icon: CreditCard },
   { id: "appearance" as const, label: "Appearance", icon: Palette },
+  { id: "test" as const, label: "Test Send", icon: FlaskConical },
 ];
 
 const sectionMeta: Record<Section, { title: string; description: string }> = {
@@ -32,6 +34,10 @@ const sectionMeta: Record<Section, { title: string; description: string }> = {
   appearance: {
     title: "Appearance",
     description: "Choose your preferred theme",
+  },
+  test: {
+    title: "Test Send",
+    description: "Send a test EPUB to verify your Kindle setup",
   },
 };
 
@@ -210,6 +216,8 @@ export const Settings: FC = () => {
               </div>
             </div>
           )}
+
+          {activeSection === "test" && <TestSend />}
 
           {/* Mobile sign out */}
           <button
