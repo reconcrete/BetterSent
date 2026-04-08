@@ -273,14 +273,15 @@ const processFile = async (
 
 const runInBackground = (fn: () => Promise<void>, historyId: string, userId: string) => {
   fn().catch(async (error) => {
-    log.error({ error, historyId }, "Background processing failed");
+    const message = error instanceof Error ? error.message : String(error);
+    log.error({ err: error, historyId }, `Background processing failed: ${message}`);
     try {
       await updateAndNotifyHistory(historyId, userId, {
         status: "error",
-        errorMessage: error instanceof Error ? error.message : "Unknown error occurred",
+        errorMessage: message,
       });
     } catch (notifyError) {
-      log.error({ error: notifyError, historyId }, "Failed to update error status");
+      log.error({ err: notifyError, historyId }, "Failed to update error status");
     }
   });
 };

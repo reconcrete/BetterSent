@@ -57,13 +57,13 @@ export const TestSend: FC = () => {
             ) : (
               <Send className="size-4" />
             )}
-            {mutation.isPending ? "Sending..." : "Send Test EPUB"}
+            {mutation.isPending ? "Sending..." : "Send Test Book"}
           </Button>
 
           {mutation.isSuccess && (
             <div className="flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
               <CheckCircle2 className="size-4 shrink-0" />
-              Test EPUB sent! Check your Kindle in a few minutes.
+              Test book sent! Check your Kindle in a few minutes.
             </div>
           )}
 
