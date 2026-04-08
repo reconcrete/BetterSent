@@ -9,7 +9,7 @@ import { useSession } from "~/shared/lib";
 
 import { PreviewExtraction } from "~/features/previewExtraction";
 import { ViewReferences } from "~/features/viewReferences";
-import type { HistoryItem } from "~/widgets/historyCard";
+import type { HistoryItem } from "~/entities/sendHistory";
 import { RecentSendRow, RecentSendsSkeleton } from "~/widgets/recentSends";
 
 const EmptyHistoryState: FC = () => (

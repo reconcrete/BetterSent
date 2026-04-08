@@ -1,4 +1,4 @@
-import type { HistoryItem } from "~/widgets/historyCard";
+import type { HistoryItem } from "~/entities/sendHistory";
 
 const typeLabels: Record<HistoryItem["type"], string> = {
   file: "File",

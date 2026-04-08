@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "~/shared/lib/treaty";
 import { useSession } from "~/shared/lib/auth";
-import type { HistoryItem } from "~/widgets/historyCard";
+import type { HistoryItem } from "~/entities/sendHistory";
 
 const MAX_RECONNECT_DELAY = 30_000;
 const BASE_RECONNECT_DELAY = 1_000;

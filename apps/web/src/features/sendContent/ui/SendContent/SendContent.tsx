@@ -6,7 +6,7 @@ import { Button } from "~/shared/ui";
 import { useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 import { BILLING_STATUS_KEY } from "~/entities/billing";
-import type { HistoryItem } from "~/widgets/historyCard";
+import type { HistoryItem } from "~/entities/sendHistory";
 
 type SendContentProps = {
   type: "url" | "text" | "file" | "youtube" | "topic";

@@ -16,7 +16,7 @@ import {
   TooltipContent,
 } from "~/shared/ui";
 import type { ReferencesModalProps } from "~/entities/modals/types";
-import type { HistoryItem } from "~/widgets/historyCard";
+import type { HistoryItem } from "~/entities/sendHistory";
 
 const ReferenceRow: FC<{ url: string; title: string | null }> = ({ url, title }) => {
   const [copied, setCopied] = useState(false);

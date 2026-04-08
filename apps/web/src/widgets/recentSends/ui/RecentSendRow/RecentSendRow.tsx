@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from "react";
 
-import type { HistoryItem } from "~/widgets/historyCard";
+import type { HistoryItem } from "~/entities/sendHistory";
 
 import { typeIcons } from "../../config/typeIcons";
 import { statusConfig } from "../../config/statusConfig";
