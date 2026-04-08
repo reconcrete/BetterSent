@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 
-import { createExtractorService, createContentExtractor } from "../../services/extractor";
+import { createExtractorService, createContentExtractor, createFirecrawlExtractor } from "../../services/extractor";
 import { createStorageService } from "../../services/storage";
 import { createEmailService } from "../../services/email";
 import { db } from "../../db";
@@ -192,7 +192,7 @@ const processUrl = async (historyId: string, url: string, userId: string, toEmai
 
 const processYoutube = async (historyId: string, url: string, userId: string, toEmail: string | null) => {
   log.debug("Extracting YouTube URL content");
-  const contentExtractor = createContentExtractor();
+  const contentExtractor = createFirecrawlExtractor();
   const extractResult = await contentExtractor.extractUrl(url);
   log.debug({ contentLength: extractResult.markdown.length }, "YouTube page extracted");
 

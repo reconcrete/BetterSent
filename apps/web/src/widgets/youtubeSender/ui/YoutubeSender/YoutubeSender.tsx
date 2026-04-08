@@ -70,7 +70,7 @@ export const YoutubeSender: FC = () => {
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="youtube" content={youtubeUrl} kindleEmailId={kindleId} onSuccess={handleSuccess} submitRef={submitRef} />
+      <SendContent type="youtube" content={youtubeError ? "" : youtubeUrl} kindleEmailId={kindleId} onSuccess={handleSuccess} submitRef={submitRef} />
     </div>
   );
 };
