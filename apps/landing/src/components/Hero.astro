@@ -2,10 +2,10 @@
 import AppMockup from "./AppMockup.astro";
 ---
 
-<section class="overflow-hidden px-6 pb-24 pt-24 lg:px-[60px] lg:pb-0 lg:pt-[100px]">
+<section class="overflow-hidden px-5 pb-20 pt-16 md:px-6 md:pb-24 md:pt-24 lg:px-[60px] lg:pb-0 lg:pt-[100px]">
   <div class="mx-auto max-w-[1352px]">
     <!-- Text content -->
-    <div class="flex flex-col items-center gap-10">
+    <div class="flex flex-col items-center gap-8 md:gap-10">
       <div class="flex flex-col items-center gap-5">
         <!-- Badge -->
         <div
@@ -22,18 +22,18 @@ import AppMockup from "./AppMockup.astro";
         <h1
           data-animate
           data-delay="1"
-          class="max-w-[800px] text-center font-display text-5xl leading-[1.05] tracking-[-2px] text-foreground md:text-[80px] md:leading-[84px]"
+          class="max-w-[800px] text-center font-display text-[40px] leading-[1.05] tracking-[-1.5px] text-foreground sm:text-[56px] md:text-[80px] md:leading-[84px] md:tracking-[-2px]"
         >
-          Read everything on<br />
-          your <em class="italic text-secondary dark:text-primary">Kindle</em>,
-          effortlessly
+          Read everything on your <em
+            class="italic text-secondary dark:text-primary">Kindle</em
+          >, effortlessly
         </h1>
 
         <!-- Subheadline -->
         <p
           data-animate
           data-delay="2"
-          class="max-w-[506px] text-center text-base leading-relaxed text-muted-foreground md:text-lg md:leading-[30.6px]"
+          class="max-w-[506px] text-center text-[15px] leading-relaxed text-muted-foreground md:text-lg md:leading-[30.6px]"
         >
           Send articles, documents, YouTube transcripts, and AI-generated
           mini-books directly to your Kindle. One click — it's on your device,
@@ -42,10 +42,14 @@ import AppMockup from "./AppMockup.astro";
       </div>
 
       <!-- CTA buttons -->
-      <div data-animate data-delay="3" class="flex items-center gap-3">
+      <div
+        data-animate
+        data-delay="3"
+        class="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center"
+      >
         <a
           href="https://app.bettersent.com/sign-in"
-          class="flex items-center gap-2.5 rounded-[10px] bg-primary px-8 py-[14px] text-[15px] font-semibold text-primary-foreground transition-all hover:brightness-110"
+          class="flex items-center justify-center gap-2.5 rounded-[10px] bg-primary px-8 py-[14px] text-[15px] font-semibold text-primary-foreground transition-all hover:brightness-110"
         >
           <svg
             class="size-4"
@@ -64,7 +68,7 @@ import AppMockup from "./AppMockup.astro";
         </a>
         <a
           href="#how-it-works"
-          class="rounded-[10px] border border-border bg-muted px-8 py-[14px] text-[15px] font-medium text-foreground transition-colors hover:bg-accent"
+          class="flex items-center justify-center rounded-[10px] border border-border bg-muted px-8 py-[14px] text-[15px] font-medium text-foreground transition-colors hover:bg-accent"
         >
           See how it works
         </a>

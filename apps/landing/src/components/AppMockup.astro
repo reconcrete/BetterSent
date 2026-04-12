@@ -17,22 +17,22 @@
   <div class="bg-[#f5f3ef] dark:bg-[#1a1d1e]">
     <!-- Top nav bar -->
     <div
-      class="flex h-14 items-center border-b border-black/[0.06] px-6 dark:border-white/[0.06]"
+      class="flex h-14 items-center border-b border-black/[0.06] px-5 sm:px-6 dark:border-white/[0.06]"
     >
       <div class="flex flex-1">
         <div class="flex items-baseline leading-none select-none">
           <span
-            class="font-display text-[22px] italic text-[#a16207] dark:text-[#fff27c]"
+            class="font-display text-[20px] italic text-[#a16207] sm:text-[22px] dark:text-[#fff27c]"
             >better</span
           >
           <span
-            class="ml-1 text-[22px] font-extrabold text-[#1a1d1e] dark:text-white"
+            class="ml-1 text-[20px] font-extrabold text-[#1a1d1e] sm:text-[22px] dark:text-white"
             >sent</span
           >
         </div>
       </div>
 
-      <nav class="hidden items-center gap-3 sm:flex">
+      <nav class="hidden items-center gap-3 md:flex">
         <span
           class="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(255,242,124,0.35)] px-4 py-2.5 text-[13px] font-medium text-[#6d5600] dark:bg-[rgba(255,242,124,0.12)] dark:text-[#fff27c]"
         >
@@ -90,9 +90,46 @@
         </span>
       </nav>
 
-      <div class="flex flex-1 justify-end">
+      <div class="flex flex-1 items-center justify-end gap-3.5">
+        <!-- Mobile: History + Settings icons -->
+        <svg
+          class="size-[19px] text-[#1a1d1e] md:hidden dark:text-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 8v4l2 2"></path>
+          <path d="M5 8V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"></path>
+          <path d="M5 16v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"></path>
+          <path
+            d="M2 12a10 10 0 1 0 20 0 10 10 0 0 0-20 0"
+          ></path>
+        </svg>
+        <svg
+          class="size-[22px] text-[#1a1d1e] md:hidden dark:text-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="21" y1="4" x2="14" y2="4"></line>
+          <line x1="10" y1="4" x2="3" y2="4"></line>
+          <line x1="21" y1="12" x2="12" y2="12"></line>
+          <line x1="8" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="20" x2="16" y2="20"></line>
+          <line x1="12" y1="20" x2="3" y2="20"></line>
+          <line x1="14" y1="2" x2="14" y2="6"></line>
+          <line x1="8" y1="10" x2="8" y2="14"></line>
+          <line x1="16" y1="18" x2="16" y2="22"></line>
+        </svg>
+        <!-- Desktop: Avatar -->
         <div
-          class="flex size-8 items-center justify-center rounded-full bg-[rgba(255,242,124,0.35)] text-xs font-bold text-[#6d5600] dark:bg-[rgba(255,242,124,0.12)] dark:text-[#fff27c]"
+          class="hidden size-8 items-center justify-center rounded-full bg-[rgba(255,242,124,0.35)] text-xs font-bold text-[#6d5600] md:flex dark:bg-[rgba(255,242,124,0.12)] dark:text-[#fff27c]"
         >
           AN
         </div>
@@ -100,7 +137,7 @@
     </div>
 
     <!-- Main content -->
-    <div class="mx-auto w-full max-w-[600px] px-6 pb-10 pt-10">
+    <div class="mx-auto w-full max-w-[600px] px-3.5 pb-6 pt-6 sm:px-6 sm:pb-10 sm:pt-10">
       <!-- Tabs -->
       <div class="flex items-center">
         <div
@@ -164,7 +201,7 @@
           Plain Text
         </div>
         <div
-          class="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474]"
+          class="hidden min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474] md:inline-flex"
         >
           <svg
             class="size-3.5"
@@ -187,7 +224,7 @@
           >
         </div>
         <div
-          class="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474]"
+          class="hidden min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474] md:inline-flex"
         >
           <svg
             class="size-3.5"
@@ -209,11 +246,28 @@
             >Pro</span
           >
         </div>
+        <!-- Mobile overflow + button -->
+        <div
+          class="inline-flex items-center rounded-t-[10px] p-4 text-[#747474] md:hidden"
+        >
+          <svg
+            class="size-[15px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+        </div>
       </div>
 
       <!-- Active tab panel -->
       <div
-        class="rounded-b-[16px] rounded-tr-[16px] border border-black/[0.06] bg-white px-[30px] pt-5 pb-[30px] dark:border-white/[0.06] dark:bg-white/[0.02]"
+        class="rounded-b-[16px] rounded-tr-[16px] border border-black/[0.06] bg-white px-3.5 pt-3 pb-3.5 dark:border-white/[0.06] dark:bg-white/[0.02] sm:px-[30px] sm:pt-5 sm:pb-[30px]"
       >
         <div class="flex flex-col gap-5">
           <!-- Info row -->
@@ -301,7 +355,7 @@
       </div>
 
       <!-- Recent sends -->
-      <div class="mt-6 px-[30px]">
+      <div class="mt-4 px-3 sm:mt-6 sm:px-[30px]">
         <p
           class="text-xs font-semibold uppercase tracking-[0.5px] text-[#929495]"
         >
@@ -326,8 +380,10 @@
             </svg>
           </div>
           <div class="flex min-w-0 flex-1 flex-col gap-1">
-            <p class="truncate text-[13px] font-medium text-[#1a1d1e] dark:text-white">
-              Bitcoin: A Peer-to-Peer Electronic Cash System by Unknown
+            <p
+              class="truncate text-[13px] font-medium text-[#1a1d1e] dark:text-white"
+            >
+              Meditations by Marcus Aurelius
             </p>
             <p class="truncate text-[11px] text-[#747474] dark:text-[#555]">
               File sent to Kindle Paperwhite
