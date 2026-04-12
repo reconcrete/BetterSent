@@ -10,6 +10,7 @@ const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
 const ACCEPTED_FILE_EXTENSIONS = [
   "pdf", "doc", "docx", "txt", "rtf", "htm", "html",
   "png", "gif", "jpg", "jpeg", "bmp", "epub",
+  "md", "markdown",
 ];
 const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",");
 

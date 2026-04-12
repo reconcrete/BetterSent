@@ -11,6 +11,7 @@ import { createMarkdownParserService } from "../../services/markdown-parser";
 import { isProduction } from "../../shared/env";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
+const MARKDOWN_FILE_EXTENSIONS = new Set(["md", "markdown"]);
 const SUPPORTED_FILE_EXTENSIONS = new Set([
   "pdf",
   "doc",
@@ -25,7 +26,48 @@ const SUPPORTED_FILE_EXTENSIONS = new Set([
   "jpeg",
   "bmp",
   "epub",
+  "md",
+  "markdown",
 ]);
+
+const getFileExtension = (filename: string): string | undefined =>
+  filename.split(".").pop()?.toLowerCase();
+
+const stripFileExtension = (filename: string): string => {
+  const dotIndex = filename.lastIndexOf(".");
+  return dotIndex <= 0 ? filename : filename.slice(0, dotIndex);
+};
+
+type MarkdownMetadata = { title: string; author: string; body: string };
+
+const parseMarkdownMetadata = (content: string, fallbackTitle: string): MarkdownMetadata => {
+  let body = content;
+  let title: string | null = null;
+  let author: string | null = null;
+
+  const frontmatterMatch = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---\s*\r?\n?/);
+  if (frontmatterMatch) {
+    body = content.slice(frontmatterMatch[0].length);
+    const yaml = frontmatterMatch[1];
+
+    const titleMatch = yaml.match(/^title\s*:\s*["']?(.+?)["']?\s*$/m);
+    if (titleMatch) title = titleMatch[1].trim();
+
+    const authorMatch = yaml.match(/^author\s*:\s*["']?(.+?)["']?\s*$/m);
+    if (authorMatch) author = authorMatch[1].trim();
+  }
+
+  if (!title) {
+    const headingMatch = body.match(/^#\s+(.+?)\s*$/m);
+    if (headingMatch) title = headingMatch[1].trim();
+  }
+
+  return {
+    title: title || fallbackTitle,
+    author: author || "Unknown",
+    body,
+  };
+};
 
 const getSentFilename = (filename: string): string => {
   if (isProduction) {
@@ -55,10 +97,10 @@ const validateDirectFile = (file: File) => {
     throw new Error("File size exceeds 200 MB limit.");
   }
 
-  const extension = file.name.split(".").pop()?.toLowerCase();
+  const extension = getFileExtension(file.name);
   if (!extension || !SUPPORTED_FILE_EXTENSIONS.has(extension)) {
     throw new Error(
-      "Unsupported file type. Allowed: PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB.",
+      "Unsupported file type. Allowed: PDF, DOC, DOCX, TXT, RTF, HTM, HTML, PNG, GIF, JPG, JPEG, BMP, EPUB, MD, MARKDOWN.",
     );
   }
 };
@@ -299,6 +341,54 @@ const processFile = async (
   await updateAndNotifyHistory(historyId, userId, { status: "completed" });
 };
 
+const processMarkdownFile = async (
+  historyId: string,
+  fileBuffer: Buffer,
+  fileName: string,
+  userId: string,
+  toEmail: string | null,
+) => {
+  const rawContent = fileBuffer.toString("utf-8");
+  const { title, author, body } = parseMarkdownMetadata(rawContent, stripFileExtension(fileName));
+  const metadata = { title, author };
+
+  await updateAndNotifyHistory(historyId, userId, {
+    title,
+    author,
+    ...(toEmail && { kindleEmail: toEmail }),
+  });
+
+  const markdownParserService = createMarkdownParserService();
+  const links = markdownParserService.parseLinks(body);
+  if (links.length > 0) {
+    try {
+      await saveReferences(historyId, links);
+    } catch (e) {
+      log.warn({ error: e, historyId }, "Failed to save references");
+    }
+  }
+
+  const storageService = createStorageService();
+  const { filename, path, markdownPath } = await storageService.saveEpub(body, "file", metadata);
+  log.debug({ filename }, "EPUB saved");
+
+  await updateAndNotifyHistory(historyId, userId, { markdownPath, epubPath: path });
+
+  if (isProduction && toEmail) {
+    const emailService = createEmailService();
+    const attachmentContent = (await storageService.getFile(path)).toString("base64");
+    const emailFilename = getSentFilename(`${title}.epub`);
+    await emailService.sendEmail(toEmail, title, "", [
+      { filename: emailFilename, content: attachmentContent },
+    ]);
+    log.info({ to: toEmail, subject: title, filename: emailFilename }, "Email sent successfully");
+  } else {
+    log.info({ filename }, "Dev mode: skipping email, epub stored locally");
+  }
+
+  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+};
+
 // --- Public API (returns immediately) ---
 
 const runInBackground = (fn: () => Promise<void>, historyId: string, userId: string) => {
@@ -395,12 +485,28 @@ export const extractFile = async (file: File, userId: string, kindleEmailId?: st
   validateDirectFile(file);
   log.debug({ filename: file.name, size: file.size }, "Received file for direct send");
 
-  const toEmail = await getKindleEmail(userId, kindleEmailId);
+  const extension = getFileExtension(file.name);
+  const isMarkdown = !!extension && MARKDOWN_FILE_EXTENSIONS.has(extension);
+
   const historyId = await createSendHistoryEntry(userId, { type: "file", content: file.name, kindleEmailId });
 
   // Read file buffer before backgrounding since File may not be available later
   const fileBuffer = Buffer.from(await file.arrayBuffer());
 
-  runInBackground(() => processFile(historyId, fileBuffer, file.name, userId, toEmail), historyId, userId);
+  if (isMarkdown) {
+    const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
+    runInBackground(
+      () => processMarkdownFile(historyId, fileBuffer, file.name, userId, toEmail),
+      historyId,
+      userId,
+    );
+  } else {
+    const toEmail = await getKindleEmail(userId, kindleEmailId);
+    runInBackground(
+      () => processFile(historyId, fileBuffer, file.name, userId, toEmail),
+      historyId,
+      userId,
+    );
+  }
   return { historyId };
 };
