@@ -8,6 +8,9 @@ const app = new Elysia()
   .get("/", () => {
     return new Response(Bun.file(path.join(import.meta.dir, "../public/index.html")));
   })
+  .get("/favicon.svg", () => {
+    return new Response(Bun.file(path.join(import.meta.dir, "../public/favicon.svg")));
+  })
   .get("/api/list", async ({ query }) => {
     const prefix = (query.prefix as string) ?? "";
     return listObjects(prefix);
