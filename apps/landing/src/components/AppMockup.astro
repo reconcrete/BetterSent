@@ -1,141 +1,355 @@
 ---
-const recentItems = [
-  {
-    title: "Why AI Will Transform Reading",
-    source: "paulgraham.com",
-    gradient: "from-[#4f39f6] to-[#7f22fe]",
-  },
-  {
-    title: "The Future of Digital Publishing",
-    source: "stratechery.com",
-    gradient: "from-[#009966] to-[#00d492]",
-  },
-  {
-    title: "Building Better Reading Habits",
-    source: "jamesclear.com",
-    gradient: "from-[#e7000b] to-[#fe9a00]",
-  },
-];
-
-const tabs = [
-  { label: "File", active: false },
-  { label: "Link", active: true },
-  { label: "Plain Text", active: false },
-  { label: "YouTube", active: false, pro: true },
-  { label: "Topic", active: false, pro: true },
-];
 ---
 
 <div
-  class="mx-auto max-w-[1000px] overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#111314]"
+  class="mx-auto max-w-[1000px] overflow-hidden rounded-2xl border border-black/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.3)] dark:border-white/8 dark:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]"
 >
   <!-- Window chrome -->
   <div
-    class="flex h-11 items-center gap-2 border-b border-border bg-[#111314] px-4"
+    class="flex h-11 items-center gap-2 border-b border-black/10 bg-[#e5e5e5] px-4 dark:border-white/6 dark:bg-[#111314]"
   >
     <span class="size-2.5 rounded-full bg-[#ff5f57]"></span>
     <span class="size-2.5 rounded-full bg-[#febc2e]"></span>
     <span class="size-2.5 rounded-full bg-[#28c840]"></span>
   </div>
 
-  <!-- App content -->
-  <div class="px-6 pt-8 pb-0 md:px-10">
+  <!-- App body -->
+  <div class="bg-[#f5f3ef] dark:bg-[#1a1d1e]">
+    <!-- Top nav bar -->
+    <div
+      class="flex h-14 items-center border-b border-black/[0.06] px-6 dark:border-white/[0.06]"
+    >
+      <div class="flex flex-1">
+        <div class="flex items-baseline leading-none select-none">
+          <span
+            class="font-display text-[22px] italic text-[#a16207] dark:text-[#fff27c]"
+            >better</span
+          >
+          <span
+            class="ml-1 text-[22px] font-extrabold text-[#1a1d1e] dark:text-white"
+            >sent</span
+          >
+        </div>
+      </div>
+
+      <nav class="hidden items-center gap-3 sm:flex">
+        <span
+          class="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(255,242,124,0.35)] px-4 py-2.5 text-[13px] font-medium text-[#6d5600] dark:bg-[rgba(255,242,124,0.12)] dark:text-[#fff27c]"
+        >
+          <svg
+            class="size-[15px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M14.5 21.7a.5.5 0 0 0 .9 0l6.5-19a.5.5 0 0 0-.6-.6l-19 6.5a.5.5 0 0 0 0 .9l7.9 3.2a2 2 0 0 1 1.1 1.1z"
+            ></path>
+            <path d="m21.9 2.1-11 11"></path>
+          </svg>
+          Send
+        </span>
+        <span
+          class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-medium text-[#929495]"
+        >
+          <svg
+            class="size-[15px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          History
+        </span>
+        <span
+          class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-medium text-[#929495]"
+        >
+          <svg
+            class="size-[15px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
+            ></path>
+          </svg>
+          Settings
+        </span>
+      </nav>
+
+      <div class="flex flex-1 justify-end">
+        <div
+          class="flex size-8 items-center justify-center rounded-full bg-[rgba(255,242,124,0.35)] text-xs font-bold text-[#6d5600] dark:bg-[rgba(255,242,124,0.12)] dark:text-[#fff27c]"
+        >
+          AN
+        </div>
+      </div>
+    </div>
+
     <!-- Main content -->
-    <div class="flex flex-col gap-6">
-      <!-- Header -->
-      <div class="text-center">
-        <h3 class="text-lg font-bold text-white">Send to Kindle</h3>
-        <p class="text-[13px] text-muted-foreground">
-          Choose a source and send it to your device
-        </p>
-      </div>
-
+    <div class="mx-auto w-full max-w-[600px] px-6 pb-10 pt-10">
       <!-- Tabs -->
-      <div class="flex items-center gap-1 overflow-x-auto rounded-xl border border-border bg-[rgba(255,255,255,0.02)] p-1.5">
-        {
-          tabs.map((tab) => (
-            <div
-              class:list={[
-                "flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-medium",
-                tab.active
-                  ? "bg-accent text-primary"
-                  : "text-muted-foreground",
-              ]}
-            >
-              {tab.label}
-              {tab.pro && (
-                <span class="rounded bg-[rgba(255,242,124,0.15)] px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary">
-                  Pro
-                </span>
-              )}
-            </div>
-          ))
-        }
+      <div class="flex items-center">
+        <div
+          class="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-black/[0.06] bg-white px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#1a1d1e] dark:border-white/[0.06] dark:bg-white/[0.02] dark:text-white"
+        >
+          <svg
+            class="size-3.5 text-[#a16207] dark:text-[#fff27c]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+            ></path>
+            <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+          </svg>
+          File
+        </div>
+        <div
+          class="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474]"
+        >
+          <svg
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"
+            ></path>
+            <path
+              d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"
+            ></path>
+          </svg>
+          Link
+        </div>
+        <div
+          class="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474]"
+        >
+          <svg
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M15 12h6"></path>
+            <path d="M15 6h6"></path>
+            <path d="M15 18h6"></path>
+            <path
+              d="M3 17a1 1 0 0 0 1 1h4a2 2 0 0 0 0-4H5a2 2 0 0 1 0-4h4a1 1 0 0 0 1-1"
+            ></path>
+          </svg>
+          Plain Text
+        </div>
+        <div
+          class="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474]"
+        >
+          <svg
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M2.5 17a24 24 0 0 1 0-10 2 2 0 0 1 1.4-1.4 50 50 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24 24 0 0 1 0 10 2 2 0 0 1-1.4 1.4 50 50 0 0 1-16.2 0A2 2 0 0 1 2.5 17"
+            ></path>
+            <path d="m10 15 5-3-5-3z"></path>
+          </svg>
+          YouTube
+          <span
+            class="ml-0.5 rounded bg-[rgba(255,242,124,0.35)] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#6d5600] dark:bg-[rgba(255,242,124,0.12)] dark:text-[#fff27c]"
+            >Pro</span
+          >
+        </div>
+        <div
+          class="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-t-[10px] border-l border-r border-t border-transparent px-3 py-4 text-[13px] font-medium whitespace-nowrap text-[#747474]"
+        >
+          <svg
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 7v14"></path>
+            <path
+              d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"
+            ></path>
+          </svg>
+          Topic
+          <span
+            class="ml-0.5 rounded bg-[rgba(255,242,124,0.35)] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#6d5600] dark:bg-[rgba(255,242,124,0.12)] dark:text-[#fff27c]"
+            >Pro</span
+          >
+        </div>
       </div>
 
-      <!-- Input form -->
+      <!-- Active tab panel -->
       <div
-        class="rounded-xl border border-border bg-[rgba(255,255,255,0.03)] p-5"
+        class="rounded-b-[16px] rounded-tr-[16px] border border-black/[0.06] bg-white px-[30px] pt-5 pb-[30px] dark:border-white/[0.06] dark:bg-white/[0.02]"
       >
-        <div class="flex gap-3">
-          <div
-            class="flex h-[45px] flex-1 items-center rounded-lg border border-border bg-[rgba(255,255,255,0.04)] px-4"
-          >
-            <span class="text-sm text-[#555]"
-              >https://example.com/article...</span
+        <div class="flex flex-col gap-5">
+          <!-- Info row -->
+          <div class="flex items-center justify-center gap-1.5">
+            <svg
+              class="size-[15px] shrink-0 text-[#929495]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
+            <p class="text-sm text-[#929495]">
+              Files are automatically formatted for the best Kindle reading
+              experience
+            </p>
           </div>
-          <button
-            class="h-[45px] rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground"
+
+          <!-- Dropzone -->
+          <div
+            class="flex flex-col items-center gap-3.5 rounded-2xl border-2 border-dashed border-black/10 px-6 py-8 text-center dark:border-white/10"
           >
-            Send
+            <div
+              class="flex items-center justify-center rounded-[14px] bg-black/[0.04] p-3.5 dark:bg-white/[0.04]"
+            >
+              <svg
+                class="size-[22px] text-[#929495]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 3v12"></path>
+                <path d="m17 8-5-5-5 5"></path>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              </svg>
+            </div>
+            <div class="flex flex-col items-center gap-2">
+              <p class="text-sm font-medium text-[#1a1d1e] dark:text-white">
+                Drop a file here or
+                <span class="text-[#a16207] dark:text-[#fff27c]">browse</span>
+              </p>
+              <p class="text-xs leading-relaxed text-[#929495]">
+                PDF, EPUB, DOC, DOCX, TXT, RTF, HTML<br />
+                and image files up to 200 MB
+              </p>
+            </div>
+          </div>
+
+          <!-- Device label -->
+          <p
+            class="text-xs font-semibold uppercase tracking-[0.5px] text-[#929495]"
+          >
+            Sending to Kindle Paperwhite
+          </p>
+
+          <!-- Send button -->
+          <button
+            class="flex w-full items-center justify-center gap-2 rounded-xl bg-[rgba(255,242,124,0.65)] py-3.5 text-[15px] font-semibold text-[#6d5600] dark:bg-[#fff27c] dark:text-[#1a1d1e]"
+          >
+            <svg
+              class="size-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14.5 21.7a.5.5 0 0 0 .9 0l6.5-19a.5.5 0 0 0-.6-.6l-19 6.5a.5.5 0 0 0 0 .9l7.9 3.2a2 2 0 0 1 1.1 1.1z"
+              ></path>
+              <path d="m21.9 2.1-11 11"></path>
+            </svg>
+            Send to Kindle
           </button>
         </div>
-        <!-- Device selector -->
-        <div class="mt-4 flex items-center gap-3">
-          <span class="text-xs text-[#555]">Device:</span>
-          <span
-            class="flex items-center gap-1.5 rounded-lg border border-primary/30 bg-accent px-3 py-1.5 text-xs font-medium text-primary"
-          >
-            <span class="size-3 rounded border border-primary/40 bg-primary/20 flex items-center justify-center">
-              <span class="text-[8px] text-primary">✓</span>
-            </span>
-            My Kindle Paperwhite
-          </span>
-        </div>
       </div>
 
-      <!-- Recent items -->
-      <div>
-        <p class="text-[13px] font-semibold text-[#a3a3a6]">Recent sends</p>
-        <div class="mt-3 flex flex-col">
-          {
-            recentItems.map((item, i) => (
-              <div
-                class:list={[
-                  "flex items-center gap-3 py-4",
-                  i < recentItems.length - 1
-                    ? "border-b border-[rgba(255,255,255,0.04)]"
-                    : "",
-                ]}
+      <!-- Recent sends -->
+      <div class="mt-6 px-[30px]">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.5px] text-[#929495]"
+        >
+          Recent sends
+        </p>
+        <div class="flex items-center gap-3.5 py-4">
+          <div
+            class="flex size-[34px] shrink-0 items-center justify-center rounded-lg bg-black/[0.04] dark:bg-white/[0.04]"
+          >
+            <svg
+              class="size-3.5 text-[#929495]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+              ></path>
+              <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+            </svg>
+          </div>
+          <div class="flex min-w-0 flex-1 flex-col gap-1">
+            <p class="truncate text-[13px] font-medium text-[#1a1d1e] dark:text-white">
+              Bitcoin: A Peer-to-Peer Electronic Cash System by Unknown
+            </p>
+            <p class="truncate text-[11px] text-[#747474] dark:text-[#555]">
+              File sent to Kindle Paperwhite
+            </p>
+          </div>
+          <div class="flex shrink-0 flex-col items-end gap-1">
+            <span class="flex items-center gap-[3px] text-[#30c68f] dark:text-[#3ddca2]">
+              <svg
+                class="size-[9px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               >
-                <div
-                  class={`h-[50px] w-9 shrink-0 rounded bg-gradient-to-br ${item.gradient}`}
-                />
-                <div class="min-w-0 flex-1">
-                  <p class="truncate text-[13px] font-semibold text-secondary-foreground">
-                    {item.title}
-                  </p>
-                  <p class="text-[11.5px] text-muted-foreground">
-                    {item.source}
-                  </p>
-                </div>
-                <span class="shrink-0 text-[11px] font-semibold text-primary">
-                  Delivered
-                </span>
-              </div>
-            ))
-          }
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="text-[11px]">Delivered</span>
+            </span>
+            <span class="text-[10px] text-[#747474] dark:text-[#555]">15 min ago</span>
+          </div>
         </div>
       </div>
     </div>

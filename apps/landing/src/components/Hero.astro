@@ -10,11 +10,11 @@ import AppMockup from "./AppMockup.astro";
         <!-- Badge -->
         <div
           data-animate
-          class="flex items-center gap-2.5 rounded-full border border-[rgba(255,242,124,0.15)] bg-accent px-[17px] py-1.5"
+          class="flex items-center gap-2.5 rounded-full border border-primary/15 bg-primary/8 px-[17px] py-1.5 dark:bg-accent"
         >
           <span class="size-1.5 rounded-full bg-primary"></span>
-          <span class="text-[13px] font-medium text-primary"
-            >Send anything to your Kindle, instantly</span
+          <span class="text-[13px] font-medium text-secondary dark:text-primary"
+            >A better Send to Kindle</span
           >
         </div>
 
@@ -22,10 +22,11 @@ import AppMockup from "./AppMockup.astro";
         <h1
           data-animate
           data-delay="1"
-          class="max-w-[800px] text-center font-display text-5xl leading-[1.05] tracking-[-2px] text-white md:text-[80px] md:leading-[84px]"
+          class="max-w-[800px] text-center font-display text-5xl leading-[1.05] tracking-[-2px] text-foreground md:text-[80px] md:leading-[84px]"
         >
           Read everything on<br />
-          your <em class="italic text-primary">Kindle</em>, effortlessly
+          your <em class="italic text-secondary dark:text-primary">Kindle</em>,
+          effortlessly
         </h1>
 
         <!-- Subheadline -->
@@ -44,10 +45,10 @@ import AppMockup from "./AppMockup.astro";
       <div data-animate data-delay="3" class="flex items-center gap-3">
         <a
           href="https://app.bettersent.com/sign-in"
-          class="group flex items-center gap-2.5 rounded-[10px] bg-primary px-8 py-[14px] text-[15px] font-semibold text-primary-foreground transition-all hover:brightness-110"
+          class="flex items-center gap-2.5 rounded-[10px] bg-primary px-8 py-[14px] text-[15px] font-semibold text-primary-foreground transition-all hover:brightness-110"
         >
           <svg
-            class="size-4 transition-transform group-hover:translate-x-0.5"
+            class="size-4"
             viewBox="0 0 16 16"
             fill="none"
             stroke="currentColor"
@@ -63,7 +64,7 @@ import AppMockup from "./AppMockup.astro";
         </a>
         <a
           href="#how-it-works"
-          class="rounded-[10px] border border-[rgba(255,255,255,0.1)] bg-muted px-8 py-[14px] text-[15px] font-medium text-secondary-foreground transition-colors hover:bg-[rgba(255,255,255,0.1)]"
+          class="rounded-[10px] border border-border bg-muted px-8 py-[14px] text-[15px] font-medium text-foreground transition-colors hover:bg-accent"
         >
           See how it works
         </a>

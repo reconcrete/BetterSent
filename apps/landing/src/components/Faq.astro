@@ -3,12 +3,12 @@ const faqs = [
   {
     question: "How does BetterSent deliver content to my Kindle?",
     answer:
-      "We convert your content into a formatted EPUB file and email it to your Kindle's email address. Amazon delivers it to your device automatically via Wi-Fi.",
+      "We convert your content into a formatted file and email it to your Kindle's email address. Amazon delivers it to your device automatically via Wi-Fi.",
   },
   {
     question: "What types of content can I send?",
     answer:
-      "You can send URLs (articles, blog posts, research papers), plain text, uploaded files (PDF, DOCX, EPUB, and more), YouTube video transcripts, and AI-generated mini-books on any topic.",
+      "You can send URLs (articles, blog posts), plain text, uploaded files (PDF, DOCX, EPUB, and more), YouTube video transcripts, and AI-generated mini-books on any topic.",
   },
   {
     question: "Do I need to install anything?",
@@ -35,21 +35,21 @@ const faqs = [
 
 <section
   id="faq"
-  class="border-t border-[rgba(255,255,255,0.04)] px-6 py-[120px] lg:px-[60px]"
+  class="border-t border-border px-6 py-[120px] lg:px-[60px]"
 >
   <div class="mx-auto max-w-[720px]">
     <!-- Section header -->
     <div class="mb-16 text-center">
       <p
         data-animate
-        class="text-[13px] font-semibold uppercase tracking-[2px] text-primary"
+        class="text-[13px] font-semibold uppercase tracking-[2px] text-secondary dark:text-primary"
       >
         FAQ
       </p>
       <h2
         data-animate
         data-delay="1"
-        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-white md:text-[48px] md:leading-[55.2px]"
+        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-foreground md:text-[48px] md:leading-[55.2px]"
       >
         Common questions
       </h2>
@@ -64,7 +64,7 @@ const faqs = [
             data-delay={String(Math.min(i + 1, 5))}
             class="group border-b border-border"
           >
-            <summary class="flex cursor-pointer items-center justify-between py-6 text-[15px] font-semibold text-white transition-colors hover:text-secondary-foreground [&::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-6 text-[15px] font-semibold text-foreground transition-colors hover:text-muted-foreground [&::-webkit-details-marker]:hidden">
               {faq.question}
               <svg
                 class="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-45"

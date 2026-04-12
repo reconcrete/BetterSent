@@ -28,11 +28,11 @@ const columns = [
       <div class="max-w-[280px]">
         <a href="/" class="flex items-baseline gap-[3px] select-none">
           <span
-            class="font-display text-[18px] leading-[28px] italic text-primary"
+            class="font-display text-[18px] leading-[28px] italic text-secondary dark:text-primary"
             >better</span
           >
           <span
-            class="text-[18px] font-extrabold leading-[28px] lowercase text-white"
+            class="text-[18px] font-extrabold leading-[28px] lowercase text-foreground"
             >sent</span
           >
         </a>
@@ -47,7 +47,7 @@ const columns = [
         {
           columns.map((col) => (
             <div>
-              <p class="text-xs font-bold uppercase tracking-[1px] text-[#555]">
+              <p class="text-xs font-bold uppercase tracking-[1px] text-muted-foreground">
                 {col.title}
               </p>
               <ul class="mt-4 space-y-2.5">
@@ -55,7 +55,7 @@ const columns = [
                   <li>
                     <a
                       href={link.href}
-                      class="text-[13.5px] text-muted-foreground transition-colors hover:text-secondary-foreground"
+                      class="text-[13.5px] text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link.label}
                     </a>
@@ -70,9 +70,9 @@ const columns = [
 
     <!-- Bottom bar -->
     <div
-      class="flex items-center justify-center border-t border-[rgba(255,255,255,0.04)] py-5"
+      class="flex items-center justify-center border-t border-border py-5"
     >
-      <p class="text-xs text-[#555]">
+      <p class="text-xs text-muted-foreground">
         &copy; {new Date().getFullYear()} Bettersent. All rights reserved.
       </p>
     </div>

@@ -10,15 +10,15 @@ const highlights = [
 <section class="px-6 py-10 lg:px-[60px]">
   <div
     data-animate
-    class="mx-auto flex max-w-[1352px] flex-wrap items-center justify-around gap-8 rounded-[20px] border border-[rgba(255,242,124,0.15)] bg-accent px-12 py-16 md:py-[60px]"
+    class="mx-auto flex max-w-[1352px] flex-wrap items-center justify-around gap-8 rounded-[20px] border border-primary/15 bg-primary/5 px-12 py-16 dark:bg-accent md:py-[60px]"
   >
     {
       highlights.map((item) => (
         <div class="text-center">
-          <p class="font-display text-4xl leading-[56px] tracking-[-1px] text-primary md:text-[56px]">
+          <p class="font-display text-4xl leading-[56px] tracking-[-1px] text-secondary dark:text-primary md:text-[56px]">
             {item.value}
           </p>
-          <p class="text-sm font-medium text-white">{item.label}</p>
+          <p class="text-sm font-medium text-foreground">{item.label}</p>
           <p class="mt-1 text-xs text-muted-foreground">{item.detail}</p>
         </div>
       ))

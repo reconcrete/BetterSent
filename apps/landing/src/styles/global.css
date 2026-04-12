@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-display: "DM Serif Display", ui-serif, Georgia, serif;
@@ -15,6 +17,8 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -24,21 +28,42 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
+  --color-ring: var(--ring);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #1a1d1e;
-  --foreground: #ffffff;
-  --primary: #fff27c;
-  --primary-foreground: #1a1d1e;
-  --secondary: #929495;
-  --secondary-foreground: #dadbd5;
-  --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #929495;
-  --accent: rgba(255, 242, 124, 0.08);
-  --accent-foreground: #fff27c;
-  --border: rgba(255, 255, 255, 0.06);
+  --background: oklch(0.978 0.004 107);
+  --foreground: oklch(0.228 0.005 220);
+  --card: oklch(0.978 0.004 107);
+  --card-foreground: oklch(0.228 0.005 220);
+  --primary: oklch(0.852 0.172 87);
+  --primary-foreground: oklch(0.228 0.005 220);
+  --secondary: oklch(0.554 0.121 66);
+  --secondary-foreground: oklch(0.551 0.023 264);
+  --muted: oklch(0.94 0.004 107);
+  --muted-foreground: oklch(0.5652 0.003 228.80);
+  --accent: oklch(0.94 0.006 87);
+  --accent-foreground: oklch(0.228 0.005 220);
+  --border: oklch(0 0 0 / 10%);
+  --ring: oklch(0.75 0.1 87);
+}
+
+.dark {
+  --background: oklch(0.228 0.005 220);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.228 0.005 220);
+  --card-foreground: oklch(1 0 0);
+  --primary: oklch(0.948 0.14 103);
+  --primary-foreground: oklch(0.228 0.005 220);
+  --secondary: oklch(1 0 0 / 6%);
+  --secondary-foreground: oklch(0.889 0.008 114);
+  --muted: oklch(1 0 0 / 8%);
+  --muted-foreground: oklch(0.559 0 0);
+  --accent: oklch(1 0 0 / 10%);
+  --accent-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --ring: oklch(0.8 0.1 103);
 }
 
 @layer base {

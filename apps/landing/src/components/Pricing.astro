@@ -33,21 +33,21 @@ const plans = [
 
 <section
   id="pricing"
-  class="border-t border-[rgba(255,255,255,0.04)] px-6 py-[120px] lg:px-[60px]"
+  class="border-t border-border px-6 py-[120px] lg:px-[60px]"
 >
   <div class="mx-auto max-w-[1352px]">
     <!-- Section header -->
     <div class="mb-16 text-center">
       <p
         data-animate
-        class="text-[13px] font-semibold uppercase tracking-[2px] text-primary"
+        class="text-[13px] font-semibold uppercase tracking-[2px] text-secondary dark:text-primary"
       >
         Pricing
       </p>
       <h2
         data-animate
         data-delay="1"
-        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-white md:text-[48px] md:leading-[55.2px]"
+        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-foreground md:text-[48px] md:leading-[55.2px]"
       >
         Simple, transparent pricing
       </h2>
@@ -72,18 +72,18 @@ const plans = [
             class:list={[
               "rounded-2xl border p-8 md:p-10",
               plan.highlighted
-                ? "border-primary/30 bg-[rgba(255,242,124,0.04)] ring-1 ring-primary/20"
-                : "border-border bg-[rgba(255,255,255,0.02)]",
+                ? "border-primary/30 bg-primary/5 ring-1 ring-primary/20"
+                : "border-border bg-card",
             ]}
           >
             {plan.highlighted && (
-              <span class="mb-4 inline-block rounded-full bg-[rgba(255,242,124,0.15)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.5px] text-primary">
+              <span class="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.5px] text-secondary dark:bg-accent dark:text-primary">
                 Most popular
               </span>
             )}
-            <h3 class="text-xl font-bold text-white">{plan.name}</h3>
+            <h3 class="text-xl font-bold text-foreground">{plan.name}</h3>
             <div class="mt-2 flex items-baseline gap-1">
-              <span class="font-display text-[48px] leading-none tracking-[-1px] text-white">
+              <span class="font-display text-[48px] leading-none tracking-[-1px] text-foreground">
                 {plan.price}
               </span>
               <span class="text-sm text-muted-foreground">/month</span>
@@ -96,7 +96,7 @@ const plans = [
                 "mt-8 block rounded-[10px] py-3.5 text-center text-sm font-semibold transition-all",
                 plan.highlighted
                   ? "bg-primary text-primary-foreground hover:brightness-110"
-                  : "border border-[rgba(255,255,255,0.1)] bg-muted text-secondary-foreground hover:bg-[rgba(255,255,255,0.1)]",
+                  : "border border-border bg-muted text-foreground hover:bg-accent",
               ]}
             >
               {plan.cta}
@@ -106,7 +106,7 @@ const plans = [
               {plan.features.map((feature) => (
                 <li class="flex items-start gap-3 text-sm text-muted-foreground">
                   <svg
-                    class="mt-0.5 size-4 shrink-0 text-primary"
+                    class="mt-0.5 size-4 shrink-0 text-secondary dark:text-primary"
                     viewBox="0 0 16 16"
                     fill="none"
                     stroke="currentColor"

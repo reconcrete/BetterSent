@@ -138,6 +138,17 @@ export const getKindleEmail = async (userId: string, kindleEmailId?: string): Pr
 
 // --- Background processors ---
 
+// Amazon delivers to Kindle asynchronously (~30s after email); delay completion to match real arrival time.
+const KINDLE_DELIVERY_DELAY_MS = 30_000;
+
+const markCompletedAfterDelivery = async (historyId: string, userId: string, wasEmailSent: boolean) => {
+  if (wasEmailSent) {
+    log.debug({ historyId, delayMs: KINDLE_DELIVERY_DELAY_MS }, "Awaiting Kindle delivery before marking completed");
+    await new Promise((resolve) => setTimeout(resolve, KINDLE_DELIVERY_DELAY_MS));
+  }
+  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+};
+
 const processText = async (historyId: string, textContent: string, userId: string, toEmail: string | null) => {
   log.debug("LLM process starting");
   const extractorService = createExtractorService();
@@ -167,7 +178,7 @@ const processText = async (historyId: string, textContent: string, userId: strin
     log.info({ filename }, "Dev mode: skipping email, epub stored locally");
   }
 
-  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+  await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
 const processUrl = async (historyId: string, url: string, userId: string, toEmail: string | null) => {
@@ -229,7 +240,7 @@ const processUrl = async (historyId: string, url: string, userId: string, toEmai
     log.info({ filename }, "Dev mode: skipping email, epub stored locally");
   }
 
-  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+  await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
 const processYoutube = async (historyId: string, url: string, userId: string, toEmail: string | null) => {
@@ -284,7 +295,7 @@ const processYoutube = async (historyId: string, url: string, userId: string, to
     log.info({ filename }, "Dev mode: skipping email, epub stored locally");
   }
 
-  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+  await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
 const processTopic = async (historyId: string, topic: string, userId: string, toEmail: string | null) => {
@@ -316,7 +327,7 @@ const processTopic = async (historyId: string, topic: string, userId: string, to
     log.info({ filename }, "Dev mode: skipping email, epub stored locally");
   }
 
-  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+  await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
 const processFile = async (
@@ -338,7 +349,7 @@ const processFile = async (
   ]);
   log.info({ to: toEmail, filename: fileName }, "File sent to Kindle successfully");
 
-  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+  await markCompletedAfterDelivery(historyId, userId, true);
 };
 
 const processMarkdownFile = async (
@@ -386,7 +397,7 @@ const processMarkdownFile = async (
     log.info({ filename }, "Dev mode: skipping email, epub stored locally");
   }
 
-  await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+  await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
 // --- Public API (returns immediately) ---
@@ -475,7 +486,7 @@ export const sendTestEpub = async (userId: string, kindleEmailId?: string) => {
     ]);
     log.info({ to: toEmail }, "Test EPUB sent successfully");
 
-    await updateAndNotifyHistory(historyId, userId, { status: "completed" });
+    await markCompletedAfterDelivery(historyId, userId, true);
   }, historyId, userId);
 
   return { historyId };

@@ -33,14 +33,14 @@ const useCases = [
     <div class="mb-16 text-center">
       <p
         data-animate
-        class="text-[13px] font-semibold uppercase tracking-[2px] text-primary"
+        class="text-[13px] font-semibold uppercase tracking-[2px] text-secondary dark:text-primary"
       >
         Use cases
       </p>
       <h2
         data-animate
         data-delay="1"
-        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-white md:text-[48px] md:leading-[55.2px]"
+        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-foreground md:text-[48px] md:leading-[55.2px]"
       >
         Built for how you actually read
       </h2>
@@ -60,12 +60,12 @@ const useCases = [
           <div
             data-animate
             data-delay={String(Math.min(i + 1, 4))}
-            class="flex gap-5 rounded-2xl border border-border bg-[rgba(255,255,255,0.02)] p-7"
+            class="flex gap-5 rounded-2xl border border-border bg-card p-7"
           >
-            <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 dark:bg-accent">
               {uc.icon === "book" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -79,7 +79,7 @@ const useCases = [
               )}
               {uc.icon === "video" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -93,7 +93,7 @@ const useCases = [
               )}
               {uc.icon === "lightbulb" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -107,7 +107,7 @@ const useCases = [
               )}
               {uc.icon === "send" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -121,7 +121,7 @@ const useCases = [
               )}
             </div>
             <div>
-              <h3 class="text-[15px] font-bold text-white">{uc.title}</h3>
+              <h3 class="text-[15px] font-bold text-foreground">{uc.title}</h3>
               <p class="mt-2 text-sm leading-[22px] text-muted-foreground">
                 {uc.description}
               </p>

@@ -1,61 +1,60 @@
 ---
 const features = [
   {
-    title: "One-click send",
+    title: "Every format, finally",
     description:
-      "Paste any URL and hit send. Articles, blog posts, research papers — delivered to your Kindle in seconds.",
-    icon: "link",
+      "Markdown, MOBI, FB2, EPUB, PDF, DOCX — we convert them all into something your Kindle will actually accept. No more 'unsupported file type'.",
+    icon: "formats",
   },
   {
-    title: "Smart formatting",
+    title: "PDFs that read like books",
     description:
-      "We strip away web clutter automatically. No ads, no sidebars — just the content, perfectly formatted for e-ink.",
-    icon: "sparkles",
+      "Kindle's native PDF handling is unreadable on e-ink. We reflow the text, preserve structure, and strip the cruft so it feels like a real book.",
+    icon: "pdf",
   },
   {
-    title: "PDF & EPUB support",
+    title: "Articles without the clutter",
     description:
-      "Upload PDFs, EPUBs, DOCX, and more. Files up to 200MB, optimized and delivered instantly.",
-    icon: "file",
+      "Paste a URL to any article or blog post. We scrape it cleanly, convert to Markdown, and deliver the content — no ads, no sidebars, no popups.",
+    icon: "article",
   },
   {
-    title: "YouTube transcripts",
+    title: "Code blocks that work",
     description:
-      "Paste a YouTube URL. We extract the full transcript and send it as a readable document to your Kindle.",
-    icon: "play",
-    pro: true,
+      "Send an EPUB with code and Amazon's pipeline mangles it into unreadable soup. We preserve formatting, indentation, and fonts so code stays legible.",
+    icon: "code",
   },
   {
-    title: "AI topic generation",
+    title: "AI-generated mini-books",
     description:
-      "Enter any topic. Our AI generates a comprehensive mini-book — research, structure, and all — sent to your Kindle.",
+      "Type a topic. Our AI researches, outlines, and writes a full mini-book on it — delivered to your Kindle, ready to read.",
     icon: "ai",
     pro: true,
   },
   {
-    title: "Telegram bot",
+    title: "YouTube transcriptions",
     description:
-      "Send content from Telegram. Forward a link or text to our bot and it lands on your Kindle without opening a browser.",
-    icon: "telegram",
-    free: true,
+      "Paste any YouTube link. We pull the full transcript and send it as a clean, readable document — perfect for long lectures and interviews.",
+    icon: "youtube",
+    pro: true,
   },
 ];
 ---
 
-<section id="features" class="border-t border-[rgba(255,255,255,0.04)] px-6 py-[120px] lg:px-[60px]">
+<section id="features" class="border-t border-border px-6 py-[120px] lg:px-[60px]">
   <div class="mx-auto max-w-[1352px]">
     <!-- Section header -->
     <div class="mb-16 max-w-[516px]">
       <p
         data-animate
-        class="text-[13px] font-semibold uppercase tracking-[2px] text-primary"
+        class="text-[13px] font-semibold uppercase tracking-[2px] text-secondary dark:text-primary"
       >
         Features
       </p>
       <h2
         data-animate
         data-delay="1"
-        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-white md:text-[48px] md:leading-[55.2px]"
+        class="mt-4 font-display text-4xl leading-[1.15] tracking-[-1px] text-foreground md:text-[48px] md:leading-[55.2px]"
       >
         Everything you need to read on your terms
       </h2>
@@ -76,26 +75,13 @@ const features = [
           <div
             data-animate
             data-delay={String(Math.min(i + 1, 5))}
-            class="group rounded-2xl border border-border bg-[rgba(255,255,255,0.02)] p-8 transition-colors hover:border-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.04)]"
+            class="group rounded-2xl border border-border bg-card p-8 transition-colors hover:border-primary/30 hover:bg-accent/50"
           >
             {/* Icon */}
-            <div class="mb-6 flex size-11 items-center justify-center rounded-xl bg-accent">
-              {feature.icon === "link" && (
+            <div class="mb-6 flex size-11 items-center justify-center rounded-xl bg-primary/10 dark:bg-accent">
+              {feature.icon === "formats" && (
                 <svg
-                  class="size-5 text-primary"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                >
-                  <path d="M8.5 11.5a4 4 0 0 0 5.66 0l2-2a4 4 0 0 0-5.66-5.66l-1 1" />
-                  <path d="M11.5 8.5a4 4 0 0 0-5.66 0l-2 2a4 4 0 0 0 5.66 5.66l1-1" />
-                </svg>
-              )}
-              {feature.icon === "sparkles" && (
-                <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -103,13 +89,14 @@ const features = [
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path d="M10 2l1.5 4.5L16 8l-4.5 1.5L10 14l-1.5-4.5L4 8l4.5-1.5L10 2z" />
-                  <path d="M15 12l.75 2.25L18 15l-2.25.75L15 18l-.75-2.25L12 15l2.25-.75L15 12z" />
+                  <path d="M3.5 5.5h6l2 2h5a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z" />
+                  <path d="M7 11.5h6" />
+                  <path d="M7 14h4" />
                 </svg>
               )}
-              {feature.icon === "file" && (
+              {feature.icon === "pdf" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -119,13 +106,13 @@ const features = [
                 >
                   <path d="M12 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7l-5-5z" />
                   <polyline points="12 2 12 7 17 7" />
-                  <line x1="7" y1="10" x2="13" y2="10" />
-                  <line x1="7" y1="13" x2="11" y2="13" />
+                  <path d="M6 11.5h8" />
+                  <path d="M6 14h6" />
                 </svg>
               )}
-              {feature.icon === "play" && (
+              {feature.icon === "article" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -133,13 +120,32 @@ const features = [
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <circle cx="10" cy="10" r="8" />
-                  <polygon points="8 6.5 14 10 8 13.5" fill="currentColor" />
+                  <rect x="2.5" y="3.5" width="15" height="13" rx="1.5" />
+                  <path d="M2.5 7.5h15" />
+                  <path d="M5.5 11h5" />
+                  <path d="M5.5 13.5h7" />
+                  <path d="M13 11h1.5" />
+                  <path d="M13 13.5h1.5" />
+                </svg>
+              )}
+              {feature.icon === "code" && (
+                <svg
+                  class="size-5 text-secondary dark:text-primary"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="6.5 7 3 10 6.5 13" />
+                  <polyline points="13.5 7 17 10 13.5 13" />
+                  <line x1="11.5" y1="5" x2="8.5" y2="15" />
                 </svg>
               )}
               {feature.icon === "ai" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
@@ -147,34 +153,34 @@ const features = [
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path d="M10 2v2M10 16v2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M2 10h2M16 10h2M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41" />
-                  <circle cx="10" cy="10" r="3" />
+                  <path d="M10 2.5l1.3 3.5 3.5 1.3-3.5 1.3L10 12l-1.3-3.4L5.2 7.3l3.5-1.3z" />
+                  <path d="M15 12.5l.7 1.8 1.8.7-1.8.7L15 17.5l-.7-1.8-1.8-.7 1.8-.7z" />
                 </svg>
               )}
-              {feature.icon === "telegram" && (
+              {feature.icon === "youtube" && (
                 <svg
-                  class="size-5 text-primary"
+                  class="size-5 text-secondary dark:text-primary"
                   viewBox="0 0 20 20"
-                  fill="currentColor"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
-                  <path d="M18.384 2.492a1.21 1.21 0 0 0-1.232-.175L2.434 8.255a1.21 1.21 0 0 0 .1 2.254l3.586 1.16 1.394 4.45a.808.808 0 0 0 1.361.33l2.002-2.035 3.59 2.647a1.21 1.21 0 0 0 1.894-.783l2.14-12.584a1.21 1.21 0 0 0-.117-.802zM8.29 12.533l-.398 2.686-1.155-3.692L14.7 6.058 8.29 12.533z" />
+                  <path d="M2.5 14a20 20 0 0 1 0-8 1.5 1.5 0 0 1 1.05-1.05 41 41 0 0 1 12.9 0A1.5 1.5 0 0 1 17.5 6a20 20 0 0 1 0 8 1.5 1.5 0 0 1-1.05 1.05 41 41 0 0 1-12.9 0A1.5 1.5 0 0 1 2.5 14" />
+                  <path d="m8.5 12.5 4-2.5-4-2.5z" fill="currentColor" />
                 </svg>
               )}
             </div>
 
             {/* Content */}
             <div class="flex items-center gap-2">
-              <h3 class="text-[17px] font-bold tracking-[-0.2px] text-white">
+              <h3 class="text-[17px] font-bold tracking-[-0.2px] text-foreground">
                 {feature.title}
               </h3>
               {feature.pro && (
-                <span class="rounded-md bg-[rgba(255,242,124,0.15)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.5px] text-primary">
+                <span class="rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.5px] text-secondary dark:bg-accent dark:text-primary">
                   Pro
-                </span>
-              )}
-              {feature.free && (
-                <span class="rounded-md bg-[rgba(255,255,255,0.08)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
-                  Free
                 </span>
               )}
             </div>
