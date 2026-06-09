@@ -1,8 +1,8 @@
-import type { FC } from "react";
+import { type FC } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Markdown from "react-markdown";
+import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Eye, TriangleAlert } from "lucide-react";
+import { Eye, TriangleAlert, User } from "lucide-react";
 
 import { api } from "~/shared/lib/treaty";
 import {
@@ -13,6 +13,11 @@ import {
   DialogHeader,
 } from "~/shared/ui";
 import type { MarkdownPreviewModalProps } from "~/entities/modals/types";
+
+import { parseFrontmatter, previewUrlTransform } from "../../lib";
+import { PreviewImage } from "../PreviewImage/PreviewImage";
+
+const markdownComponents: Components = { img: PreviewImage };
 
 export const MarkdownPreviewModal: FC<MarkdownPreviewModalProps> = ({
   historyId,
@@ -37,6 +42,11 @@ export const MarkdownPreviewModal: FC<MarkdownPreviewModalProps> = ({
       return response.data?.data?.content ?? "";
     },
   });
+
+  const { title, author, body } = content
+    ? parseFrontmatter(content)
+    : { title: undefined, author: undefined, body: "" };
+  const showAuthor = author && author.toLowerCase() !== "unknown";
 
   return (
     <Dialog open onOpenChange={(open) => !open && closeModal()}>
@@ -87,9 +97,31 @@ export const MarkdownPreviewModal: FC<MarkdownPreviewModalProps> = ({
           )}
 
           {content && (
-            <div className="prose prose-neutral dark:prose-invert prose-sm max-w-none prose-headings:tracking-tight prose-headings:font-semibold prose-p:leading-relaxed prose-a:text-secondary dark:prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border/60 prose-pre:rounded-xl dark:prose-pre:bg-white/6 dark:prose-pre:border-white/10 dark:prose-pre:text-foreground/90 prose-code:text-secondary dark:prose-code:text-primary prose-code:font-medium prose-img:rounded-xl prose-blockquote:border-primary/30 prose-blockquote:not-italic prose-hr:border-border/60">
-              <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
-            </div>
+            <article>
+              {title && (
+                <header className="mb-6 pb-5 border-b border-border/50">
+                  <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    {title}
+                  </h1>
+                  {showAuthor && (
+                    <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <User className="size-3.5" />
+                      {author}
+                    </p>
+                  )}
+                </header>
+              )}
+
+              <div className="prose prose-neutral dark:prose-invert prose-sm max-w-none prose-headings:tracking-tight prose-headings:font-semibold prose-p:leading-relaxed prose-a:text-secondary dark:prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border/60 prose-pre:rounded-xl dark:prose-pre:bg-white/6 dark:prose-pre:border-white/10 dark:prose-pre:text-foreground/90 prose-code:text-secondary dark:prose-code:text-primary prose-code:font-medium prose-img:rounded-xl prose-blockquote:border-primary/30 prose-blockquote:not-italic prose-hr:border-border/60">
+                <Markdown
+                  remarkPlugins={[remarkGfm]}
+                  components={markdownComponents}
+                  urlTransform={previewUrlTransform}
+                >
+                  {body}
+                </Markdown>
+              </div>
+            </article>
           )}
         </div>
       </DialogContent>

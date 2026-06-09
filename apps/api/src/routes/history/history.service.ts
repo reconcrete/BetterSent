@@ -1,8 +1,11 @@
+import { posix } from "path";
+
 import { db } from "../../db";
 import { sendHistory, kindleEmailAddress, reference } from "@bettersent/db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { log } from "../../lib/logger";
 import { sendToUser } from "../../lib/ws";
+import type { IStorageService } from "../../services/storage";
 
 export type SendHistoryStatus = "pending" | "processing" | "completed" | "error";
 
@@ -238,6 +241,68 @@ export const saveReferences = async (
   );
 
   log.debug({ historyId, count: links.length }, "References saved");
+};
+
+const RELATIVE_IMAGE_RE = /!\[([^\]]*)\]\((?!https?:\/\/|data:)([^)\s]+)\)/g;
+
+const IMAGE_MIME_BY_EXT: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+  svg: "image/svg+xml",
+  bmp: "image/bmp",
+};
+
+const MAX_INLINE_IMAGE_BYTES = 8 * 1024 * 1024;
+
+/**
+ * The preview markdown stored by the pipeline references images by relative path
+ * (e.g. `images/0.jpg`) that live alongside the markdown file in storage. A browser
+ * can't resolve those, so before returning the preview we load each one from storage
+ * and inline it as a base64 data URI. Absolute http(s) images are left untouched.
+ */
+export const inlinePreviewImages = async (
+  content: string,
+  markdownPath: string,
+  storageService: IStorageService,
+): Promise<string> => {
+  const relativePaths = [
+    ...new Set([...content.matchAll(RELATIVE_IMAGE_RE)].map((match) => match[2])),
+  ];
+  if (relativePaths.length === 0) return content;
+
+  const baseDir = posix.dirname(markdownPath.split("\\").join("/"));
+  const dataUriByPath = new Map<string, string>();
+
+  await Promise.all(
+    relativePaths.map(async (relativePath) => {
+      const normalized = posix.normalize(relativePath);
+      // Guard against escaping the run folder via traversal.
+      if (normalized.startsWith("..") || posix.isAbsolute(normalized)) return;
+
+      const ext = normalized.split(".").pop()?.toLowerCase() ?? "";
+      const mime = IMAGE_MIME_BY_EXT[ext];
+      if (!mime) return;
+
+      const key = posix.join(baseDir, normalized);
+      try {
+        const buffer = await storageService.getFile(key);
+        if (buffer.byteLength > MAX_INLINE_IMAGE_BYTES) return;
+        dataUriByPath.set(relativePath, `data:${mime};base64,${buffer.toString("base64")}`);
+      } catch (error) {
+        log.warn({ error, key }, "Failed to inline preview image");
+      }
+    }),
+  );
+
+  if (dataUriByPath.size === 0) return content;
+
+  return content.replace(RELATIVE_IMAGE_RE, (whole, alt: string, url: string) => {
+    const dataUri = dataUriByPath.get(url);
+    return dataUri ? `![${alt}](${dataUri})` : whole;
+  });
 };
 
 /**
