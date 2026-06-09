@@ -206,6 +206,7 @@ export async function buildMarkdownLocally(
  */
 export async function buildEpubLocally(markdownPath: string, runFolderPath: string): Promise<string> {
   const epubPath = markdownPath.replace(".md", ".epub");
-  await $`pandoc ${markdownPath} -o ${epubPath} --to epub3 --resource-path=${runFolderPath}`;
+
+  await $`pandoc ${markdownPath} -o ${epubPath} --from=markdown-implicit_figures --to epub3 --resource-path=${runFolderPath}`;
   return epubPath;
 }
