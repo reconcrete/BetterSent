@@ -14,6 +14,7 @@ import { authMiddleware } from "../../lib/auth";
 import { log } from "../../lib/logger";
 import { checkAndIncrementUsage } from "../billing/billing.service";
 import { UsageLimitError, FeatureLockedError } from "../billing/billing.errors";
+import { KindleEmailNotConfiguredError } from "./extractor.errors";
 
 export const extractorRouter = new Elysia({ prefix: "/extract" })
   .use(authMiddleware)
@@ -25,6 +26,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await extractText(body.textContent, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof KindleEmailNotConfiguredError) {
+          set.status = 400;
+          return { success: false, error: error.message };
+        }
         if (error instanceof UsageLimitError) {
           set.status = 429;
           return { success: false, error: error.message };
@@ -52,6 +57,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await extractUrl(body.url, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof KindleEmailNotConfiguredError) {
+          set.status = 400;
+          return { success: false, error: error.message };
+        }
         if (error instanceof UsageLimitError) {
           set.status = 429;
           return { success: false, error: error.message };
@@ -74,6 +83,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await extractYoutube(body.url, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof KindleEmailNotConfiguredError) {
+          set.status = 400;
+          return { success: false, error: error.message };
+        }
         if (error instanceof FeatureLockedError) {
           set.status = 403;
           return { success: false, error: error.message };
@@ -100,6 +113,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await extractTopic(body.topic, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof KindleEmailNotConfiguredError) {
+          set.status = 400;
+          return { success: false, error: error.message };
+        }
         if (error instanceof FeatureLockedError) {
           set.status = 403;
           return { success: false, error: error.message };
@@ -126,6 +143,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await extractFile(body.file, user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof KindleEmailNotConfiguredError) {
+          set.status = 400;
+          return { success: false, error: error.message };
+        }
         if (error instanceof UsageLimitError) {
           set.status = 429;
           return { success: false, error: error.message };
@@ -147,6 +168,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
         const data = await sendTestEpub(user.id, body.kindleEmailId);
         return { success: true, data };
       } catch (error) {
+        if (error instanceof KindleEmailNotConfiguredError) {
+          set.status = 400;
+          return { success: false, error: error.message };
+        }
         log.error({ error }, "Test send error");
         set.status = 500;
         return {

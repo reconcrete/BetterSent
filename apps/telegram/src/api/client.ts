@@ -22,7 +22,17 @@ async function handleResponse<T>(res: Response): Promise<ApiResponse<T>> {
   if (!res.ok) {
     const text = await res.text();
     console.error(`API error ${res.status}: ${text}`);
-    return { success: false, error: `API returned ${res.status}` };
+    // Surface the API's own error message when present, so the user sees
+    // something actionable (e.g. "No Kindle email configured") instead of a
+    // bare status code.
+    let apiError: string | undefined;
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed.error === "string") apiError = parsed.error;
+    } catch {
+      // Non-JSON error body; fall back to the status code.
+    }
+    return { success: false, error: apiError ?? `API returned ${res.status}` };
   }
   const json = await res.json();
   if (!json) {

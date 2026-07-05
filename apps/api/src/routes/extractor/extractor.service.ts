@@ -9,6 +9,7 @@ import { log } from "../../lib/logger";
 import { createSendHistoryEntry, updateAndNotifyHistory, saveReferences } from "../history/history.service";
 import { createMarkdownParserService } from "../../services/markdown-parser";
 import { isProduction } from "../../shared/env";
+import { KindleEmailNotConfiguredError } from "./extractor.errors";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
 const MARKDOWN_FILE_EXTENSIONS = new Set(["md", "markdown"]);
@@ -132,7 +133,7 @@ export const getKindleEmail = async (userId: string, kindleEmailId?: string): Pr
   if (kindleEmail) {
     return kindleEmail.email;
   } else {
-    throw new Error("No Kindle email configured. Please add a Kindle email in settings.");
+    throw new KindleEmailNotConfiguredError();
   }
 };
 

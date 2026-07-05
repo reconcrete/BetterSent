@@ -17,18 +17,27 @@ export async function extractConversation(
   const userId = await conversation.external((ctx) => ctx.session.userId!);
   const selectedDeviceId = await conversation.external((ctx) => ctx.session.selectedDeviceId);
 
-  let deviceId = selectedDeviceId;
+  const devices = await conversation.external(() =>
+    db.query.kindleEmailAddress.findMany({
+      where: eq(kindleEmailAddress.userId, userId),
+    })
+  );
+
+  if (devices.length === 0) {
+    await ctx.reply("You don't have any devices yet. Use /add_device to add one first.");
+    return;
+  }
+
+  // Only trust the cached selection if that device still exists — it may have
+  // been deleted from the web app, leaving a stale id in the session that the
+  // API would reject with "No Kindle email configured".
+  let deviceId = devices.some((d) => d.id === selectedDeviceId) ? selectedDeviceId : undefined;
 
   if (!deviceId) {
-    const devices = await conversation.external(() =>
-      db.query.kindleEmailAddress.findMany({
-        where: eq(kindleEmailAddress.userId, userId),
-      })
-    );
-
-    if (devices.length === 0) {
-      await ctx.reply("You don't have any devices yet. Use /add_device to add one first.");
-      return;
+    if (selectedDeviceId) {
+      await conversation.external((ctx) => {
+        ctx.session.selectedDeviceId = undefined;
+      });
     }
 
     await ctx.reply("Please select a device first:", {

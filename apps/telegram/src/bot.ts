@@ -72,14 +72,33 @@ bot.callbackQuery("device_add_new", async (ctx) => {
   await ctx.conversation.enter(ADD_DEVICE_CONVERSATION);
 });
 
+// Resolve the session's selected device, clearing it if it no longer exists
+// (e.g. deleted from the web app) so we re-prompt instead of sending a stale id
+// that the API would reject with "No Kindle email configured".
+async function getValidSelectedDevice(ctx: BotContext) {
+  const { userId, selectedDeviceId } = ctx.session;
+  if (!userId || !selectedDeviceId) return null;
+
+  const device = await db.query.kindleEmailAddress.findFirst({
+    where: and(eq(kindleEmailAddress.id, selectedDeviceId), eq(kindleEmailAddress.userId, userId)),
+  });
+
+  if (!device) {
+    ctx.session.selectedDeviceId = undefined;
+    return null;
+  }
+
+  return device;
+}
+
 // --- Fallback: auto-detect URL/text/file ---
 bot.on("message:text", async (ctx) => {
   if (!ctx.session.userId) return;
 
   const text = ctx.message.text;
-  const deviceId = ctx.session.selectedDeviceId;
+  const device = await getValidSelectedDevice(ctx);
 
-  if (!deviceId) {
+  if (!device) {
     await ctx.reply("Please select a device first. Use /device to choose one.");
     return;
   }
@@ -98,7 +117,8 @@ bot.on("message:text", async (ctx) => {
 bot.on("message:document", async (ctx) => {
   if (!ctx.session.userId) return;
 
-  if (!ctx.session.selectedDeviceId) {
+  const device = await getValidSelectedDevice(ctx);
+  if (!device) {
     await ctx.reply("Please select a device first. Use /device to choose one.");
     return;
   }
