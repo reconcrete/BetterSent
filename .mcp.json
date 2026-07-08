@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "linear": {
+      "type": "http",
+      "url": "https://mcp.linear.app/mcp"
+    },
+    "Railway": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@railway/mcp-server"]
+    }
+  }
+}
