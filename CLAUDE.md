@@ -50,6 +50,7 @@ bun run api:start          # Start API server
 - **Auth**: Better Auth with Google OAuth (Magic Link available in dev only for testing)
 - **Auth middleware**: Custom Elysia macro + internal API key support for Telegram bot
 - **Services use factory pattern**: Extractor (content extraction) and Storage (S3 vs filesystem) have interface/implementation/factory structure
+- **URL extraction is a fallback chain** (`createContentExtractor`): local Defuddle (in-process, free) → hosted `defuddle.md` (different egress IP) → Firecrawl (proxied browser, paid). Failures are typed as `ExtractionError`; terminal reasons (non-HTML, private host, 404) stop the chain instead of escalating to a paid tier. Debug with `bun apps/api/scripts/extract.ts <url>`.
 - **Content pipeline**: URL → scrape → OpenAI extraction → Pandoc conversion (HTML→Markdown/EPUB) → S3 storage → Resend email to Kindle
 - **Topic generation**: User provides a topic → OpenAI (`chatgpt-5.4-latest`) generates a mini book → same EPUB/email pipeline
 - **OpenAI models**: `gpt-5-mini-2025-08-07` for extraction/metadata, `chatgpt-5.4-latest` for topic content generation

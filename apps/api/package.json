@@ -13,6 +13,7 @@
     "@elysiajs/cors": "latest",
     "@mendable/firecrawl-js": "^4.17.0",
     "better-auth": "^1.4.10",
+    "defuddle": "^0.19.1",
     "drizzle-orm": "^0.45.1",
     "elysia": "catalog:",
     "openai": "^4.73.0",

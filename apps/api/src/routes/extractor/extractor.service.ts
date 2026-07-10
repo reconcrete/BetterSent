@@ -1,6 +1,11 @@
 import { eq, and } from "drizzle-orm";
 
-import { createExtractorService, createContentExtractor, createFirecrawlExtractor } from "../../services/extractor";
+import {
+  createExtractorService,
+  createContentExtractor,
+  createFirecrawlExtractor,
+  ExtractionError,
+} from "../../services/extractor";
 import { createStorageService } from "../../services/storage";
 import { createEmailService } from "../../services/email";
 import { db } from "../../db";
@@ -406,11 +411,16 @@ const processMarkdownFile = async (
 const runInBackground = (fn: () => Promise<void>, historyId: string, userId: string) => {
   fn().catch(async (error) => {
     const message = error instanceof Error ? error.message : String(error);
-    log.error({ err: error, historyId }, `Background processing failed: ${message}`);
+    // Logs keep the diagnostic detail; history stores what a reader can act on.
+    const userMessage = error instanceof ExtractionError ? error.userMessage : message;
+    log.error(
+      { err: error, historyId, ...(error instanceof ExtractionError && { reason: error.reason }) },
+      `Background processing failed: ${message}`,
+    );
     try {
       await updateAndNotifyHistory(historyId, userId, {
         status: "error",
-        errorMessage: message,
+        errorMessage: userMessage,
       });
     } catch (notifyError) {
       log.error({ err: notifyError, historyId }, "Failed to update error status");
