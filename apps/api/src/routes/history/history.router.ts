@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 
-import { historyArrayOutputSchema, previewOutputSchema } from "./history.schema";
+import { historyListQuerySchema, historyListOutputSchema, previewOutputSchema } from "./history.schema";
 import { getSendHistory, getHistoryEntry, inlinePreviewImages } from "./history.service";
 import { authMiddleware } from "../../lib/auth";
 import { createStorageService } from "../../services/storage";
@@ -8,12 +8,12 @@ import { log } from "../../lib/logger";
 
 export const historyRouter = new Elysia({ prefix: "/history" })
   .use(authMiddleware)
-  // Get all send history for the user
+  // Get a page of send history for the user
   .get(
     "/",
-    async ({ user, set }) => {
+    async ({ user, query, set }) => {
       try {
-        const data = await getSendHistory(user.id);
+        const data = await getSendHistory(user.id, { page: query.page, pageSize: query.pageSize });
         return { success: true, data };
       } catch (error) {
         log.error({ error }, "Get send history error");
@@ -24,7 +24,7 @@ export const historyRouter = new Elysia({ prefix: "/history" })
         };
       }
     },
-    { auth: true, response: historyArrayOutputSchema }
+    { auth: true, query: historyListQuerySchema, response: historyListOutputSchema }
   )
   // Get markdown preview for a history entry
   .get(

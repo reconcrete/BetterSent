@@ -6,7 +6,14 @@ import { Button } from "~/shared/ui";
 import { useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 import { BILLING_STATUS_KEY } from "~/entities/billing";
-import type { HistoryItem } from "~/entities/sendHistory";
+import {
+  prependHistoryItem,
+  replaceHistoryItemId,
+  restoreSendHistory,
+  sendHistoryKeys,
+  snapshotSendHistory,
+  type HistoryItem,
+} from "~/entities/sendHistory";
 
 type SendContentProps = {
   type: "url" | "text" | "file" | "youtube" | "topic";
@@ -69,8 +76,8 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       return response.data;
     },
     onMutate: async (vars: MutationVars) => {
-      await queryClient.cancelQueries({ queryKey: ["sendHistory"] });
-      const previous = queryClient.getQueryData<HistoryItem[]>(["sendHistory"]);
+      await queryClient.cancelQueries({ queryKey: sendHistoryKeys.all });
+      const previous = snapshotSendHistory(queryClient);
 
       const tempId = crypto.randomUUID();
       const optimisticItem: HistoryItem = {
@@ -88,7 +95,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         updatedAt: new Date().toISOString(),
       };
 
-      queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) => [optimisticItem, ...old]);
+      prependHistoryItem(queryClient, optimisticItem);
       onSuccess?.();
 
       return { previous, tempId };
@@ -97,9 +104,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       if (context?.tempId && data) {
         const historyId = data.data?.historyId;
         if (historyId) {
-          queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) =>
-            old.map((item) => (item.id === context.tempId ? { ...item, id: historyId } : item))
-          );
+          replaceHistoryItemId(queryClient, context.tempId, historyId);
         }
       }
       analytics.capture("extraction_sent", { type: vars.type });
@@ -107,7 +112,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
     },
     onError: (err: Error, _, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["sendHistory"], context.previous);
+        restoreSendHistory(queryClient, context.previous);
       }
       setError(err.message);
     },

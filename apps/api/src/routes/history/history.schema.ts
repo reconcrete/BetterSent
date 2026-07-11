@@ -20,10 +20,24 @@ export const historyItemSchema = t.Object({
   updatedAt: t.String(),
 });
 
-export const historyArrayOutputSchema = {
+export const DEFAULT_PAGE_SIZE = 10;
+export const MAX_PAGE_SIZE = 50;
+
+export const historyListQuerySchema = t.Object({
+  page: t.Numeric({ minimum: 1, default: 1 }),
+  pageSize: t.Numeric({ minimum: 1, maximum: MAX_PAGE_SIZE, default: DEFAULT_PAGE_SIZE }),
+});
+
+export const historyListOutputSchema = {
   200: t.Object({
     success: t.Literal(true),
-    data: t.Array(historyItemSchema),
+    data: t.Object({
+      items: t.Array(historyItemSchema),
+      page: t.Number(),
+      pageSize: t.Number(),
+      total: t.Number(),
+      totalPages: t.Number(),
+    }),
   }),
   500: t.Object({
     success: t.Literal(false),

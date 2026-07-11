@@ -16,7 +16,14 @@ import {
   TooltipContent,
 } from "~/shared/ui";
 import type { ReferencesModalProps } from "~/entities/modals/types";
-import type { HistoryItem } from "~/entities/sendHistory";
+import {
+  prependHistoryItem,
+  replaceHistoryItemId,
+  restoreSendHistory,
+  sendHistoryKeys,
+  snapshotSendHistory,
+  type HistoryItem,
+} from "~/entities/sendHistory";
 
 const ReferenceRow: FC<{ url: string; title: string | null }> = ({ url, title }) => {
   const [copied, setCopied] = useState(false);
@@ -43,8 +50,8 @@ const ReferenceRow: FC<{ url: string; title: string | null }> = ({ url, title })
       return response.data;
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["sendHistory"] });
-      const previous = queryClient.getQueryData<HistoryItem[]>(["sendHistory"]);
+      await queryClient.cancelQueries({ queryKey: sendHistoryKeys.all });
+      const previous = snapshotSendHistory(queryClient);
 
       const tempId = crypto.randomUUID();
       const optimisticItem: HistoryItem = {
@@ -62,23 +69,21 @@ const ReferenceRow: FC<{ url: string; title: string | null }> = ({ url, title })
         updatedAt: new Date().toISOString(),
       };
 
-      queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) => [optimisticItem, ...old]);
+      prependHistoryItem(queryClient, optimisticItem);
       return { previous, tempId };
     },
     onSuccess: (data, _, context) => {
       if (context?.tempId && data) {
         const historyId = data.data?.historyId;
         if (historyId) {
-          queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) =>
-            old.map((item) => (item.id === context.tempId ? { ...item, id: historyId } : item))
-          );
+          replaceHistoryItemId(queryClient, context.tempId, historyId);
         }
       }
       analytics.capture("reference_sent", { url });
     },
     onError: (_err, _, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["sendHistory"], context.previous);
+        restoreSendHistory(queryClient, context.previous);
       }
     },
   });

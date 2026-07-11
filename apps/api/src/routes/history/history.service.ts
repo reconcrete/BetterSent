@@ -2,7 +2,7 @@ import { posix } from "path";
 
 import { db } from "../../db";
 import { sendHistory, kindleEmailAddress, reference } from "@bettersent/db/schema";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, count, desc, inArray } from "drizzle-orm";
 import { log } from "../../lib/logger";
 import { sendToUser } from "../../lib/ws";
 import type { IStorageService } from "../../services/storage";
@@ -22,6 +22,14 @@ export type SendHistoryData = {
   references: { url: string; title: string | null }[];
   createdAt: string;
   updatedAt: string;
+};
+
+export type SendHistoryPage = {
+  items: SendHistoryData[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 };
 
 export const toSendHistoryData = (
@@ -44,10 +52,20 @@ export const toSendHistoryData = (
 });
 
 /**
- * Get all send history for a user, ordered by most recent first
+ * Get a page of send history for a user, ordered by most recent first
  */
-export const getSendHistory = async (userId: string): Promise<SendHistoryData[]> => {
-  log.debug({ userId }, "Fetching send history");
+export const getSendHistory = async (
+  userId: string,
+  { page, pageSize }: { page: number; pageSize: number },
+): Promise<SendHistoryPage> => {
+  log.debug({ userId, page, pageSize }, "Fetching send history");
+
+  const [totals] = await db
+    .select({ total: count() })
+    .from(sendHistory)
+    .where(eq(sendHistory.userId, userId));
+
+  const total = totals?.total ?? 0;
 
   const history = await db
     .select({
@@ -57,15 +75,26 @@ export const getSendHistory = async (userId: string): Promise<SendHistoryData[]>
     .from(sendHistory)
     .leftJoin(kindleEmailAddress, eq(sendHistory.kindleEmailId, kindleEmailAddress.id))
     .where(eq(sendHistory.userId, userId))
-    .orderBy(desc(sendHistory.createdAt));
+    // id breaks ties so rows can't shuffle between pages when timestamps collide
+    .orderBy(desc(sendHistory.createdAt), desc(sendHistory.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
 
-  log.debug({ userId, count: history.length }, "Found send history items");
+  log.debug({ userId, page, count: history.length, total }, "Found send history items");
 
   // Fetch all references for these history items in one query
   const historyIds = history.map((row) => row.history.id);
   const refsMap = await getReferencesMap(historyIds);
 
-  return history.map((row) => toSendHistoryData(row.history, row.kindleLabel, refsMap.get(row.history.id) ?? []));
+  return {
+    items: history.map((row) =>
+      toSendHistoryData(row.history, row.kindleLabel, refsMap.get(row.history.id) ?? []),
+    ),
+    page,
+    pageSize,
+    total,
+    totalPages: Math.ceil(total / pageSize),
+  };
 };
 
 /**

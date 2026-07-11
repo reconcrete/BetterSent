@@ -15,3 +15,4 @@ export * from "./FileDropZone/FileDropZone";
 export * from "./Skeleton/Skeleton";
 export * from "./ProBadge/ProBadge";
 export * from "./Tooltip/Tooltip";
+export * from "./Pagination/Pagination";

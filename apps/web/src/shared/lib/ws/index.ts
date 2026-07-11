@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "~/shared/lib/treaty";
 import { useSession } from "~/shared/lib/auth";
-import type { HistoryItem } from "~/entities/sendHistory";
+import { applyHistoryUpdate, type HistoryItem } from "~/entities/sendHistory";
 
 const MAX_RECONNECT_DELAY = 30_000;
 const BASE_RECONNECT_DELAY = 1_000;
@@ -26,14 +26,7 @@ export const useHistoryWebSocket = () => {
         ws.subscribe((message: MessageEvent) => {
           const parsed = typeof message.data === "string" ? JSON.parse(message.data) : message.data;
           if (parsed.type === "history:updated") {
-            const updated = parsed.data as HistoryItem;
-            queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) => {
-              const exists = old.some((item) => item.id === updated.id);
-              if (exists) {
-                return old.map((item) => (item.id === updated.id ? updated : item));
-              }
-              return [updated, ...old];
-            });
+            applyHistoryUpdate(queryClient, parsed.data as HistoryItem);
           }
         });
 

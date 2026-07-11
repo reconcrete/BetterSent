@@ -1,16 +1,15 @@
-import type { FC } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { type FC, useState } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 
-import { Button } from "~/shared/ui";
-import { api } from "~/shared/lib/treaty";
-import { useSession } from "~/shared/lib";
+import { Button, Pagination } from "~/shared/ui";
 
 import { PreviewExtraction } from "~/features/previewExtraction";
 import { ViewReferences } from "~/features/viewReferences";
-import type { HistoryItem } from "~/entities/sendHistory";
+import { useSendHistory } from "~/entities/sendHistory";
 import { RecentSendRow, RecentSendsSkeleton } from "~/widgets/recentSends";
+
+const PAGE_SIZE = 10;
 
 const EmptyHistoryState: FC = () => (
   <div className="text-center py-16 space-y-4">
@@ -26,17 +25,10 @@ const EmptyHistoryState: FC = () => (
 );
 
 export const History: FC = () => {
-  const { data: session } = useSession();
+  const [page, setPage] = useState(1);
+  const { data: historyPage, isLoading } = useSendHistory({ page, pageSize: PAGE_SIZE });
 
-  const { data: historyItems, isLoading } = useQuery({
-    queryKey: ["sendHistory"],
-    queryFn: async () => {
-      const response = await api.history.get();
-      if (response.error) return [];
-      return (response.data?.data ?? []) as HistoryItem[];
-    },
-    enabled: !!session,
-  });
+  const items = historyPage?.items;
 
   return (
     <div className="max-w-2xl mx-auto pt-6 space-y-6">
@@ -44,11 +36,11 @@ export const History: FC = () => {
 
       {isLoading && <RecentSendsSkeleton />}
 
-      {!isLoading && historyItems?.length === 0 && <EmptyHistoryState />}
+      {!isLoading && items?.length === 0 && <EmptyHistoryState />}
 
-      {!isLoading && historyItems && historyItems.length > 0 && (
+      {!isLoading && items && items.length > 0 && (
         <div>
-          {historyItems.map((item, i) => (
+          {items.map((item, i) => (
             <RecentSendRow
               key={item.id}
               item={item}
@@ -64,6 +56,15 @@ export const History: FC = () => {
             />
           ))}
         </div>
+      )}
+
+      {!isLoading && historyPage && (
+        <Pagination
+          page={historyPage.page}
+          totalPages={historyPage.totalPages}
+          onPageChange={setPage}
+          className="pb-6"
+        />
       )}
     </div>
   );

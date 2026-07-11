@@ -12,3 +12,11 @@ export type HistoryItem = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type SendHistoryPage = {
+  items: HistoryItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+};

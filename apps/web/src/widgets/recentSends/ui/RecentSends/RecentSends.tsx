@@ -1,31 +1,19 @@
 import type { FC } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Link as RouterLink } from "react-router-dom";
-
-import { api } from "~/shared/lib/treaty";
-import { useSession } from "~/shared/lib";
 
 import { PreviewExtraction } from "~/features/previewExtraction";
 import { ViewReferences } from "~/features/viewReferences";
-import type { HistoryItem } from "~/entities/sendHistory";
+import { useSendHistory } from "~/entities/sendHistory";
 
 import { RecentSendRow } from "../RecentSendRow/RecentSendRow";
 import { RecentSendsSkeleton } from "../RecentSendsSkeleton/RecentSendsSkeleton";
 
+const RECENT_SENDS_COUNT = 3;
+
 export const RecentSends: FC = () => {
-  const { data: session } = useSession();
+  const { data: historyPage, isLoading } = useSendHistory({ pageSize: RECENT_SENDS_COUNT });
 
-  const { data: historyItems, isLoading } = useQuery({
-    queryKey: ["sendHistory"],
-    queryFn: async () => {
-      const response = await api.history.get();
-      if (response.error) return [];
-      return (response.data?.data ?? []) as HistoryItem[];
-    },
-    enabled: !!session,
-  });
-
-  const recentItems = historyItems?.slice(0, 3);
+  const recentItems = historyPage?.items;
 
   if (isLoading) return <RecentSendsSkeleton />;
   if (!recentItems || recentItems.length === 0) return null;
