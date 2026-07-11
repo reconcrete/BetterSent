@@ -7,6 +7,7 @@ import { History } from "~/pages/history";
 import { Settings } from "~/pages/settings";
 import { SignIn } from "~/pages/sign-in";
 import { Onboarding } from "~/pages/onboarding";
+import { Device } from "~/pages/device";
 
 import { AppLayout } from "~/widgets/appLayout";
 import { TooltipProvider } from "~/shared/ui";
@@ -26,6 +27,7 @@ createRoot(document.getElementById("root")!).render(
               <Routes>
                 <Route path="/sign-in" element={<SignIn />} />
                 <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/device" element={<Device />} />
                 <Route element={<AppLayout />}>
                   <Route path="/" element={<Root />} />
                   <Route path="/history" element={<History />} />

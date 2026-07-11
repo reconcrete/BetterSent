@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import Elysia from "elysia";
 import { createEmailService } from "../services/email";
 import { isProduction } from "../shared/env";
+import { resolveCliToken } from "../routes/cli/cli.service";
 
 const trustedOrigins = process.env.TRUSTED_ORIGINS
   ? process.env.TRUSTED_ORIGINS.split(",")
@@ -55,6 +56,12 @@ export const auth = betterAuth({
 
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
 
+export const getBearerToken = (headers: Headers): string | null => {
+  const header = headers.get("authorization");
+  if (!header?.toLowerCase().startsWith("bearer ")) return null;
+  return header.slice(7).trim() || null;
+};
+
 export const authMiddleware = new Elysia({ name: 'auth-middleware' })
   .mount(auth.handler)
   .macro({
@@ -70,6 +77,17 @@ export const authMiddleware = new Elysia({ name: 'auth-middleware' })
           if (!dbUser) return status(401);
           return {
             user: dbUser as any,
+            session: null as any,
+          };
+        }
+
+        // Allow CLI access tokens issued by the device authorization flow
+        const bearerToken = getBearerToken(headers);
+        if (bearerToken) {
+          const cliUser = await resolveCliToken(bearerToken);
+          if (!cliUser) return status(401);
+          return {
+            user: cliUser as any,
             session: null as any,
           };
         }

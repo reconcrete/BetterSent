@@ -6,9 +6,10 @@ import { Button } from "~/shared/ui";
 
 type GoogleSignInProps = {
   className?: string;
+  callbackURL?: string;
 };
 
-export const GoogleSignIn: FC<GoogleSignInProps> = ({ className }) => {
+export const GoogleSignIn: FC<GoogleSignInProps> = ({ className, callbackURL }) => {
   const analytics = useAnalytics();
 
   return (
@@ -18,7 +19,9 @@ export const GoogleSignIn: FC<GoogleSignInProps> = ({ className }) => {
         analytics.capture("sign_in_google");
         signIn.social({
           provider: "google",
-          callbackURL: window.location.origin,
+          callbackURL: callbackURL
+            ? new URL(callbackURL, window.location.origin).toString()
+            : window.location.origin,
           newUserCallbackURL: `${window.location.origin}/onboarding`,
         });
       }}
