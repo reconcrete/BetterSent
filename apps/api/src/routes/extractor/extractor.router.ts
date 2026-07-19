@@ -4,12 +4,11 @@ import {
   extractTextInputSchema,
   extractUrlInputSchema,
   extractYoutubeInputSchema,
-  extractTopicInputSchema,
   extractFileInputSchema,
   extractTestInputSchema,
   extractAcceptedSchema,
 } from "./extractor.schema";
-import { extractText, extractUrl, extractYoutube, extractTopic, extractFile, sendTestEpub } from "./extractor.service";
+import { extractText, extractUrl, extractYoutube, extractFile, sendTestEpub } from "./extractor.service";
 import { authMiddleware } from "../../lib/auth";
 import { log } from "../../lib/logger";
 import { checkAndIncrementUsage } from "../billing/billing.service";
@@ -104,36 +103,6 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
       }
     },
     { auth: true, body: extractYoutubeInputSchema, response: extractAcceptedSchema }
-  )
-  .post(
-    "/topic",
-    async ({ body, set, user }) => {
-      try {
-        await checkAndIncrementUsage(user.id, "topic");
-        const data = await extractTopic(body.topic, user.id, body.kindleEmailId);
-        return { success: true, data };
-      } catch (error) {
-        if (error instanceof KindleEmailNotConfiguredError) {
-          set.status = 400;
-          return { success: false, error: error.message };
-        }
-        if (error instanceof FeatureLockedError) {
-          set.status = 403;
-          return { success: false, error: error.message };
-        }
-        if (error instanceof UsageLimitError) {
-          set.status = 429;
-          return { success: false, error: error.message };
-        }
-        log.error({ error }, "Topic generation error");
-        set.status = 500;
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : "Unknown error occurred",
-        };
-      }
-    },
-    { auth: true, body: extractTopicInputSchema, response: extractAcceptedSchema }
   )
   .post(
     "/file",
