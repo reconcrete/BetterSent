@@ -22,7 +22,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     async ({ body, set, user }) => {
       try {
         await checkAndIncrementUsage(user.id, "text");
-        const data = await extractText(body.textContent, user.id, body.kindleEmailId);
+        const data = await extractText(body.textContent, user.id, body.kindleEmailId, {
+          title: body.title,
+          author: body.author,
+        });
         return { success: true, data };
       } catch (error) {
         if (error instanceof KindleEmailNotConfiguredError) {
@@ -53,7 +56,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
           return { success: false, error: "YouTube links should be sent through the YouTube tab." };
         }
         await checkAndIncrementUsage(user.id, "url");
-        const data = await extractUrl(body.url, user.id, body.kindleEmailId);
+        const data = await extractUrl(body.url, user.id, body.kindleEmailId, {
+          title: body.title,
+          author: body.author,
+        });
         return { success: true, data };
       } catch (error) {
         if (error instanceof KindleEmailNotConfiguredError) {
@@ -79,7 +85,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     async ({ body, set, user }) => {
       try {
         await checkAndIncrementUsage(user.id, "youtube");
-        const data = await extractYoutube(body.url, user.id, body.kindleEmailId);
+        const data = await extractYoutube(body.url, user.id, body.kindleEmailId, {
+          title: body.title,
+          author: body.author,
+        });
         return { success: true, data };
       } catch (error) {
         if (error instanceof KindleEmailNotConfiguredError) {
@@ -109,7 +118,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     async ({ body, set, user }) => {
       try {
         await checkAndIncrementUsage(user.id, "file");
-        const data = await extractFile(body.file, user.id, body.kindleEmailId);
+        const data = await extractFile(body.file, user.id, body.kindleEmailId, {
+          title: body.title,
+          author: body.author,
+        });
         return { success: true, data };
       } catch (error) {
         if (error instanceof KindleEmailNotConfiguredError) {

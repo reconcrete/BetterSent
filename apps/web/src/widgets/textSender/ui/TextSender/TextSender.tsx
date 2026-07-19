@@ -3,14 +3,20 @@ import { Info } from "lucide-react";
 
 import { Textarea } from "~/shared/ui";
 
-import { SendContent } from "~/features/sendContent";
+import { SendContent, BookDetailsFields } from "~/features/sendContent";
 import { ChooseDevice } from "~/features/chooseDevice";
 
 export const TextSender: FC = () => {
   const [text, setText] = useState("");
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
 
-  const handleSuccess = () => setText("");
+  const handleSuccess = () => {
+    setText("");
+    setBookTitle("");
+    setBookAuthor("");
+  };
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
 
   return (
@@ -29,10 +35,18 @@ export const TextSender: FC = () => {
           onChange={(e) => setText(e.target.value)}
         />
 
+        <BookDetailsFields
+          visible={text.trim().length > 0}
+          title={bookTitle}
+          author={bookAuthor}
+          onTitleChange={setBookTitle}
+          onAuthorChange={setBookAuthor}
+        />
+
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="text" content={text} kindleEmailId={kindleId} onSuccess={handleSuccess} />
+      <SendContent type="text" content={text} kindleEmailId={kindleId} title={bookTitle} author={bookAuthor} onSuccess={handleSuccess} />
     </div>
   );
 };

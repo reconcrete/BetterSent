@@ -1,9 +1,10 @@
 import { type FC, useState, useRef, useCallback, type ChangeEvent, type DragEvent } from "react";
-import { Info, X, FileText } from "lucide-react";
+import { Info } from "lucide-react";
 
 import { FileDropZone } from "~/shared/ui";
 
 import { SendContent } from "~/features/sendContent";
+import { ChangePreselectedFile, type PreselectedFileDetails } from "~/features/changePreselectedFile";
 import { ChooseDevice } from "~/features/chooseDevice";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
@@ -16,15 +17,12 @@ const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(
 
 const fileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
 
-const formatFileSize = (bytes: number): string => {
-  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${bytes} B`;
-};
+const EMPTY_DETAILS: PreselectedFileDetails = { title: "", author: "" };
 
 export const FileSender: FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [fileErrors, setFileErrors] = useState<string[]>([]);
+  const [fileDetails, setFileDetails] = useState<Record<string, PreselectedFileDetails>>({});
   const [isDragging, setIsDragging] = useState(false);
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -61,6 +59,7 @@ export const FileSender: FC = () => {
 
   const removeFile = (file: File) => {
     setFiles((prev) => prev.filter((existing) => fileKey(existing) !== fileKey(file)));
+    setFileDetails(({ [fileKey(file)]: _removed, ...rest }) => rest);
   };
 
   const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +77,7 @@ export const FileSender: FC = () => {
   const handleSuccess = () => {
     setFiles([]);
     setFileErrors([]);
+    setFileDetails({});
   };
 
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
@@ -117,24 +117,15 @@ export const FileSender: FC = () => {
         {files.length > 0 && (
           <ul className="flex flex-col gap-1.5">
             {files.map((file) => (
-              <li
+              <ChangePreselectedFile
                 key={fileKey(file)}
-                className="flex items-center gap-2 rounded-xl bg-accent/50 px-3 py-2 text-sm"
-              >
-                <FileText className="size-4 shrink-0 text-muted-foreground" />
-                <span className="min-w-0 flex-1 truncate text-foreground">{file.name}</span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {formatFileSize(file.size)}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => removeFile(file)}
-                  aria-label={`Remove ${file.name}`}
-                  className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <X className="size-4" />
-                </button>
-              </li>
+                file={file}
+                details={fileDetails[fileKey(file)] ?? EMPTY_DETAILS}
+                onDetailsChange={(details) =>
+                  setFileDetails((prev) => ({ ...prev, [fileKey(file)]: details }))
+                }
+                onRemove={() => removeFile(file)}
+              />
             ))}
           </ul>
         )}
@@ -150,7 +141,13 @@ export const FileSender: FC = () => {
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="file" content={files} kindleEmailId={kindleId} onSuccess={handleSuccess} />
+      <SendContent
+        type="file"
+        content={files}
+        kindleEmailId={kindleId}
+        getFileDetails={(file) => fileDetails[fileKey(file)] ?? EMPTY_DETAILS}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 };

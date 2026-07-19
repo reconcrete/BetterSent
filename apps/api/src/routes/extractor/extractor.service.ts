@@ -39,6 +39,16 @@ const stripFileExtension = (filename: string): string => {
   return dotIndex <= 0 ? filename : filename.slice(0, dotIndex);
 };
 
+export type BookDetailsOverrides = { title?: string; author?: string };
+
+const applyBookDetailsOverrides = (
+  metadata: { title: string; author: string },
+  overrides?: BookDetailsOverrides,
+): { title: string; author: string } => ({
+  title: overrides?.title?.trim() || metadata.title,
+  author: overrides?.author?.trim() || metadata.author,
+});
+
 type MarkdownMetadata = { title: string; author: string; body: string };
 
 const parseMarkdownMetadata = (content: string, fallbackTitle: string): MarkdownMetadata => {
@@ -150,10 +160,17 @@ const markCompletedAfterDelivery = async (historyId: string, userId: string, was
   await updateAndNotifyHistory(historyId, userId, { status: "completed" });
 };
 
-const processText = async (historyId: string, textContent: string, userId: string, toEmail: string | null) => {
+const processText = async (
+  historyId: string,
+  textContent: string,
+  userId: string,
+  toEmail: string | null,
+  overrides?: BookDetailsOverrides,
+) => {
   log.debug("LLM process starting");
   const extractorService = createExtractorService();
-  const { markdown, metadata } = await extractorService.extractContent(textContent);
+  const { markdown, metadata: extractedMetadata } = await extractorService.extractContent(textContent);
+  const metadata = applyBookDetailsOverrides(extractedMetadata, overrides);
 
   await updateAndNotifyHistory(historyId, userId, {
     title: metadata.title,
@@ -182,7 +199,13 @@ const processText = async (historyId: string, textContent: string, userId: strin
   await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
-const processUrl = async (historyId: string, url: string, userId: string, toEmail: string | null) => {
+const processUrl = async (
+  historyId: string,
+  url: string,
+  userId: string,
+  toEmail: string | null,
+  overrides?: BookDetailsOverrides,
+) => {
   log.debug("Extracting URL content");
   const contentExtractor = createContentExtractor();
   const extractResult = await contentExtractor.extractUrl(url);
@@ -205,6 +228,8 @@ const processUrl = async (historyId: string, url: string, userId: string, toEmai
     markdown = extractResult.markdown;
     metadata = extractResult.metadata;
   }
+
+  metadata = applyBookDetailsOverrides(metadata, overrides);
 
   await updateAndNotifyHistory(historyId, userId, {
     title: metadata.title,
@@ -244,7 +269,13 @@ const processUrl = async (historyId: string, url: string, userId: string, toEmai
   await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
-const processYoutube = async (historyId: string, url: string, userId: string, toEmail: string | null) => {
+const processYoutube = async (
+  historyId: string,
+  url: string,
+  userId: string,
+  toEmail: string | null,
+  overrides?: BookDetailsOverrides,
+) => {
   log.debug("Extracting YouTube URL content");
   const contentExtractor = createFirecrawlExtractor();
   const extractResult = await contentExtractor.extractUrl(url);
@@ -259,7 +290,8 @@ const processYoutube = async (historyId: string, url: string, userId: string, to
 
   log.debug("LLM process starting (YouTube content)");
   const extractorService = createExtractorService();
-  const { markdown, metadata } = await extractorService.extractYoutubeContent(truncatedContent);
+  const { markdown, metadata: extractedMetadata } = await extractorService.extractYoutubeContent(truncatedContent);
+  const metadata = applyBookDetailsOverrides(extractedMetadata, overrides);
 
   await updateAndNotifyHistory(historyId, userId, {
     title: metadata.title,
@@ -305,18 +337,27 @@ const processFile = async (
   fileName: string,
   userId: string,
   toEmail: string,
+  overrides?: BookDetailsOverrides,
 ) => {
+  // Kindle uses the attachment filename as the document title, so a title
+  // override renames the sent file (keeping the original extension).
+  const titleOverride = overrides?.title?.trim();
+  const authorOverride = overrides?.author?.trim();
+  const extension = getFileExtension(fileName);
+  const sentFileName = titleOverride && extension ? `${titleOverride}.${extension}` : fileName;
+
   await updateAndNotifyHistory(historyId, userId, {
-    title: fileName,
+    title: titleOverride || fileName,
+    ...(authorOverride && { author: authorOverride }),
     kindleEmail: toEmail,
   });
 
   const attachmentContent = fileBuffer.toString("base64");
   const emailService = createEmailService();
-  await emailService.sendEmail(toEmail, fileName, "", [
-    { filename: getSentFilename(fileName), content: attachmentContent },
+  await emailService.sendEmail(toEmail, sentFileName, "", [
+    { filename: getSentFilename(sentFileName), content: attachmentContent },
   ]);
-  log.info({ to: toEmail, filename: fileName }, "File sent to Kindle successfully");
+  log.info({ to: toEmail, filename: sentFileName }, "File sent to Kindle successfully");
 
   await markCompletedAfterDelivery(historyId, userId, true);
 };
@@ -327,10 +368,13 @@ const processMarkdownFile = async (
   fileName: string,
   userId: string,
   toEmail: string | null,
+  overrides?: BookDetailsOverrides,
 ) => {
   const rawContent = fileBuffer.toString("utf-8");
-  const { title, author, body } = parseMarkdownMetadata(rawContent, stripFileExtension(fileName));
-  const metadata = { title, author };
+  const parsed = parseMarkdownMetadata(rawContent, stripFileExtension(fileName));
+  const { body } = parsed;
+  const metadata = applyBookDetailsOverrides(parsed, overrides);
+  const { title, author } = metadata;
 
   await updateAndNotifyHistory(historyId, userId, {
     title,
@@ -386,25 +430,40 @@ const runInBackground = (fn: () => Promise<void>, historyId: string, userId: str
   });
 };
 
-export const extractText = async (textContent: string, userId: string, kindleEmailId?: string) => {
+export const extractText = async (
+  textContent: string,
+  userId: string,
+  kindleEmailId?: string,
+  overrides?: BookDetailsOverrides,
+) => {
   log.debug({ contentLength: textContent.length }, "Received text content");
   const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
   const historyId = await createSendHistoryEntry(userId, { type: "text", content: textContent, kindleEmailId });
 
-  runInBackground(() => processText(historyId, textContent, userId, toEmail), historyId, userId);
+  runInBackground(() => processText(historyId, textContent, userId, toEmail, overrides), historyId, userId);
   return { historyId };
 };
 
-export const extractUrl = async (url: string, userId: string, kindleEmailId?: string) => {
+export const extractUrl = async (
+  url: string,
+  userId: string,
+  kindleEmailId?: string,
+  overrides?: BookDetailsOverrides,
+) => {
   log.debug({ url }, "Received URL");
   const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
   const historyId = await createSendHistoryEntry(userId, { type: "url", content: url, kindleEmailId });
 
-  runInBackground(() => processUrl(historyId, url, userId, toEmail), historyId, userId);
+  runInBackground(() => processUrl(historyId, url, userId, toEmail, overrides), historyId, userId);
   return { historyId };
 };
 
-export const extractYoutube = async (url: string, userId: string, kindleEmailId?: string) => {
+export const extractYoutube = async (
+  url: string,
+  userId: string,
+  kindleEmailId?: string,
+  overrides?: BookDetailsOverrides,
+) => {
   const youtubeUrlRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|live\/)|youtu\.be\/)/;
 
   if (!youtubeUrlRegex.test(url)) {
@@ -415,7 +474,7 @@ export const extractYoutube = async (url: string, userId: string, kindleEmailId?
   const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
   const historyId = await createSendHistoryEntry(userId, { type: "youtube", content: url, kindleEmailId });
 
-  runInBackground(() => processYoutube(historyId, url, userId, toEmail), historyId, userId);
+  runInBackground(() => processYoutube(historyId, url, userId, toEmail, overrides), historyId, userId);
   return { historyId };
 };
 
@@ -452,7 +511,12 @@ export const sendTestEpub = async (userId: string, kindleEmailId?: string) => {
   return { historyId };
 };
 
-export const extractFile = async (file: File, userId: string, kindleEmailId?: string) => {
+export const extractFile = async (
+  file: File,
+  userId: string,
+  kindleEmailId?: string,
+  overrides?: BookDetailsOverrides,
+) => {
   validateDirectFile(file);
   log.debug({ filename: file.name, size: file.size }, "Received file for direct send");
 
@@ -467,14 +531,14 @@ export const extractFile = async (file: File, userId: string, kindleEmailId?: st
   if (isMarkdown) {
     const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
     runInBackground(
-      () => processMarkdownFile(historyId, fileBuffer, file.name, userId, toEmail),
+      () => processMarkdownFile(historyId, fileBuffer, file.name, userId, toEmail, overrides),
       historyId,
       userId,
     );
   } else {
     const toEmail = await getKindleEmail(userId, kindleEmailId);
     runInBackground(
-      () => processFile(historyId, fileBuffer, file.name, userId, toEmail),
+      () => processFile(historyId, fileBuffer, file.name, userId, toEmail, overrides),
       historyId,
       userId,
     );

@@ -3,7 +3,7 @@ import { Info, Link } from "lucide-react";
 
 import { Input } from "~/shared/ui";
 
-import { SendContent } from "~/features/sendContent";
+import { SendContent, BookDetailsFields } from "~/features/sendContent";
 import { ChooseDevice } from "~/features/chooseDevice";
 import { useSubscriptionStatus } from "~/entities/billing";
 
@@ -15,6 +15,8 @@ export const YoutubeSender: FC = () => {
   const { data: status } = useSubscriptionStatus();
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
   const submitRef = useRef<(() => void) | null>(null);
 
@@ -30,6 +32,8 @@ export const YoutubeSender: FC = () => {
   const handleSuccess = () => {
     setYoutubeUrl("");
     setYoutubeError(null);
+    setBookTitle("");
+    setBookAuthor("");
   };
 
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
@@ -67,10 +71,18 @@ export const YoutubeSender: FC = () => {
           </p>
         )}
 
+        <BookDetailsFields
+          visible={!youtubeError && youtubeUrl.trim().length > 0}
+          title={bookTitle}
+          author={bookAuthor}
+          onTitleChange={setBookTitle}
+          onAuthorChange={setBookAuthor}
+        />
+
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="youtube" content={youtubeError ? "" : youtubeUrl} kindleEmailId={kindleId} onSuccess={handleSuccess} submitRef={submitRef} />
+      <SendContent type="youtube" content={youtubeError ? "" : youtubeUrl} kindleEmailId={kindleId} title={bookTitle} author={bookAuthor} onSuccess={handleSuccess} submitRef={submitRef} />
     </div>
   );
 };

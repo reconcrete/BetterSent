@@ -3,15 +3,21 @@ import { Info, Link } from "lucide-react";
 
 import { Input } from "~/shared/ui";
 
-import { SendContent } from "~/features/sendContent";
+import { SendContent, BookDetailsFields } from "~/features/sendContent";
 import { ChooseDevice } from "~/features/chooseDevice";
 
 export const UrlSender: FC = () => {
   const [url, setUrl] = useState("");
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
   const submitRef = useRef<(() => void) | null>(null);
 
-  const handleSuccess = () => setUrl("");
+  const handleSuccess = () => {
+    setUrl("");
+    setBookTitle("");
+    setBookAuthor("");
+  };
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
 
   return (
@@ -33,10 +39,18 @@ export const UrlSender: FC = () => {
           icon={<Link />}
         />
 
+        <BookDetailsFields
+          visible={url.trim().length > 0}
+          title={bookTitle}
+          author={bookAuthor}
+          onTitleChange={setBookTitle}
+          onAuthorChange={setBookAuthor}
+        />
+
         <ChooseDevice value={kindleId} onChange={handleKindleChange} />
       </div>
 
-      <SendContent type="url" content={url} kindleEmailId={kindleId} onSuccess={handleSuccess} submitRef={submitRef} />
+      <SendContent type="url" content={url} kindleEmailId={kindleId} title={bookTitle} author={bookAuthor} onSuccess={handleSuccess} submitRef={submitRef} />
     </div>
   );
 };

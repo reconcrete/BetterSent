@@ -12,6 +12,9 @@ type SendContentProps = {
   type: "url" | "text" | "file" | "youtube";
   content: string | File | File[] | null;
   kindleEmailId?: string;
+  title?: string;
+  author?: string;
+  getFileDetails?: (file: File) => { title?: string; author?: string };
   onSuccess?: () => void;
   submitRef?: RefObject<(() => void) | null>;
 };
@@ -20,9 +23,11 @@ type MutationVars = {
   type: "url" | "text" | "file" | "youtube";
   content: string | File | null;
   kindleEmailId?: string;
+  title?: string;
+  author?: string;
 };
 
-export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess, submitRef }) => {
+export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, title, author, getFileDetails, onSuccess, submitRef }) => {
   const analytics = useAnalytics();
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<string[]>([]);
@@ -40,18 +45,23 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         }
       }
 
+      const bookDetails = {
+        title: vars.title?.trim() || undefined,
+        author: vars.author?.trim() || undefined,
+      };
+
       let response;
       if (vars.type === "file") {
         if (!(vars.content instanceof File)) {
           throw new Error("No file selected.");
         }
-        response = await api.extract.file.post({ file: vars.content, kindleEmailId: vars.kindleEmailId });
+        response = await api.extract.file.post({ file: vars.content, kindleEmailId: vars.kindleEmailId, ...bookDetails });
       } else if (vars.type === "youtube") {
-        response = await api.extract.youtube.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
+        response = await api.extract.youtube.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId, ...bookDetails });
       } else if (vars.type === "url") {
-        response = await api.extract.url.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
+        response = await api.extract.url.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId, ...bookDetails });
       } else {
-        response = await api.extract.text.post({ textContent: vars.content as string, kindleEmailId: vars.kindleEmailId });
+        response = await api.extract.text.post({ textContent: vars.content as string, kindleEmailId: vars.kindleEmailId, ...bookDetails });
       }
 
       if (response.error) {
@@ -74,8 +84,8 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         id: tempId,
         type: vars.type,
         content: typeof vars.content === "string" ? vars.content : vars.content?.name ?? "",
-        title: null,
-        author: null,
+        title: vars.title?.trim() || null,
+        author: vars.author?.trim() || null,
         status: "processing",
         errorMessage: null,
         kindleLabel: null,
@@ -132,7 +142,12 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
     setErrors([]);
     const items = Array.isArray(content) ? content : [content];
     for (const item of items) {
-      mutate({ type, content: item, kindleEmailId });
+      // Files carry their own per-file details; other senders use the shared title/author
+      const details =
+        item instanceof File
+          ? (getFileDetails?.(item) ?? {})
+          : { title, author };
+      mutate({ type, content: item, kindleEmailId, ...details });
     }
   };
 
