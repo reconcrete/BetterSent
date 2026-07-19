@@ -21,6 +21,6 @@
   "devDependencies": {
     "bun-types": "latest",
     "drizzle-kit": "^0.31.8",
-    "typescript": "latest"
+    "typescript": "~5.9.3"
   }
 }

@@ -1,0 +1,6 @@
+.output
+.wxt
+stats.html
+stats-*.json
+keys/*.pem
+keys/pub.der

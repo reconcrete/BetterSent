@@ -9,9 +9,15 @@ import Elysia from "elysia";
 import { createEmailService } from "../services/email";
 import { isProduction } from "../shared/env";
 
-const trustedOrigins = process.env.TRUSTED_ORIGINS
-  ? process.env.TRUSTED_ORIGINS.split(",")
-  : ["http://localhost:5173"];
+// Pinned via the manifest "key" in apps/extension/wxt.config.ts
+const EXTENSION_ORIGIN = "chrome-extension://fbimedfnalioofncdcpcojjfkdfknlol";
+
+const trustedOrigins = [
+  ...(process.env.TRUSTED_ORIGINS
+    ? process.env.TRUSTED_ORIGINS.split(",")
+    : ["http://localhost:5173"]),
+  EXTENSION_ORIGIN,
+];
 
 export const auth = betterAuth({
   basePath: "/api/auth",

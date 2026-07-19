@@ -1,0 +1,33 @@
+{
+  "name": "@bettersent/extension",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "lint": "wxt prepare && tsc --noEmit",
+    "test": "echo 'No tests for extension'",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "@elysiajs/eden": "^1.4.6",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "cnfast": "^0.0.8",
+    "lucide-react": "^0.562.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@wxt-dev/module-react": "^1.2.2",
+    "typescript": "~5.9.3",
+    "wxt": "^0.20.27"
+  }
+}
