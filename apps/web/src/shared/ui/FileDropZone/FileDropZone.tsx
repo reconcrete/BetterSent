@@ -22,8 +22,8 @@ function FileDropZone({
   onDrop,
   children,
   className,
-  description = "Drop a file here or",
-  formats = "PDF, EPUB, DOC, DOCX, TXT, RTF, HTML\nand image files up to 200 MB",
+  description = "Drop files here or",
+  formats = "PDF, EPUB, DOC, DOCX, TXT, RTF, HTML\nand image files up to 200 MB each",
 }: FileDropZoneProps) {
   return (
     <label
