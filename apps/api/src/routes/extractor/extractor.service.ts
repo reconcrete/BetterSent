@@ -299,38 +299,6 @@ const processYoutube = async (historyId: string, url: string, userId: string, to
   await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
 };
 
-const processTopic = async (historyId: string, topic: string, userId: string, toEmail: string | null) => {
-  log.debug("LLM topic generation starting");
-  const extractorService = createExtractorService();
-  const { markdown, metadata } = await extractorService.generateTopicContent(topic);
-
-  await updateAndNotifyHistory(historyId, userId, {
-    title: metadata.title,
-    author: metadata.author,
-    ...(toEmail && { kindleEmail: toEmail }),
-  });
-
-  const storageService = createStorageService();
-  const { filename, path, markdownPath } = await storageService.saveEpub(markdown, "topic", metadata);
-  log.debug({ filename }, "EPUB saved");
-
-  await updateAndNotifyHistory(historyId, userId, { markdownPath, epubPath: path });
-
-  if (isProduction && toEmail) {
-    const emailService = createEmailService();
-    const attachmentContent = (await storageService.getFile(path)).toString("base64");
-    const emailFilename = getSentFilename(`${metadata.title}.epub`);
-    await emailService.sendEmail(toEmail, metadata.title, "", [
-      { filename: emailFilename, content: attachmentContent },
-    ]);
-    log.info({ to: toEmail, subject: metadata.title, filename: emailFilename }, "Email sent successfully");
-  } else {
-    log.info({ filename }, "Dev mode: skipping email, epub stored locally");
-  }
-
-  await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
-};
-
 const processFile = async (
   historyId: string,
   fileBuffer: Buffer,
@@ -448,15 +416,6 @@ export const extractYoutube = async (url: string, userId: string, kindleEmailId?
   const historyId = await createSendHistoryEntry(userId, { type: "youtube", content: url, kindleEmailId });
 
   runInBackground(() => processYoutube(historyId, url, userId, toEmail), historyId, userId);
-  return { historyId };
-};
-
-export const extractTopic = async (topic: string, userId: string, kindleEmailId?: string) => {
-  log.debug({ topicLength: topic.length }, "Received topic for generation");
-  const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
-  const historyId = await createSendHistoryEntry(userId, { type: "topic", content: topic, kindleEmailId });
-
-  runInBackground(() => processTopic(historyId, topic, userId, toEmail), historyId, userId);
   return { historyId };
 };
 

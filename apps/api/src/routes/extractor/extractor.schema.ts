@@ -16,11 +16,6 @@ export const extractYoutubeInputSchema = t.Object({
   kindleEmailId: t.Optional(t.String({ maxLength: 256 })),
 });
 
-export const extractTopicInputSchema = t.Object({
-  topic: t.String({ minLength: 1, maxLength: 10_000 }),
-  kindleEmailId: t.Optional(t.String({ maxLength: 256 })),
-});
-
 export const extractFileInputSchema = t.Object({
   file: t.File(),
   kindleEmailId: t.Optional(t.String()),

@@ -1,4 +1,4 @@
-import { Link, LetterText, File as FileIcon, Youtube, BookOpen, Plus } from "lucide-react";
+import { Link, LetterText, File as FileIcon, Youtube, Plus } from "lucide-react";
 
 import {
   Tabs,
@@ -17,7 +17,6 @@ import { ProBadge } from "~/shared/ui";
 import { UrlSender } from "~/widgets/urlSender";
 import { TextSender } from "~/widgets/textSender";
 import { YoutubeSender } from "~/widgets/youtubeSender";
-import { TopicSender } from "~/widgets/topicSender";
 import { FileSender } from "~/widgets/fileSender";
 import { RecentSends } from "~/widgets/recentSends";
 
@@ -27,7 +26,7 @@ export const Root = () => {
   const [activeTab, setActiveTab] = usePersistedTab();
   const { isPro, isLoaded } = useSubscriptionStatus();
 
-  const isOverflowActive = activeTab === "youtube" || activeTab === "topic";
+  const isOverflowActive = activeTab === "youtube";
 
   return (
     <div className="pt-6 md:pt-10 mx-auto w-full max-w-[600px] flex flex-col gap-6 md:gap-10">
@@ -50,11 +49,6 @@ export const Root = () => {
             YouTube
             {isLoaded && !isPro && <ProBadge />}
           </TabsTrigger>
-          <TabsTrigger value="topic" className="hidden md:inline-flex data-[state=active]:[&_svg]:text-[#22C55E]">
-            <BookOpen className="size-3.5" />
-            Topic
-            {isLoaded && !isPro && <ProBadge />}
-          </TabsTrigger>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -74,11 +68,6 @@ export const Root = () => {
                 YouTube
                 {isLoaded && !isPro && <ProBadge />}
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setActiveTab("topic")}>
-                <BookOpen className="size-3.5 text-[#22C55E]" />
-                Topic
-                {isLoaded && !isPro && <ProBadge />}
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </TabsList>
@@ -94,9 +83,6 @@ export const Root = () => {
         </TabsContent>
         <TabsContent value="youtube" className="rounded-tl-[16px] md:rounded-t-[16px]">
           <YoutubeSender />
-        </TabsContent>
-        <TabsContent value="topic" className="rounded-tl-[16px]">
-          <TopicSender />
         </TabsContent>
       </Tabs>
 

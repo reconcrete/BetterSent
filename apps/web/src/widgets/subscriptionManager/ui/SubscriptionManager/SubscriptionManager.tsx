@@ -109,13 +109,6 @@ export const SubscriptionManager: FC = () => {
               limit={status.usage.extractionLimit}
               label="Extractions"
             />
-            {isPro && (
-              <UsageBar
-                used={status.usage.topicCount}
-                limit={status.usage.topicLimit}
-                label="Topic generations"
-              />
-            )}
           </div>
         </div>
       )}
@@ -152,10 +145,6 @@ export const SubscriptionManager: FC = () => {
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Check className="size-3.5 text-secondary dark:text-primary shrink-0" />
                 YouTube video extraction
-              </li>
-              <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Check className="size-3.5 text-secondary dark:text-primary shrink-0" />
-                AI topic generation (50/month)
               </li>
             </ul>
             <Button

@@ -9,7 +9,7 @@ import { BILLING_STATUS_KEY } from "~/entities/billing";
 import type { HistoryItem } from "~/entities/sendHistory";
 
 type SendContentProps = {
-  type: "url" | "text" | "file" | "youtube" | "topic";
+  type: "url" | "text" | "file" | "youtube";
   content: string | File | null;
   kindleEmailId?: string;
   onSuccess?: () => void;
@@ -17,7 +17,7 @@ type SendContentProps = {
 };
 
 type MutationVars = {
-  type: "url" | "text" | "file" | "youtube" | "topic";
+  type: "url" | "text" | "file" | "youtube";
   content: string | File | null;
   kindleEmailId?: string;
 };
@@ -49,8 +49,6 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         response = await api.extract.file.post({ file: vars.content, kindleEmailId: vars.kindleEmailId });
       } else if (vars.type === "youtube") {
         response = await api.extract.youtube.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
-      } else if (vars.type === "topic") {
-        response = await api.extract.topic.post({ topic: vars.content as string, kindleEmailId: vars.kindleEmailId });
       } else if (vars.type === "url") {
         response = await api.extract.url.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
       } else {
