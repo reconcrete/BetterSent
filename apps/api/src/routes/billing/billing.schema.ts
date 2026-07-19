@@ -20,8 +20,6 @@ export const billingStatusOutputSchema = baseResponseSchema(
     usage: t.Object({
       extractionCount: t.Number(),
       extractionLimit: t.Number(),
-      topicCount: t.Number(),
-      topicLimit: t.Number(),
     }),
     currentPeriodEnd: t.Nullable(t.String()),
     cancelAtPeriodEnd: t.Boolean(),

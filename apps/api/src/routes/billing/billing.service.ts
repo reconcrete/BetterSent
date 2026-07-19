@@ -11,10 +11,9 @@ const FRONTEND_URL = process.env.CORS_ORIGIN || "http://localhost:5173";
 
 const FREE_EXTRACTION_LIMIT = 5;
 const PRO_EXTRACTION_LIMIT = 500;
-const PRO_TOPIC_LIMIT = 50;
 
 type Plan = "free" | "pro";
-type ExtractionType = "url" | "text" | "file" | "youtube" | "topic";
+type ExtractionType = "url" | "text" | "file" | "youtube";
 
 // --- Stripe Customer ---
 
@@ -304,8 +303,6 @@ export const getSubscriptionStatus = async (userId: string) => {
     usage: {
       extractionCount: record.extractionCount,
       extractionLimit: plan === "pro" ? PRO_EXTRACTION_LIMIT : FREE_EXTRACTION_LIMIT,
-      topicCount: record.topicCount,
-      topicLimit: plan === "pro" ? PRO_TOPIC_LIMIT : 0,
     },
     currentPeriodEnd: periodEnd.toISOString(),
     cancelAtPeriodEnd: sub?.cancelAtPeriodEnd ?? false,
@@ -319,10 +316,8 @@ export const checkAndIncrementUsage = async (
   const { plan, sub } = await getUserPlan(userId);
 
   // Feature gating
-  if (plan === "free" && (extractionType === "youtube" || extractionType === "topic")) {
-    throw new FeatureLockedError(
-      `${extractionType === "youtube" ? "YouTube" : "Topic"} extraction requires a Pro subscription.`
-    );
+  if (plan === "free" && extractionType === "youtube") {
+    throw new FeatureLockedError("YouTube extraction requires a Pro subscription.");
   }
 
   // Determine period
@@ -350,22 +345,11 @@ export const checkAndIncrementUsage = async (
     );
   }
 
-  // Check topic sub-limit
-  if (extractionType === "topic" && record.topicCount >= PRO_TOPIC_LIMIT) {
-    throw new UsageLimitError(
-      `You've reached your monthly limit of ${PRO_TOPIC_LIMIT} topic generations.`,
-      PRO_TOPIC_LIMIT,
-      record.topicCount,
-    );
-  }
-
   // Atomically increment
-  const isTopic = extractionType === "topic";
   await db
     .update(usageRecord)
     .set({
       extractionCount: sql`${usageRecord.extractionCount} + 1`,
-      ...(isTopic && { topicCount: sql`${usageRecord.topicCount} + 1` }),
     })
     .where(eq(usageRecord.id, record.id));
 };

@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { Send, Link, FileText, Type, Sparkles } from "lucide-react";
+import { Send, Link, FileText, Type, Youtube } from "lucide-react";
 import { Button } from "~/shared/ui";
 
 type WelcomeStepProps = {
@@ -23,9 +23,9 @@ const features = [
     description: "Notes, excerpts, and custom content",
   },
   {
-    icon: Sparkles,
-    title: "Generate Books",
-    description: "Create minibooks on topics you are interested in",
+    icon: Youtube,
+    title: "Send YouTube videos",
+    description: "Readable summaries of video content",
   },
 ];
 

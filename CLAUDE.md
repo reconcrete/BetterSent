@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Bettersent is a service for sending content to e-book readers (currently Kindle) from various sources: URLs, plain text, files, YouTube videos, and AI-generated topic articles. It provides web, API, and Telegram bot interfaces.
+Bettersent is a service for sending content to e-book readers (currently Kindle) from various sources: URLs, plain text, files, and YouTube videos. It provides web, API, and Telegram bot interfaces.
 
 ## Monorepo Structure
 
@@ -52,8 +52,7 @@ bun run api:start          # Start API server
 - **Auth middleware**: Custom Elysia macro + internal API key support for Telegram bot
 - **Services use factory pattern**: Extractor (content extraction) and Storage (S3 vs filesystem) have interface/implementation/factory structure
 - **Content pipeline**: URL → scrape → OpenAI extraction → Pandoc conversion (HTML→Markdown/EPUB) → S3 storage → Resend email to Kindle
-- **Topic generation**: User provides a topic → OpenAI (`chatgpt-5.4-latest`) generates a mini book → same EPUB/email pipeline
-- **OpenAI models**: `gpt-5-mini-2025-08-07` for extraction/metadata, `chatgpt-5.4-latest` for topic content generation
+- **OpenAI models**: `gpt-5-mini-2025-08-07` for extraction/metadata
 
 ### Web (`apps/web`)
 - **Architecture**: Feature-Sliced Design (FSD) with strict layer imports:

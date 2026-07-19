@@ -9,15 +9,15 @@ import { BILLING_STATUS_KEY } from "~/entities/billing";
 import type { HistoryItem } from "~/entities/sendHistory";
 
 type SendContentProps = {
-  type: "url" | "text" | "file" | "youtube" | "topic";
-  content: string | File | null;
+  type: "url" | "text" | "file" | "youtube";
+  content: string | File | File[] | null;
   kindleEmailId?: string;
   onSuccess?: () => void;
   submitRef?: RefObject<(() => void) | null>;
 };
 
 type MutationVars = {
-  type: "url" | "text" | "file" | "youtube" | "topic";
+  type: "url" | "text" | "file" | "youtube";
   content: string | File | null;
   kindleEmailId?: string;
 };
@@ -25,12 +25,11 @@ type MutationVars = {
 export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, onSuccess, submitRef }) => {
   const analytics = useAnalytics();
   const queryClient = useQueryClient();
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [pendingCount, setPendingCount] = useState(0);
 
-  const { mutate, isPending } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: async (vars: MutationVars) => {
-      setError(null);
-
       if (vars.type === "url" && typeof vars.content === "string") {
         const normalized = vars.content.trim().toLowerCase();
         if (
@@ -49,8 +48,6 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         response = await api.extract.file.post({ file: vars.content, kindleEmailId: vars.kindleEmailId });
       } else if (vars.type === "youtube") {
         response = await api.extract.youtube.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
-      } else if (vars.type === "topic") {
-        response = await api.extract.topic.post({ topic: vars.content as string, kindleEmailId: vars.kindleEmailId });
       } else if (vars.type === "url") {
         response = await api.extract.url.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId });
       } else {
@@ -69,8 +66,8 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       return response.data;
     },
     onMutate: async (vars: MutationVars) => {
+      setPendingCount((count) => count + 1);
       await queryClient.cancelQueries({ queryKey: ["sendHistory"] });
-      const previous = queryClient.getQueryData<HistoryItem[]>(["sendHistory"]);
 
       const tempId = crypto.randomUUID();
       const optimisticItem: HistoryItem = {
@@ -91,7 +88,7 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) => [optimisticItem, ...old]);
       onSuccess?.();
 
-      return { previous, tempId };
+      return { tempId };
     },
     onSuccess: (data, vars, context) => {
       if (context?.tempId && data) {
@@ -105,22 +102,38 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       analytics.capture("extraction_sent", { type: vars.type });
       queryClient.invalidateQueries({ queryKey: BILLING_STATUS_KEY });
     },
-    onError: (err: Error, _, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(["sendHistory"], context.previous);
+    onError: (err: Error, vars, context) => {
+      if (context?.tempId) {
+        queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) =>
+          old.filter((item) => item.id !== context.tempId)
+        );
       }
-      setError(err.message);
+      setErrors((prev) => [
+        ...prev,
+        vars.content instanceof File ? `${vars.content.name}: ${err.message}` : err.message,
+      ]);
+    },
+    onSettled: () => {
+      setPendingCount((count) => count - 1);
     },
   });
 
+  const isPending = pendingCount > 0;
+
   const canSend =
     type === "file"
-      ? content instanceof File
+      ? Array.isArray(content)
+        ? content.length > 0
+        : content instanceof File
       : typeof content === "string" && content.trim().length > 0;
 
   const handleSend = () => {
     if (!canSend) return;
-    mutate({ type, content, kindleEmailId });
+    setErrors([]);
+    const items = Array.isArray(content) ? content : [content];
+    for (const item of items) {
+      mutate({ type, content: item, kindleEmailId });
+    }
   };
 
   useEffect(() => {
@@ -135,12 +148,16 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         className="w-full rounded-xl py-3 h-auto font-semibold"
       >
         <Send className="size-3.5" />
-        Send to Kindle
+        {Array.isArray(content) && content.length > 1
+          ? `Send ${content.length} files to Kindle`
+          : "Send to Kindle"}
       </Button>
-      {error && (
-        <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-xl">
-          {error}
-        </p>
+      {errors.length > 0 && (
+        <div className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-xl space-y-1">
+          {errors.map((message) => (
+            <p key={message}>{message}</p>
+          ))}
+        </div>
       )}
     </div>
   );
