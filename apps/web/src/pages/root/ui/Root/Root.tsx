@@ -81,7 +81,7 @@ export const Root = () => {
         <TabsContent value="text" className="rounded-t-[16px]">
           <TextSender />
         </TabsContent>
-        <TabsContent value="youtube" className="rounded-tl-[16px] md:rounded-t-[16px]">
+        <TabsContent value="youtube" className="rounded-tl-[16px]">
           <YoutubeSender />
         </TabsContent>
       </Tabs>
