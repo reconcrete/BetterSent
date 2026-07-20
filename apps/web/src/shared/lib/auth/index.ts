@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import { magicLinkClient } from "better-auth/client/plugins";
+import { deviceAuthorizationClient, magicLinkClient } from "better-auth/client/plugins";
 import { isProduction } from "../env";
 
 const getBaseURL = () => {
@@ -24,6 +24,7 @@ const getBaseURL = () => {
 export const authClient = createAuthClient({
   baseURL: getBaseURL(),
   plugins: [
+    deviceAuthorizationClient(),
     ...(!isProduction ? [magicLinkClient()] : []),
   ],
 });

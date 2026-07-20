@@ -6,10 +6,15 @@ import { Separator } from "~/shared/ui";
 import { isProduction } from "~/shared/lib";
 
 
-export const SignInForm: FC = () => {
+type SignInFormProps = {
+  /** Where to land after sign-in (relative path). Defaults to the app root. */
+  callbackURL?: string;
+};
+
+export const SignInForm: FC<SignInFormProps> = ({ callbackURL }) => {
   return (
     <div className="bg-card border border-border rounded-[20px] p-[30px] space-y-5">
-      <GoogleSignIn />
+      <GoogleSignIn callbackURL={callbackURL} />
 
       {!isProduction && (
         <>
@@ -19,7 +24,7 @@ export const SignInForm: FC = () => {
             <Separator className="flex-1" />
           </div>
 
-          <MagicLinkSignIn />
+          <MagicLinkSignIn callbackURL={callbackURL} />
         </>
       )}
     </div>
