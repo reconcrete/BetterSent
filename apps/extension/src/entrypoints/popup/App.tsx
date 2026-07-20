@@ -7,6 +7,7 @@ import { sendUrl } from "@/shared/lib/send";
 import { api } from "@/shared/lib/treaty";
 import { getUnsendableReason } from "@/shared/lib/urls";
 import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
 import {
   Select,
   SelectContent,
@@ -47,6 +48,10 @@ export const App = () => {
   // Applies to this send only — never persisted, never changes the account default.
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | undefined>();
   const [sendState, setSendState] = useState<SendState>({ status: "idle" });
+  // Left blank on purpose — the extractor infers better metadata than the raw
+  // page title, so these only take effect when the user fills them in.
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
 
   useEffect(() => {
     void browser.tabs
@@ -83,7 +88,10 @@ export const App = () => {
   const handleSend = async () => {
     if (!tab?.url) return;
     setSendState({ status: "sending" });
-    const result = await sendUrl(tab.url, selectedDeviceId);
+    const result = await sendUrl(tab.url, selectedDeviceId, {
+      title: bookTitle,
+      author: bookAuthor,
+    });
     if (result.ok) {
       setSendState({ status: "sent" });
     } else if (result.status === 401) {
@@ -164,6 +172,20 @@ export const App = () => {
                   ))}
                 </SelectContent>
               </Select>
+
+              <span className="mt-2 text-xs font-semibold uppercase tracking-[0.5px] text-muted-foreground">
+                Book details
+              </span>
+              <Input
+                placeholder="Book title (Optional)"
+                value={bookTitle}
+                onChange={(e) => setBookTitle(e.target.value)}
+              />
+              <Input
+                placeholder="Author (Optional)"
+                value={bookAuthor}
+                onChange={(e) => setBookAuthor(e.target.value)}
+              />
             </div>
           )}
 

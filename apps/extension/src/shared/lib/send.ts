@@ -45,13 +45,31 @@ const wrap = async (request: () => Promise<TreatyResponse>): Promise<SendResult>
   }
 };
 
-// YouTube URLs auto-route to the dedicated endpoint; /extract/url rejects them.
-export const sendUrl = (url: string, kindleEmailId?: string): Promise<SendResult> =>
-  wrap(() =>
-    isYoutubeUrl(url)
-      ? api.extract.youtube.post({ url, kindleEmailId })
-      : api.extract.url.post({ url, kindleEmailId }),
-  );
+// Optional overrides for the EPUB metadata; omitted fields fall back to what
+// the extractor infers from the content.
+export type BookDetails = { title?: string; author?: string };
 
-export const sendText = (textContent: string, kindleEmailId?: string): Promise<SendResult> =>
-  wrap(() => api.extract.text.post({ textContent, kindleEmailId }));
+// Empty strings would override the inferred metadata with nothing, so drop them.
+const normalize = (details: BookDetails | undefined): BookDetails => ({
+  title: details?.title?.trim() || undefined,
+  author: details?.author?.trim() || undefined,
+});
+
+// YouTube URLs auto-route to the dedicated endpoint; /extract/url rejects them.
+export const sendUrl = (
+  url: string,
+  kindleEmailId?: string,
+  details?: BookDetails,
+): Promise<SendResult> => {
+  const body = { url, kindleEmailId, ...normalize(details) };
+  return wrap(() =>
+    isYoutubeUrl(url) ? api.extract.youtube.post(body) : api.extract.url.post(body),
+  );
+};
+
+export const sendText = (
+  textContent: string,
+  kindleEmailId?: string,
+  details?: BookDetails,
+): Promise<SendResult> =>
+  wrap(() => api.extract.text.post({ textContent, kindleEmailId, ...normalize(details) }));
