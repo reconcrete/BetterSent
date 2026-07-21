@@ -115,7 +115,7 @@ export const FileSender: FC = () => {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-1.5 justify-center">
-        <Info className="size-[15px] shrink-0 text-muted-foreground" />
+        <Info className="size-3.75 shrink-0 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
           Files are automatically formatted for the best Kindle reading experience
         </p>
