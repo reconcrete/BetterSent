@@ -6,7 +6,7 @@ import { Button } from "~/shared/ui";
 import { useAnalytics } from "~/shared/lib";
 import { api } from "~/shared/lib/treaty";
 import { BILLING_STATUS_KEY } from "~/entities/billing";
-import type { HistoryItem } from "~/entities/sendHistory";
+import { reconcileOptimisticSend, type HistoryItem } from "~/entities/sendHistory";
 
 type SendContentProps = {
   type: "url" | "text" | "file" | "youtube";
@@ -104,8 +104,11 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
       if (context?.tempId && data) {
         const historyId = data.data?.historyId;
         if (historyId) {
+          // The websocket may have already pushed the real row before this
+          // response arrived — in that case the optimistic item is dropped
+          // instead of remapped, so the send doesn't show up twice.
           queryClient.setQueryData<HistoryItem[]>(["sendHistory"], (old = []) =>
-            old.map((item) => (item.id === context.tempId ? { ...item, id: historyId } : item))
+            reconcileOptimisticSend(old, context.tempId, historyId)
           );
         }
       }
