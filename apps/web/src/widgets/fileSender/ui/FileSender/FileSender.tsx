@@ -3,9 +3,15 @@ import { Info } from "lucide-react";
 
 import { FileDropZone } from "~/shared/ui";
 
-import { SendContent } from "~/features/sendContent";
+import {
+  SendContent,
+  type FileSendOptions,
+  type PdfConversionMode,
+} from "~/features/sendContent";
 import { ChangePreselectedFile, type PreselectedFileDetails } from "~/features/changePreselectedFile";
 import { ChooseDevice } from "~/features/chooseDevice";
+
+import { PdfConversionDialog } from "../PdfConversionDialog/PdfConversionDialog";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
 const ACCEPTED_FILE_EXTENSIONS = [
@@ -17,6 +23,8 @@ const FILE_INPUT_ACCEPT = ACCEPTED_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(
 
 const fileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
 
+const isPdfFile = (file: File) => file.name.toLowerCase().endsWith(".pdf");
+
 const EMPTY_DETAILS: PreselectedFileDetails = { title: "", author: "" };
 
 export const FileSender: FC = () => {
@@ -25,6 +33,9 @@ export const FileSender: FC = () => {
   const [fileDetails, setFileDetails] = useState<Record<string, PreselectedFileDetails>>({});
   const [isDragging, setIsDragging] = useState(false);
   const [kindleId, setKindleId] = useState<string | undefined>(undefined);
+  const [pdfDialogRequest, setPdfDialogRequest] = useState<{
+    resolve: (mode: PdfConversionMode | null) => void;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const validateFile = (nextFile: File): string | null => {
@@ -82,10 +93,29 @@ export const FileSender: FC = () => {
 
   const handleKindleChange = useCallback((id: string | undefined) => setKindleId(id), []);
 
+  // Sending PDFs first asks how they should arrive on the Kindle; the dialog
+  // resolves the pending send with the chosen mode (null = cancelled).
+  const resolveFileSendOptions = useCallback((): Promise<FileSendOptions | null> => {
+    if (!files.some(isPdfFile)) return Promise.resolve({});
+    return new Promise<PdfConversionMode | null>((resolve) =>
+      setPdfDialogRequest({ resolve })
+    ).then((mode) => (mode === null ? null : { pdfConversion: mode }));
+  }, [files]);
+
+  const handlePdfConversionSelect = (mode: PdfConversionMode) => {
+    pdfDialogRequest?.resolve(mode);
+    setPdfDialogRequest(null);
+  };
+
+  const handlePdfConversionCancel = () => {
+    pdfDialogRequest?.resolve(null);
+    setPdfDialogRequest(null);
+  };
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-1.5 justify-center">
-        <Info className="size-[15px] shrink-0 text-muted-foreground" />
+        <Info className="size-3.75 shrink-0 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
           Files are automatically formatted for the best Kindle reading experience
         </p>
@@ -146,7 +176,15 @@ export const FileSender: FC = () => {
         content={files}
         kindleEmailId={kindleId}
         getFileDetails={(file) => fileDetails[fileKey(file)] ?? EMPTY_DETAILS}
+        resolveFileSendOptions={resolveFileSendOptions}
         onSuccess={handleSuccess}
+      />
+
+      <PdfConversionDialog
+        open={pdfDialogRequest !== null}
+        pdfCount={files.filter(isPdfFile).length}
+        onSelect={handlePdfConversionSelect}
+        onCancel={handlePdfConversionCancel}
       />
     </div>
   );

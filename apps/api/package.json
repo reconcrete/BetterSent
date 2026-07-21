@@ -11,6 +11,7 @@
     "@bettersent/db": "workspace:*",
     "@bogeychan/elysia-logger": "^0.1.10",
     "@elysiajs/cors": "latest",
+    "@llamaindex/liteparse": "^2.8.0",
     "@mendable/firecrawl-js": "^4.17.0",
     "better-auth": "^1.4.10",
     "drizzle-orm": "^0.45.1",

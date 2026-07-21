@@ -118,10 +118,13 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
     async ({ body, set, user }) => {
       try {
         await checkAndIncrementUsage(user.id, "file");
-        const data = await extractFile(body.file, user.id, body.kindleEmailId, {
-          title: body.title,
-          author: body.author,
-        });
+        const data = await extractFile(
+          body.file,
+          user.id,
+          body.kindleEmailId,
+          { title: body.title, author: body.author },
+          body.pdfConversion,
+        );
         return { success: true, data };
       } catch (error) {
         if (error instanceof KindleEmailNotConfiguredError) {
