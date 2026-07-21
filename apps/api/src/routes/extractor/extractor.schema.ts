@@ -24,9 +24,15 @@ export const extractYoutubeInputSchema = t.Object({
   ...bookDetailsFields,
 });
 
+export const pdfConversionModes = ["original", "epub", "both"] as const;
+export type PdfConversionMode = (typeof pdfConversionModes)[number];
+
 export const extractFileInputSchema = t.Object({
   file: t.File(),
   kindleEmailId: t.Optional(t.String()),
+  pdfConversion: t.Optional(
+    t.Union([t.Literal("original"), t.Literal("epub"), t.Literal("both")])
+  ),
   ...bookDetailsFields,
 });
 

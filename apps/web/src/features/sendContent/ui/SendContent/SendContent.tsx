@@ -8,6 +8,14 @@ import { api } from "~/shared/lib/treaty";
 import { BILLING_STATUS_KEY } from "~/entities/billing";
 import { reconcileOptimisticSend, type HistoryItem } from "~/entities/sendHistory";
 
+export type PdfConversionMode = "original" | "epub" | "both";
+
+export type FileSendOptions = {
+  pdfConversion?: PdfConversionMode;
+};
+
+const isPdfFile = (file: File) => file.name.toLowerCase().endsWith(".pdf");
+
 type SendContentProps = {
   type: "url" | "text" | "file" | "youtube";
   content: string | File | File[] | null;
@@ -15,6 +23,11 @@ type SendContentProps = {
   title?: string;
   author?: string;
   getFileDetails?: (file: File) => { title?: string; author?: string };
+  /**
+   * Called right before sending files; lets the parent confirm extra options
+   * (e.g. PDF conversion) via a dialog. Resolving null cancels the send.
+   */
+  resolveFileSendOptions?: () => Promise<FileSendOptions | null>;
   onSuccess?: () => void;
   submitRef?: RefObject<(() => void) | null>;
 };
@@ -25,9 +38,10 @@ type MutationVars = {
   kindleEmailId?: string;
   title?: string;
   author?: string;
+  pdfConversion?: PdfConversionMode;
 };
 
-export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, title, author, getFileDetails, onSuccess, submitRef }) => {
+export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId, title, author, getFileDetails, resolveFileSendOptions, onSuccess, submitRef }) => {
   const analytics = useAnalytics();
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<string[]>([]);
@@ -55,7 +69,12 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         if (!(vars.content instanceof File)) {
           throw new Error("No file selected.");
         }
-        response = await api.extract.file.post({ file: vars.content, kindleEmailId: vars.kindleEmailId, ...bookDetails });
+        response = await api.extract.file.post({
+          file: vars.content,
+          kindleEmailId: vars.kindleEmailId,
+          ...bookDetails,
+          ...(vars.pdfConversion && { pdfConversion: vars.pdfConversion }),
+        });
       } else if (vars.type === "youtube") {
         response = await api.extract.youtube.post({ url: vars.content as string, kindleEmailId: vars.kindleEmailId, ...bookDetails });
       } else if (vars.type === "url") {
@@ -112,7 +131,10 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
           );
         }
       }
-      analytics.capture("extraction_sent", { type: vars.type });
+      analytics.capture("extraction_sent", {
+        type: vars.type,
+        ...(vars.pdfConversion && { pdfConversion: vars.pdfConversion }),
+      });
       queryClient.invalidateQueries({ queryKey: BILLING_STATUS_KEY });
     },
     onError: (err: Error, vars, context) => {
@@ -140,8 +162,14 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         : content instanceof File
       : typeof content === "string" && content.trim().length > 0;
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!canSend) return;
+    let fileSendOptions: FileSendOptions = {};
+    if (resolveFileSendOptions) {
+      const resolved = await resolveFileSendOptions();
+      if (!resolved) return;
+      fileSendOptions = resolved;
+    }
     setErrors([]);
     const items = Array.isArray(content) ? content : [content];
     for (const item of items) {
@@ -150,7 +178,9 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         item instanceof File
           ? (getFileDetails?.(item) ?? {})
           : { title, author };
-      mutate({ type, content: item, kindleEmailId, ...details });
+      const pdfConversion =
+        item instanceof File && isPdfFile(item) ? fileSendOptions.pdfConversion : undefined;
+      mutate({ type, content: item, kindleEmailId, ...details, pdfConversion });
     }
   };
 

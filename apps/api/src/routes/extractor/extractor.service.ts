@@ -8,8 +8,10 @@ import { kindleEmailAddress } from "@bettersent/db/schema";
 import { log } from "../../lib/logger";
 import { createSendHistoryEntry, updateAndNotifyHistory, saveReferences } from "../history/history.service";
 import { createMarkdownParserService } from "../../services/markdown-parser";
+import { createPdfParserService } from "../../services/pdf-parser";
 import { isProduction } from "../../shared/env";
 import { KindleEmailNotConfiguredError } from "./extractor.errors";
+import type { PdfConversionMode } from "./extractor.schema";
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024;
 const MARKDOWN_FILE_EXTENSIONS = new Set(["md", "markdown"]);
@@ -362,6 +364,67 @@ const processFile = async (
   await markCompletedAfterDelivery(historyId, userId, true);
 };
 
+const processPdfAsEpub = async (
+  historyId: string,
+  fileBuffer: Buffer,
+  fileName: string,
+  userId: string,
+  toEmail: string | null,
+  includeOriginalPdf: boolean,
+  overrides?: BookDetailsOverrides,
+) => {
+  const metadata = applyBookDetailsOverrides(
+    { title: stripFileExtension(fileName), author: "Unknown" },
+    overrides,
+  );
+  const { title, author } = metadata;
+
+  await updateAndNotifyHistory(historyId, userId, {
+    title,
+    author,
+    ...(toEmail && { kindleEmail: toEmail }),
+  });
+
+  log.debug({ fileName }, "Parsing PDF to markdown");
+  const pdfParserService = createPdfParserService();
+  const markdown = await pdfParserService.parseToMarkdown(fileBuffer);
+  log.debug({ fileName, markdownLength: markdown.length }, "PDF parsed to markdown");
+
+  const markdownParserService = createMarkdownParserService();
+  const links = markdownParserService.parseLinks(markdown);
+  if (links.length > 0) {
+    try {
+      await saveReferences(historyId, links);
+    } catch (e) {
+      log.warn({ error: e, historyId }, "Failed to save references");
+    }
+  }
+
+  const storageService = createStorageService();
+  const { filename, path, markdownPath } = await storageService.saveEpub(markdown, "file", metadata);
+  log.debug({ filename }, "EPUB saved");
+
+  await updateAndNotifyHistory(historyId, userId, { markdownPath, epubPath: path });
+
+  if (isProduction && toEmail) {
+    const emailService = createEmailService();
+    const epubContent = (await storageService.getFile(path)).toString("base64");
+    const attachments = [{ filename: getSentFilename(`${title}.epub`), content: epubContent }];
+    if (includeOriginalPdf) {
+      attachments.push({ filename: getSentFilename(`${title}.pdf`), content: fileBuffer.toString("base64") });
+    }
+    await emailService.sendEmail(toEmail, title, "", attachments);
+    log.info(
+      { to: toEmail, subject: title, attachmentCount: attachments.length },
+      "Email sent successfully",
+    );
+  } else {
+    log.info({ filename }, "Dev mode: skipping email, epub stored locally");
+  }
+
+  await markCompletedAfterDelivery(historyId, userId, isProduction && !!toEmail);
+};
+
 const processMarkdownFile = async (
   historyId: string,
   fileBuffer: Buffer,
@@ -516,12 +579,15 @@ export const extractFile = async (
   userId: string,
   kindleEmailId?: string,
   overrides?: BookDetailsOverrides,
+  pdfConversion?: PdfConversionMode,
 ) => {
   validateDirectFile(file);
-  log.debug({ filename: file.name, size: file.size }, "Received file for direct send");
+  log.debug({ filename: file.name, size: file.size, pdfConversion }, "Received file for direct send");
 
   const extension = getFileExtension(file.name);
   const isMarkdown = !!extension && MARKDOWN_FILE_EXTENSIONS.has(extension);
+  const convertPdf =
+    extension === "pdf" && (pdfConversion === "epub" || pdfConversion === "both");
 
   const historyId = await createSendHistoryEntry(userId, { type: "file", content: file.name, kindleEmailId });
 
@@ -532,6 +598,22 @@ export const extractFile = async (
     const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
     runInBackground(
       () => processMarkdownFile(historyId, fileBuffer, file.name, userId, toEmail, overrides),
+      historyId,
+      userId,
+    );
+  } else if (convertPdf) {
+    const toEmail = isProduction ? await getKindleEmail(userId, kindleEmailId) : null;
+    runInBackground(
+      () =>
+        processPdfAsEpub(
+          historyId,
+          fileBuffer,
+          file.name,
+          userId,
+          toEmail,
+          pdfConversion === "both",
+          overrides,
+        ),
       historyId,
       userId,
     );
