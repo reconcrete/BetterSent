@@ -12,6 +12,7 @@ Bettersent is a service for sending content to e-book readers (currently Kindle)
 - **apps/web** — React + Vite frontend (TanStack Query, shadcn/ui, Tailwind CSS 4)
 - **apps/telegram** — Grammy Telegram bot
 - **apps/extension** — Chrome MV3 extension (WXT + React), sends current page/link/selection to Kindle
+- **apps/cli** — `bettersent` terminal CLI (device-code login, sends URL/file/YouTube, device setup)
 - **apps/storage-browser** — S3 bucket browser utility
 - **packages/db** — Shared database layer (Drizzle ORM + PostgreSQL)
 

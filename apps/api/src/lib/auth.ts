@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink } from "better-auth/plugins";
+import { bearer, deviceAuthorization, magicLink } from "better-auth/plugins";
 
 import { db } from "../db";
 import { user as userTable } from "@bettersent/db/schema";
@@ -19,6 +19,11 @@ const trustedOrigins = [
   EXTENSION_ORIGIN,
 ];
 
+// Web app origin — hosts the /device approval page for the CLI login flow
+const WEB_APP_URL = process.env.WEB_APP_URL || trustedOrigins[0];
+
+export const CLI_CLIENT_ID = "bettersent-cli";
+
 export const auth = betterAuth({
   basePath: "/api/auth",
   trustedOrigins,
@@ -32,6 +37,15 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    // CLI login: OAuth 2.0 Device Authorization Grant (bettersent login)
+    deviceAuthorization({
+      expiresIn: "10m",
+      interval: "5s",
+      verificationUri: `${WEB_APP_URL}/device`,
+      validateClient: (clientId) => clientId === CLI_CLIENT_ID,
+    }),
+    // Lets the CLI call the API with Authorization: Bearer <session token>
+    bearer(),
     ...(!isProduction
       ? [
           magicLink({

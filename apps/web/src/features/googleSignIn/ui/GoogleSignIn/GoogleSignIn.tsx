@@ -6,9 +6,11 @@ import { Button } from "~/shared/ui";
 
 type GoogleSignInProps = {
   className?: string;
+  /** Where to land after sign-in (relative path). Defaults to the app root. */
+  callbackURL?: string;
 };
 
-export const GoogleSignIn: FC<GoogleSignInProps> = ({ className }) => {
+export const GoogleSignIn: FC<GoogleSignInProps> = ({ className, callbackURL }) => {
   const analytics = useAnalytics();
 
   return (
@@ -16,10 +18,17 @@ export const GoogleSignIn: FC<GoogleSignInProps> = ({ className }) => {
       variant="outline"
       onClick={() => {
         analytics.capture("sign_in_google");
+        const absoluteCallbackURL = callbackURL
+          ? new URL(callbackURL, window.location.origin).toString()
+          : window.location.origin;
         signIn.social({
           provider: "google",
-          callbackURL: window.location.origin,
-          newUserCallbackURL: `${window.location.origin}/onboarding`,
+          callbackURL: absoluteCallbackURL,
+          // When an explicit callback is set (e.g. CLI device approval), completing
+          // that flow takes priority over onboarding for brand-new users.
+          newUserCallbackURL: callbackURL
+            ? absoluteCallbackURL
+            : `${window.location.origin}/onboarding`,
         });
       }}
       className={cn("w-full h-[46px] rounded-xl", className)}

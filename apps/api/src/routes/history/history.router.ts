@@ -1,7 +1,7 @@
 import Elysia, { t } from "elysia";
 
-import { historyArrayOutputSchema, previewOutputSchema } from "./history.schema";
-import { getSendHistory, getHistoryEntry, inlinePreviewImages } from "./history.service";
+import { historyArrayOutputSchema, historyItemOutputSchema, previewOutputSchema } from "./history.schema";
+import { getSendHistory, getHistoryEntry, getHistoryEntryWithLabel, inlinePreviewImages } from "./history.service";
 import { authMiddleware } from "../../lib/auth";
 import { createStorageService } from "../../services/storage";
 import { log } from "../../lib/logger";
@@ -25,6 +25,34 @@ export const historyRouter = new Elysia({ prefix: "/history" })
       }
     },
     { auth: true, response: historyArrayOutputSchema }
+  )
+  // Get a single history entry (used by the CLI to follow a send to completion)
+  .get(
+    "/:id",
+    async ({ user, params, set }) => {
+      try {
+        const entry = await getHistoryEntryWithLabel(params.id, user.id);
+
+        if (!entry) {
+          set.status = 404;
+          return { success: false, error: "History entry not found" };
+        }
+
+        return { success: true, data: entry };
+      } catch (error) {
+        log.error({ error, historyId: params.id }, "Get history entry error");
+        set.status = 500;
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error occurred",
+        };
+      }
+    },
+    {
+      auth: true,
+      params: t.Object({ id: t.String() }),
+      response: historyItemOutputSchema,
+    }
   )
   // Get markdown preview for a history entry
   .get(
