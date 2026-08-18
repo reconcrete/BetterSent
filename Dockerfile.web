@@ -34,12 +34,18 @@ COPY packages/db/package.json ./packages/db/
 # irrelevant to a static web build and pull in toolchains this image lacks.
 RUN bun install --ignore-scripts
 
+# apps/api's source is needed only so the `~/api/*` tsconfig path resolves
+# during typechecking; its dependencies are already installed by the workspace
+# install above. Nothing from it reaches the bundle — the one cross-app import
+# is `import type`, erased before bundling.
+COPY packages/db ./packages/db
+COPY apps/api ./apps/api
 COPY apps/web ./apps/web
 
-# `vite build` only. The package script is `tsc -b && vite build`; typechecking
-# is skipped because it would additionally need apps/api's dependency tree. The
-# single cross-app import (`import type { Api }`) is erased before bundling.
-RUN cd apps/web && bunx vite build
+# Typecheck, then build. Skipping `tsc -b` here once let a plain
+# ReferenceError (an identifier used but no longer imported) reach production,
+# because nothing else in the pipeline executes the module.
+RUN cd apps/web && bunx tsc -b && bunx vite build
 
 FROM caddy:2-alpine
 COPY --from=build /app/apps/web/dist /srv
