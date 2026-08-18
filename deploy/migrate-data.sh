@@ -25,7 +25,21 @@ set -euo pipefail
 : "${USER_EMAILS:?set USER_EMAILS to a comma-separated list}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-[ -f "$ROOT/.env" ] && set -a && . "$ROOT/.env" && set +a
+
+# Read .env by parsing rather than sourcing: values legitimately contain
+# characters bash would treat as syntax (RESEND_FROM_EMAIL holds angle
+# brackets, for one), and sourcing them fails or, worse, executes them.
+env_get() {
+  [ -f "$ROOT/.env" ] || return 0
+  sed -n "s/^$1=//p" "$ROOT/.env" | tail -1 \
+    | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'\$/\1/"
+}
+POSTGRES_USER="${POSTGRES_USER:-$(env_get POSTGRES_USER)}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-$(env_get POSTGRES_PASSWORD)}"
+POSTGRES_DB="${POSTGRES_DB:-$(env_get POSTGRES_DB)}"
+S3_BUCKET="${S3_BUCKET:-$(env_get S3_BUCKET)}"
+S3_ACCESS_KEY="${S3_ACCESS_KEY:-$(env_get S3_ACCESS_KEY)}"
+S3_SECRET_KEY="${S3_SECRET_KEY:-$(env_get S3_SECRET_KEY)}"
 DST_DATABASE_URL="${DST_DATABASE_URL:-postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@host.docker.internal:8094/${POSTGRES_DB:-bettersent}}"
 
 WORK="$(mktemp -d)"

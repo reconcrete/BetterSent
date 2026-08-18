@@ -19,9 +19,25 @@ set -euo pipefail
 : "${SRC_S3_ENDPOINT:?}" "${SRC_S3_BUCKET:?}" "${SRC_S3_ACCESS_KEY:?}" "${SRC_S3_SECRET_KEY:?}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-[ -f "$ROOT/.env" ] && set -a && . "$ROOT/.env" && set +a
+
+# Read .env by parsing rather than sourcing: values legitimately contain
+# characters bash would treat as syntax (RESEND_FROM_EMAIL holds angle
+# brackets, for one), and sourcing them fails or, worse, executes them.
+env_get() {
+  [ -f "$ROOT/.env" ] || return 0
+  sed -n "s/^$1=//p" "$ROOT/.env" | tail -1 \
+    | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'\$/\1/"
+}
+POSTGRES_USER="${POSTGRES_USER:-$(env_get POSTGRES_USER)}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-$(env_get POSTGRES_PASSWORD)}"
+POSTGRES_DB="${POSTGRES_DB:-$(env_get POSTGRES_DB)}"
+S3_BUCKET="${S3_BUCKET:-$(env_get S3_BUCKET)}"
+S3_ACCESS_KEY="${S3_ACCESS_KEY:-$(env_get S3_ACCESS_KEY)}"
+S3_SECRET_KEY="${S3_SECRET_KEY:-$(env_get S3_SECRET_KEY)}"
 DST_DATABASE_URL="${DST_DATABASE_URL:-postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@host.docker.internal:8094/${POSTGRES_DB:-bettersent}}"
 DST_BUCKET="${S3_BUCKET:-bettersent}"
+WORKDIR="$(mktemp -d)"
+trap 'rm -rf "$WORKDIR"' EXIT
 PG_IMAGE="${PG_IMAGE:-postgres:17-alpine}"
 
 # Strip the trailing filename to get the run folder. Done with a regex rather
@@ -46,25 +62,29 @@ fi
 count=$(printf '%s\n' "$folders" | wc -l | tr -d '[:space:]')
 echo "==> $count run folder(s) to copy"
 
-mc_run() {
-  docker run --rm --add-host=host.docker.internal:host-gateway \
-    --entrypoint /bin/sh minio/mc:latest -c "$1"
-}
+# One container for the whole batch: spawning a container per folder would
+# dominate the runtime for what is otherwise a few seconds of copying.
+printf '%s\n' "$folders" > "$WORKDIR/folders.txt"
 
-setup="mc alias set src '$SRC_S3_ENDPOINT' '$SRC_S3_ACCESS_KEY' '$SRC_S3_SECRET_KEY' >/dev/null && \
-mc alias set dst 'http://host.docker.internal:8092' '$S3_ACCESS_KEY' '$S3_SECRET_KEY' >/dev/null"
-
-failed=0
-while IFS= read -r f; do
-  [ -n "$f" ] || continue
-  echo "    $f"
-  if ! mc_run "$setup && mc mirror --overwrite --quiet 'src/$SRC_S3_BUCKET/$f/' 'dst/$DST_BUCKET/$f/'"; then
-    echo "    ^ FAILED" >&2
-    failed=$((failed + 1))
-  fi
-done <<< "$folders"
-
-echo "==> Copied $((count - failed))/$count folder(s)"
-echo "==> Objects now in the local bucket:"
-mc_run "$setup && mc ls --recursive 'dst/$DST_BUCKET/' | wc -l"
-[ "$failed" -eq 0 ] || exit 1
+docker run --rm --add-host=host.docker.internal:host-gateway \
+  -e EP="$SRC_S3_ENDPOINT" -e BKT="$SRC_S3_BUCKET" \
+  -e AK="$SRC_S3_ACCESS_KEY" -e SK="$SRC_S3_SECRET_KEY" \
+  -e DST_BUCKET="$DST_BUCKET" \
+  -e DAK="$S3_ACCESS_KEY" -e DSK="$S3_SECRET_KEY" \
+  -v "$WORKDIR:/work" --entrypoint /bin/sh minio/mc:latest -c '
+    set -e
+    mc alias set src "$EP" "$AK" "$SK" >/dev/null
+    mc alias set dst "http://host.docker.internal:8092" "$DAK" "$DSK" >/dev/null
+    failed=0
+    while IFS= read -r f; do
+      [ -n "$f" ] || continue
+      if ! mc mirror --overwrite --quiet "src/$BKT/$f/" "dst/$DST_BUCKET/$f/" >/dev/null 2>&1; then
+        echo "FAILED: $f" >&2
+        failed=$((failed+1))
+      fi
+    done < /work/folders.txt
+    echo "failed folders: $failed"
+    echo -n "objects now in local bucket: "
+    mc ls --recursive "dst/$DST_BUCKET/" | wc -l
+    [ "$failed" -eq 0 ]
+  '
