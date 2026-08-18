@@ -182,16 +182,21 @@ services:
     depends_on:
       bettersent-api:
         condition: service_healthy
-    # The bot is a long-poller with no HTTP surface, so health is measured by
-    # asking Telegram whether the token still authenticates. Only one replica
-    # may poll at a time.
+    # The bot is a long-poller with no HTTP surface, so health is two checks.
+    #
+    # Token validity alone is not enough: if a second instance is polling the
+    # same token, Telegram returns 409, grammy exits non-zero, and the restart
+    # policy loops it — while getMe keeps answering 200. So the age of PID 1 is
+    # checked first, and a process that keeps dying never gets old enough to
+    # look healthy. Only one instance may poll a token at a time.
     healthcheck:
       test:
-        - CMD
-        - bun
-        - -e
-        - "fetch('https://api.telegram.org/bot' + process.env.BOT_TOKEN + '/getMe').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
-      interval: 60s
+        - CMD-SHELL
+        - >-
+          age=$$(( $$(awk '{print int($$1)}' /proc/uptime) - $$(awk '{print int($$22/100)}' /proc/1/stat) ));
+          [ "$$age" -gt 45 ] || exit 1;
+          bun -e "fetch('https://api.telegram.org/bot' + process.env.BOT_TOKEN + '/getMe').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
