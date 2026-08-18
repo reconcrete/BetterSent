@@ -3,7 +3,7 @@ import type { FC } from "react";
 import { GoogleSignIn } from "~/features/googleSignIn";
 import { MagicLinkSignIn } from "~/features/magicLinkSignIn";
 import { Separator } from "~/shared/ui";
-import { isProduction } from "~/shared/lib";
+import { magicLinkEnabled } from "~/shared/lib";
 
 
 type SignInFormProps = {
@@ -16,7 +16,7 @@ export const SignInForm: FC<SignInFormProps> = ({ callbackURL }) => {
     <div className="bg-card border border-border rounded-[20px] p-[30px] space-y-5">
       <GoogleSignIn callbackURL={callbackURL} />
 
-      {!isProduction && (
+      {magicLinkEnabled && (
         <>
           <div className="flex items-center gap-4">
             <Separator className="flex-1" />

@@ -46,25 +46,56 @@ export const auth = betterAuth({
     }),
     // Lets the CLI call the API with Authorization: Bearer <session token>
     bearer(),
-    ...(!isProduction
+    // Magic-link sign-in: always on outside production, and in production only
+    // when switched on explicitly. Self-hosted, it is the way in when Google
+    // OAuth is not configured for the deployment's domain.
+    ...(!isProduction || process.env.ENABLE_MAGIC_LINK === "1"
       ? [
           magicLink({
+            // better-auth defaults to 5 minutes, which is tight when the link
+            // has to be fetched out of the logs and handed over by a person.
+            expiresIn: Number(process.env.MAGIC_LINK_TTL ?? 3600),
             sendMagicLink: async ({ email, url }) => {
-              const emailService = createEmailService();
-              await emailService.sendEmail(
-                email,
-                "Sign in to Bettersent",
-                `Click here to sign in: ${url}`,
-                []
-              );
+              // A magic-link URL grants a session, so printing one is a
+              // deliberate escape hatch for hosts with no mail delivery
+              // configured. Off unless asked for.
+              const logLink = process.env.MAGIC_LINK_LOG === "1";
+              if (logLink) {
+                console.log(`[magic-link] ${email} -> ${url}`);
+              }
+              try {
+                const emailService = createEmailService();
+                await emailService.sendEmail(
+                  email,
+                  "Sign in to Bettersent",
+                  `Click here to sign in: ${url}`,
+                  []
+                );
+              } catch (error) {
+                // When the link has been logged there is still a usable way in,
+                // so a mail failure should not fail the request.
+                if (!logLink) throw error;
+                console.error("[magic-link] email delivery failed:", error);
+              }
             },
           }),
         ]
       : []),
   ],
   advanced: {
+    // The web app and the API live on sibling hostnames (bettersent.holod.dev
+    // and bettersent-api.holod.dev). Left to itself better-auth scopes the
+    // session cookie to the API's own hostname, which a sibling host never
+    // receives — so the app could never see the session. COOKIE_DOMAIN is the
+    // shared parent to scope it to instead.
+    //
+    // That parent is shared with other services, so the cookie is also given a
+    // distinct name: the default prefix would collide with any other
+    // better-auth app on the same domain.
+    cookiePrefix: "bettersent",
     crossSubDomainCookies: {
       enabled: isProduction,
+      ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {}),
     },
     defaultCookieAttributes: {
       sameSite: isProduction ? "none" : "lax",
