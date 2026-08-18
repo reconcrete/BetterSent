@@ -1,0 +1,44 @@
+# Static build of apps/web, served by Caddy.
+#
+# Build context is the repo root (monorepo). VITE_* values are inlined into the
+# bundle at build time, so changing the API URL needs a rebuild, not a restart.
+#
+# Note: in a production build apps/web discards whatever protocol you pass in
+# VITE_API_URL and forces https:// for any non-localhost host. See
+# apps/web/src/shared/lib/{treaty,auth}/index.ts.
+FROM oven/bun:1 AS build
+WORKDIR /app
+
+ARG VITE_API_URL
+ARG VITE_PUBLIC_POSTHOG_KEY
+ARG VITE_PUBLIC_POSTHOG_HOST
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_PUBLIC_POSTHOG_KEY=$VITE_PUBLIC_POSTHOG_KEY \
+    VITE_PUBLIC_POSTHOG_HOST=$VITE_PUBLIC_POSTHOG_HOST
+
+# Every workspace manifest, so the lockfile resolves against the same workspace
+# set it was generated from.
+COPY package.json bun.lock turbo.json ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/cli/package.json ./apps/cli/
+COPY apps/extension/package.json ./apps/extension/
+COPY apps/landing/package.json ./apps/landing/
+COPY apps/storage-browser/package.json ./apps/storage-browser/
+COPY apps/telegram/package.json ./apps/telegram/
+COPY apps/web/package.json ./apps/web/
+COPY packages/db/package.json ./packages/db/
+
+# --ignore-scripts: the extension's WXT prepare step and native postinstalls are
+# irrelevant to a static web build and pull in toolchains this image lacks.
+RUN bun install --ignore-scripts
+
+COPY apps/web ./apps/web
+
+# `vite build` only. The package script is `tsc -b && vite build`; typechecking
+# is skipped because it would additionally need apps/api's dependency tree. The
+# single cross-app import (`import type { Api }`) is erased before bundling.
+RUN cd apps/web && bunx vite build
+
+FROM caddy:2-alpine
+COPY --from=build /app/apps/web/dist /srv
+COPY deploy/web.Caddyfile /etc/caddy/Caddyfile
