@@ -1,6 +1,6 @@
 import { createAuthClient } from "better-auth/react";
 import { deviceAuthorizationClient, magicLinkClient } from "better-auth/client/plugins";
-import { isProduction } from "../env";
+import { magicLinkEnabled } from "../env";
 
 const getBaseURL = () => {
   const url = import.meta.env.VITE_API_URL;
@@ -25,7 +25,7 @@ export const authClient = createAuthClient({
   baseURL: getBaseURL(),
   plugins: [
     deviceAuthorizationClient(),
-    ...(!isProduction ? [magicLinkClient()] : []),
+    ...(magicLinkEnabled ? [magicLinkClient()] : []),
   ],
 });
 
