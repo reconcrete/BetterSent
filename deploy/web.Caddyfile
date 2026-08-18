@@ -1,0 +1,19 @@
+# Static SPA host. The API lives on its own origin
+# (bettersent-api.holod.dev) because its route prefixes — notably /history —
+# collide with the app's client-side routes, so a single-origin split by path
+# would be ambiguous.
+#
+# TLS is terminated upstream by the host Caddy in ~/Network/reverse-proxy.
+:8080 {
+	encode gzip zstd
+
+	handle /_web_health {
+		respond "OK" 200
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
