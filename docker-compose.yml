@@ -96,6 +96,12 @@ services:
       BETTER_AUTH_URL: ${API_URL}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET must be set}
 
+      # Parent domain shared by the web and API hostnames — see auth.ts.
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
+      # Fallback sign-in when Google OAuth has no redirect URI for this domain.
+      ENABLE_MAGIC_LINK: ${ENABLE_MAGIC_LINK:-0}
+      MAGIC_LINK_LOG: ${MAGIC_LINK_LOG:-0}
+      MAGIC_LINK_TTL: ${MAGIC_LINK_TTL:-3600}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       # Shared secret for the Telegram bot's x-internal-api-key header. If this
@@ -147,6 +153,7 @@ services:
       dockerfile: Dockerfile.web
       args:
         VITE_API_URL: ${API_URL}
+        VITE_ENABLE_MAGIC_LINK: ${ENABLE_MAGIC_LINK:-0}
         VITE_PUBLIC_POSTHOG_KEY: ${VITE_PUBLIC_POSTHOG_KEY:-}
         VITE_PUBLIC_POSTHOG_HOST: ${VITE_PUBLIC_POSTHOG_HOST:-}
     container_name: bettersent-web
