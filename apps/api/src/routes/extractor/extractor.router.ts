@@ -14,6 +14,7 @@ import { log } from "../../lib/logger";
 import { checkAndIncrementUsage } from "../billing/billing.service";
 import { UsageLimitError, FeatureLockedError } from "../billing/billing.errors";
 import { KindleEmailNotConfiguredError } from "./extractor.errors";
+import { dropPlaceholderStrings } from "./multipart";
 
 export const extractorRouter = new Elysia({ prefix: "/extract" })
   .use(authMiddleware)
@@ -115,7 +116,10 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
   )
   .post(
     "/file",
-    async ({ body, set, user }) => {
+    async ({ body: rawBody, set, user }) => {
+      // Multipart bodies serialise unset optional fields as "undefined"; drop them
+      // so the default device and the file's own metadata apply.
+      const body = dropPlaceholderStrings(rawBody);
       try {
         await checkAndIncrementUsage(user.id, "file");
         const data = await extractFile(

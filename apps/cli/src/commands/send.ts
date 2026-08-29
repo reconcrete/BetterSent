@@ -80,7 +80,9 @@ const submit = async (
   }
 
   const file = new File([new Uint8Array(readFileSync(path))], basename(path));
-  return api.extract.file.post({ file, kindleEmailId });
+  // Multipart bodies turn `undefined` into the string "undefined", so only add
+  // the device when one was actually chosen; the API falls back to the default.
+  return api.extract.file.post({ file, ...(kindleEmailId && { kindleEmailId }) });
 };
 
 /** Poll the history entry until the send reaches a terminal state. */

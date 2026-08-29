@@ -69,10 +69,13 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         if (!(vars.content instanceof File)) {
           throw new Error("No file selected.");
         }
+        // Multipart bodies serialise `undefined` as the string "undefined", so
+        // only include the optional fields that actually have a value.
         response = await api.extract.file.post({
           file: vars.content,
-          kindleEmailId: vars.kindleEmailId,
-          ...bookDetails,
+          ...(vars.kindleEmailId && { kindleEmailId: vars.kindleEmailId }),
+          ...(bookDetails.title && { title: bookDetails.title }),
+          ...(bookDetails.author && { author: bookDetails.author }),
           ...(vars.pdfConversion && { pdfConversion: vars.pdfConversion }),
         });
       } else if (vars.type === "youtube") {
