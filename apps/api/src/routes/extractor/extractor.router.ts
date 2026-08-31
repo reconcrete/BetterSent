@@ -14,7 +14,7 @@ import { log } from "../../lib/logger";
 import { checkAndIncrementUsage } from "../billing/billing.service";
 import { UsageLimitError, FeatureLockedError } from "../billing/billing.errors";
 import { KindleEmailNotConfiguredError } from "./extractor.errors";
-import { dropPlaceholderStrings } from "./multipart";
+import { dropPlaceholderStrings } from "../../lib/multipart";
 
 export const extractorRouter = new Elysia({ prefix: "/extract" })
   .use(authMiddleware)
