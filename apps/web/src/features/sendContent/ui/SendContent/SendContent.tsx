@@ -69,10 +69,12 @@ export const SendContent: FC<SendContentProps> = ({ type, content, kindleEmailId
         if (!(vars.content instanceof File)) {
           throw new Error("No file selected.");
         }
+        // FormData would serialise undefined fields as the string "undefined"
         response = await api.extract.file.post({
           file: vars.content,
-          kindleEmailId: vars.kindleEmailId,
-          ...bookDetails,
+          ...(vars.kindleEmailId && { kindleEmailId: vars.kindleEmailId }),
+          ...(bookDetails.title && { title: bookDetails.title }),
+          ...(bookDetails.author && { author: bookDetails.author }),
           ...(vars.pdfConversion && { pdfConversion: vars.pdfConversion }),
         });
       } else if (vars.type === "youtube") {

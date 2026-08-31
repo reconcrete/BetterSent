@@ -80,7 +80,8 @@ const submit = async (
   }
 
   const file = new File([new Uint8Array(readFileSync(path))], basename(path));
-  return api.extract.file.post({ file, kindleEmailId });
+  // FormData would serialise an undefined kindleEmailId as the string "undefined"
+  return api.extract.file.post({ file, ...(kindleEmailId && { kindleEmailId }) });
 };
 
 /** Poll the history entry until the send reaches a terminal state. */
