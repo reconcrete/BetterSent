@@ -117,8 +117,6 @@ export const extractorRouter = new Elysia({ prefix: "/extract" })
   .post(
     "/file",
     async ({ body: rawBody, set, user }) => {
-      // Multipart bodies serialise unset optional fields as "undefined"; drop them
-      // so the default device and the file's own metadata apply.
       const body = dropPlaceholderStrings(rawBody);
       try {
         await checkAndIncrementUsage(user.id, "file");

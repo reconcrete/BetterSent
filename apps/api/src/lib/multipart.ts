@@ -1,12 +1,7 @@
 /**
- * Multipart form bodies cannot carry `undefined`. A client that spreads optional
- * fields into a FormData post (`{ file, kindleEmailId, title, author }` with some
- * of them unset) ends up sending the literal strings "undefined" or "null", and
- * the schema accepts those as ordinary strings. Downstream that surfaces as a
- * foreign-key failure on `kindle_email_id = 'undefined'` and as books arriving
- * on the device titled "undefined" by "undefined".
- *
- * Treat those placeholders (and empty strings) as absent so the defaults apply.
+ * Multipart bodies cannot carry `undefined` — a client that spreads unset optional
+ * fields into a FormData post sends the literal strings "undefined"/"null" instead.
+ * Treat those (and empty strings) as absent so the defaults apply.
  */
 const PLACEHOLDER_STRINGS = new Set(["", "undefined", "null"]);
 

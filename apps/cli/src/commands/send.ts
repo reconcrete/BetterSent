@@ -80,8 +80,7 @@ const submit = async (
   }
 
   const file = new File([new Uint8Array(readFileSync(path))], basename(path));
-  // Multipart bodies turn `undefined` into the string "undefined", so only add
-  // the device when one was actually chosen; the API falls back to the default.
+  // FormData would serialise an undefined kindleEmailId as the string "undefined"
   return api.extract.file.post({ file, ...(kindleEmailId && { kindleEmailId }) });
 };
 
