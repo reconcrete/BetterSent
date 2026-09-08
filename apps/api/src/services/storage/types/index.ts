@@ -1,6 +1,8 @@
 export interface EpubMetadata {
   title?: string;
   author?: string;
+  /** BCP-47 tag. Detected from the content when omitted. */
+  language?: string;
 }
 
 export interface SaveResult {

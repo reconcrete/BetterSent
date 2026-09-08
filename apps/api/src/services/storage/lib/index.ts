@@ -3,7 +3,13 @@ import { join } from "path";
 import { $ } from "bun";
 
 import type { EpubMetadata } from "../types";
-import { INLINE_IMAGE_RE } from "../constants";
+import {
+  DEFAULT_LANGUAGE,
+  EPUB_HYPHENATION_CSS,
+  INLINE_IMAGE_RE,
+  LANGUAGE_DETECTION_THRESHOLD,
+  LANGUAGE_PATTERNS,
+} from "../constants";
 import { DEFAULT_USER_AGENT } from "../../scraper/constants";
 import { isPrivateHost } from "../../scraper/lib";
 
@@ -154,13 +160,38 @@ export async function ensureDir(dirPath: string): Promise<void> {
   await mkdir(dirPath, { recursive: true });
 }
 
-export function buildFrontmatter(metadata?: EpubMetadata): string {
-  const title = metadata?.title || "Untitled";
-  const author = metadata?.author || "Unknown";
+/**
+ * Guesses the document language from its script. Only used to tag the EPUB so
+ * the reader picks the right hyphenation dictionary, so a coarse
+ * script-level guess is enough — we do not try to tell Russian from Ukrainian.
+ */
+export function detectLanguage(content: string): string {
+  const sample = content.slice(0, 20_000);
+  const letters = sample.replace(/[^\p{L}]/gu, "").length;
+  if (letters === 0) return DEFAULT_LANGUAGE;
+
+  for (const { lang, re } of LANGUAGE_PATTERNS) {
+    const matches = sample.match(new RegExp(re.source, "gu"));
+    if (matches && matches.length / letters >= LANGUAGE_DETECTION_THRESHOLD) {
+      return lang;
+    }
+  }
+  return DEFAULT_LANGUAGE;
+}
+
+/** Escapes double quotes so a title can sit inside a quoted YAML scalar. */
+function escapeYaml(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+export function buildFrontmatter(metadata?: EpubMetadata, content = ""): string {
+  const title = escapeYaml(metadata?.title || "Untitled");
+  const author = escapeYaml(metadata?.author || "Unknown");
+  const language = metadata?.language || detectLanguage(content);
   return `---
 title: "${title}"
 author: "${author}"
-language: "en-US"
+language: "${language}"
 ---
 
 `;
@@ -194,7 +225,7 @@ export async function buildMarkdownLocally(
   const markdownFilename = generateMarkdownFilename(source);
   const markdownPath = join(runFolderPath, markdownFilename);
 
-  const header = buildFrontmatter(metadata);
+  const header = buildFrontmatter(metadata, localizedContent);
   await writeFile(markdownPath, header + localizedContent, "utf-8");
 
   return { runFolderName, runFolderPath, markdownFilename, markdownPath };
@@ -204,9 +235,32 @@ export async function buildMarkdownLocally(
  * Runs pandoc on a local markdown file to produce an EPUB.
  * Returns the path to the generated .epub file.
  */
+/**
+ * Writes the stylesheet pandoc should use: its own default plus our
+ * hyphenation rules. `--css` *replaces* the built-in stylesheet rather than
+ * adding to it, so we have to start from the default and append. Returns null
+ * if the default cannot be read, in which case the caller falls back to
+ * pandoc's built-in styling.
+ */
+async function writeEpubStylesheet(runFolderPath: string): Promise<string | null> {
+  try {
+    const base = await $`pandoc --print-default-data-file epub.css`.text();
+    const cssPath = join(runFolderPath, "epub.css");
+    await writeFile(cssPath, base + EPUB_HYPHENATION_CSS, "utf-8");
+    return cssPath;
+  } catch {
+    return null;
+  }
+}
+
 export async function buildEpubLocally(markdownPath: string, runFolderPath: string): Promise<string> {
   const epubPath = markdownPath.replace(".md", ".epub");
+  const cssPath = await writeEpubStylesheet(runFolderPath);
 
-  await $`pandoc ${markdownPath} -o ${epubPath} --from=markdown-implicit_figures --to epub3 --resource-path=${runFolderPath}`;
+  if (cssPath) {
+    await $`pandoc ${markdownPath} -o ${epubPath} --from=markdown-implicit_figures --to epub3 --resource-path=${runFolderPath} --css=${cssPath}`;
+  } else {
+    await $`pandoc ${markdownPath} -o ${epubPath} --from=markdown-implicit_figures --to epub3 --resource-path=${runFolderPath}`;
+  }
   return epubPath;
 }
