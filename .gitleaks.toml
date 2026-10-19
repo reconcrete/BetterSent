@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Chrome extension public key (intentionally public, pins the extension ID)"
+paths = [
+  '''apps/extension/keys/manifest-key\.txt''',
+  '''apps/extension/wxt\.config\.ts''',
+]

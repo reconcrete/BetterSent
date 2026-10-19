@@ -1,0 +1,10 @@
+# Never bake local secrets or runtime state into images
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/dist
+**/.turbo
+apps/telegram/data
+.git
+.claude
