@@ -6,9 +6,28 @@ export function getEnvironment(): Environment {
 
 export const isProduction = getEnvironment() === "production";
 
+export type SignInOption = "google" | "login" | "magiclink";
+const KNOWN: readonly SignInOption[] = ["google", "login", "magiclink"];
+
 /**
- * Magic-link sign-in is available in development, and in production builds only
- * when VITE_ENABLE_MAGIC_LINK is set. It must match ENABLE_MAGIC_LINK on the API.
+ * Sign-in methods offered on the sign-in page, in display order. Read from
+ * VITE_SIGN_IN_OPTIONS ("google|login|magiclink") at build time; must match
+ * SIGN_IN_OPTIONS on the API. Unset: "google" in production, "google|magiclink"
+ * in development.
  */
-export const magicLinkEnabled =
-  !isProduction || import.meta.env.VITE_ENABLE_MAGIC_LINK === "1";
+export const signInOptions: SignInOption[] = (() => {
+  const raw =
+    import.meta.env.VITE_SIGN_IN_OPTIONS?.trim() ||
+    (isProduction ? "google" : "google|magiclink");
+  const parsed = raw
+    .split(/[|,]/)
+    .map((s: string) => s.trim().toLowerCase())
+    .filter((s: string): s is SignInOption => {
+      if (KNOWN.includes(s as SignInOption)) return true;
+      if (s) console.warn(`VITE_SIGN_IN_OPTIONS: ignoring unknown option "${s}"`);
+      return false;
+    });
+  return [...new Set(parsed)];
+})();
+
+export const magicLinkEnabled = signInOptions.includes("magiclink");

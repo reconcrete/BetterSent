@@ -82,7 +82,7 @@ services:
     restart: unless-stopped
     environment:
       # Load-bearing in three places: selects S3 storage, forces
-      # secure/SameSite=None cookies, and disables the dev-only magic-link login.
+      # secure/SameSite=None cookies, and makes SIGN_IN_OPTIONS default to google only.
       NODE_ENV: production
       PORT: 8080
       LOG_LEVEL: ${LOG_LEVEL:-info}
@@ -98,8 +98,11 @@ services:
 
       # Parent domain shared by the web and API hostnames — see auth.ts.
       COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
-      # Fallback sign-in when Google OAuth has no redirect URI for this domain.
-      ENABLE_MAGIC_LINK: ${ENABLE_MAGIC_LINK:-0}
+      # Distinct cookie name — holod.dev is shared with other better-auth apps.
+      COOKIE_PREFIX: ${COOKIE_PREFIX:-bettersent}
+      # Sign-in methods, in display order: google|login|magiclink.
+      # Also passed to the web build below, so the page matches the API.
+      SIGN_IN_OPTIONS: ${SIGN_IN_OPTIONS:-google}
       MAGIC_LINK_LOG: ${MAGIC_LINK_LOG:-0}
       MAGIC_LINK_TTL: ${MAGIC_LINK_TTL:-3600}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
@@ -153,7 +156,7 @@ services:
       dockerfile: Dockerfile.web
       args:
         VITE_API_URL: ${API_URL}
-        VITE_ENABLE_MAGIC_LINK: ${ENABLE_MAGIC_LINK:-0}
+        VITE_SIGN_IN_OPTIONS: ${SIGN_IN_OPTIONS:-google}
         VITE_PUBLIC_POSTHOG_KEY: ${VITE_PUBLIC_POSTHOG_KEY:-}
         VITE_PUBLIC_POSTHOG_HOST: ${VITE_PUBLIC_POSTHOG_HOST:-}
     container_name: bettersent-web

@@ -4,7 +4,7 @@
 #   ./deploy/login-link.sh antonmorozoff64@gmail.com
 #
 # This is the way in when Google OAuth has no redirect URI registered for this
-# deployment's domain. It needs ENABLE_MAGIC_LINK=1 and MAGIC_LINK_LOG=1 (the
+# deployment's domain. It needs magiclink in SIGN_IN_OPTIONS and MAGIC_LINK_LOG=1 (the
 # link is read back out of the API container's logs). The same link is also
 # emailed via Resend, so normally you can just use the form at /sign-in — this
 # script is the fallback for when mail is not arriving.
