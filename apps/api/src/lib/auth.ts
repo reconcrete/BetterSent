@@ -7,7 +7,7 @@ import { user as userTable } from "@bettersent/db/schema";
 import { eq } from "drizzle-orm";
 import Elysia from "elysia";
 import { createEmailService } from "../services/email";
-import { isProduction } from "../shared/env";
+import { isProduction, signInOptions } from "../shared/env";
 
 // Pinned via the manifest "key" in apps/extension/wxt.config.ts
 const EXTENSION_ORIGIN = "chrome-extension://fbimedfnalioofncdcpcojjfkdfknlol";
@@ -30,12 +30,20 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
+  // Which of these are on is SIGN_IN_OPTIONS (see shared/env/signInOptions.ts).
+  emailAndPassword: {
+    enabled: signInOptions.includes("login"),
+    // Never self-service: passwords are set with apps/api/scripts/set-password.ts.
+    disableSignUp: true,
   },
+  socialProviders: signInOptions.includes("google")
+    ? {
+        google: {
+          clientId: process.env.GOOGLE_CLIENT_ID as string,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+        },
+      }
+    : {},
   plugins: [
     // CLI login: OAuth 2.0 Device Authorization Grant (bettersent login)
     deviceAuthorization({
@@ -46,10 +54,7 @@ export const auth = betterAuth({
     }),
     // Lets the CLI call the API with Authorization: Bearer <session token>
     bearer(),
-    // Magic-link sign-in: always on outside production, and in production only
-    // when switched on explicitly. Self-hosted, it is the way in when Google
-    // OAuth is not configured for the deployment's domain.
-    ...(!isProduction || process.env.ENABLE_MAGIC_LINK === "1"
+    ...(signInOptions.includes("magiclink")
       ? [
           magicLink({
             // better-auth defaults to 5 minutes, which is tight when the link
@@ -89,10 +94,10 @@ export const auth = betterAuth({
     // receives — so the app could never see the session. COOKIE_DOMAIN is the
     // shared parent to scope it to instead.
     //
-    // That parent is shared with other services, so the cookie is also given a
-    // distinct name: the default prefix would collide with any other
-    // better-auth app on the same domain.
-    cookiePrefix: "bettersent",
+    // When that parent is shared with other services, set COOKIE_PREFIX too:
+    // the default "better-auth" prefix would collide with any other
+    // better-auth app on the same domain. Changing it signs everyone out once.
+    ...(process.env.COOKIE_PREFIX ? { cookiePrefix: process.env.COOKIE_PREFIX } : {}),
     crossSubDomainCookies: {
       enabled: isProduction,
       ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {}),
